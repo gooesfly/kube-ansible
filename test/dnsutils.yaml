@@ -1,9 +1,13 @@
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: DaemonSet
 metadata:
   name: dnsutils
-  namespace: default
+  labels:
+    app: dnsutils
 spec:
+  selector:
+    matchLabels:
+      app: dnsutils
   template:
     metadata:
       labels:
@@ -15,6 +19,7 @@ spec:
       containers:
         - name: dnsutils
           image: buxiaomo/dnsutils:1.3
+          imagePullPolicy: IfNotPresent
           command:
             - sleep
             - "3600"

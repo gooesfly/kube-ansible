@@ -1,9 +1,17 @@
 apiVersion: v1
+kind: Namespace
+metadata:
+  name: test01
+
+---
+apiVersion: v1
 kind: Service
 metadata:
   name: nginx01
+  namespace: test01
   labels:
     app: nginx01
+
 spec:
   ports:
   - name: http
@@ -13,11 +21,13 @@ spec:
   selector:
     app: nginx01
   type: NodePort
+
 ---
 apiVersion: apps/v1
 kind: DaemonSet
 metadata:
   name: nginx01
+  namespace: test01
   labels:
     app: nginx01
 spec:
@@ -38,11 +48,19 @@ spec:
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 80
+
+--- 
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: test02
+
 ---
 apiVersion: v1
 kind: Service
 metadata:
   name: nginx02
+  namespace: test02
   labels:
     app: nginx02
 spec:
@@ -58,6 +76,7 @@ apiVersion: apps/v1
 kind: DaemonSet
 metadata:
   name: nginx02
+  namespace: test02
   labels:
     app: nginx02
 spec:
