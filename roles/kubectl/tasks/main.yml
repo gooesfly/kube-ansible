@@ -88,6 +88,11 @@
     path: /etc/kubernetes/admin.kubeconfig
     mode: '0644'
 
+- name: Delete user kube directory
+  file: 
+    name: ~/.kube
+    state: absent
+
 - name: Create user kube directory
   file: 
     name: ~/.kube
