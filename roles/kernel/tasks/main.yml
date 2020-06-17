@@ -1,0 +1,11 @@
+---
+# tasks file for kernel
+- name: Distribution package
+  copy: 
+    src: 'kernel-ml-4.14.15-1.el7.elrepo.x86_64.rpm'
+    dest: '/tmp/kernel-ml-4.14.15-1.el7.elrepo.x86_64.rpm'
+
+- name: Install kernel
+  shell: |
+    rpm -ivh /tmp/kernel-ml-4.14.15-1.el7.elrepo.x86_64.rpm
+    grub2-set-default 0 && grub2-mkconfig -o /etc/grub2.cfg
