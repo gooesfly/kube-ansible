@@ -1,9 +1,11 @@
-{%- set tmp_hostname = "" -%}
-{%- if hostname is not defined %}
-    {%- set tmp_hostname = ansible_fqdn -%}
+{%- set hostname_override = ansible_hostname -%}
+
+{%- if nodename is not defined %}
+    {%- set hostname_override = ansible_hostname -%}
 {%- else%}
-    {%- set tmp_hostname = hostname -%}
+    {%- set hostname_override = nodename -%}
 {%- endif %}
+
 [Unit]
 Description=Kubernetes Kube Proxy
 Documentation=https://github.com/kubernetes/kubernetes
@@ -11,7 +13,7 @@ After=network.target
 
 [Service]
 ExecStart=/usr/local/bin/kube-proxy \
-  --hostname-override={{ tmp_hostname | lower }} \
+  --hostname-override={{ hostname_override }} \
   --config=/etc/kubernetes/kube-proxy.conf \
 {% if kubernetes.proxy.log is defined %}
   --logtostderr=true \
