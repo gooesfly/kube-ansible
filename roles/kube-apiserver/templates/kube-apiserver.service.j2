@@ -41,7 +41,7 @@ ExecStart=/usr/local/bin/kube-apiserver \
   --kubelet-https \
   --kubelet-client-certificate={{ kubernetes.ssl.location }}/apiserver-kubelet-client.crt \
   --kubelet-client-key={{ kubernetes.ssl.location }}/apiserver-kubelet-client.key \
-  --kubelet-preferred-address-types=InternalIP,ExternalIP,Hostname \
+  --kubelet-preferred-address-types={{ kubernetes.apiserver.kubelet_preferred_address_types | join(',') }} \
   --runtime-config=api/all=true \
   --service-cluster-ip-range={{ kubernetes.settings.SvcCIDR }} \
   --service-node-port-range={{ kubernetes.settings.NodePortRange }} \

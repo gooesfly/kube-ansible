@@ -173,6 +173,10 @@ kubernetes:
     authorization_modes:
       - Node
       - RBAC
+    kubelet_preferred_address_types:
+      - InternalIP
+      - ExternalIP
+      - Hostname
     log:
       logLevel: 2
       logDir: /var/log/kubernetes
