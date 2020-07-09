@@ -1,29 +1,29 @@
 RUNTIME := "ubuntu:16.04-systemd"
 
 build:
-	@podman build -t centos:7-systemd ./centos-7/.
-	@podman build -t ubuntu:16.04-systemd ./ubuntu-16.04/.
-	@podman build -t ubuntu:18.04-systemd ./ubuntu-18.04/.
-	@podman build -t ansible:systemd ./ansible/.
+	@sudo podman build -t centos:7-systemd ./centos-7/.
+	@sudo podman build -t ubuntu:16.04-systemd ./ubuntu-16.04/.
+	@sudo podman build -t ubuntu:18.04-systemd ./ubuntu-18.04/.
+	@sudo podman build -t ansible:systemd ./ansible/.
 
 run:
 	@[ -d ./ssh ] || mkdir -p ssh
 	@[ -f ./ssh/id_rsa ] || ssh-keygen -t rsa -P "" -f ./ssh/id_rsa
 	@[ -f ./ssh/authorized_keys ] || cp ./ssh/id_rsa.pub ./ssh/authorized_keys
-	@podman network create kube || true
-	@podman run -d --name ansible --network kube --privileged --hostname ansible -v ./ssh:/root/.ssh ansible:systemd
-	@podman run -d --name master01 --network kube --privileged --hostname master01 -v ./ssh:/root/.ssh $(RUNTIME)
-	@podman run -d --name master02 --network kube --privileged --hostname master02 -v ./ssh:/root/.ssh $(RUNTIME)
-	@podman run -d --name master03 --network kube --privileged --hostname master03 -v ./ssh:/root/.ssh $(RUNTIME)
-	@podman run -d --name worker01 --network kube --privileged --hostname worker01 -v ./ssh:/root/.ssh $(RUNTIME)
+	@sudo podman network create kube || true
+	@sudo podman run -d --name ansible --network kube --privileged --hostname ansible -v ./ssh:/root/.ssh ansible:systemd
+	@sudo podman run -d --name master01 --network kube --privileged --hostname master01 -v ./ssh:/root/.ssh $(RUNTIME)
+	@sudo podman run -d --name master02 --network kube --privileged --hostname master02 -v ./ssh:/root/.ssh $(RUNTIME)
+	@sudo podman run -d --name master03 --network kube --privileged --hostname master03 -v ./ssh:/root/.ssh $(RUNTIME)
+	@sudo podman run -d --name worker01 --network kube --privileged --hostname worker01 -v ./ssh:/root/.ssh $(RUNTIME)
 
 clean:
-	@podman rm -f master01 || true
-	@podman rm -f master02 || true
-	@podman rm -f master03 || true
-	@podman rm -f worker01 || true
-	@podman rm -f ansible || true
-	@podman network rm kube || true
+	@sudo podman rm -f master01 || true
+	@sudo podman rm -f master02 || true
+	@sudo podman rm -f master03 || true
+	@sudo podman rm -f worker01 || true
+	@sudo podman rm -f ansible || true
+	@sudo podman network rm kube || true
 
 test:
 	@./host.sh
