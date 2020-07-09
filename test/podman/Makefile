@@ -11,11 +11,11 @@ run:
 	@[ -f ./ssh/id_rsa ] || ssh-keygen -t rsa -P "" -f ./ssh/id_rsa
 	@[ -f ./ssh/authorized_keys ] || cp ./ssh/id_rsa.pub ./ssh/authorized_keys
 	@sudo podman network create kube || true
-	@sudo podman run -d --name ansible --network kube --privileged --hostname ansible -v ./ssh:/root/.ssh ansible:systemd
 	@sudo podman run -d --name master01 --network kube --privileged --hostname master01 -v ./ssh:/root/.ssh $(RUNTIME)
 	@sudo podman run -d --name master02 --network kube --privileged --hostname master02 -v ./ssh:/root/.ssh $(RUNTIME)
 	@sudo podman run -d --name master03 --network kube --privileged --hostname master03 -v ./ssh:/root/.ssh $(RUNTIME)
 	@sudo podman run -d --name worker01 --network kube --privileged --hostname worker01 -v ./ssh:/root/.ssh $(RUNTIME)
+# @sudo podman run -d --name ansible --network kube --privileged --hostname ansible -v ./ssh:/root/.ssh ansible:systemd
 
 clean:
 	@sudo podman rm -f master01 || true

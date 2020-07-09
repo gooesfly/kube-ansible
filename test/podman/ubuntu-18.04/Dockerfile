@@ -11,7 +11,7 @@ RUN apt-get update \
     && systemctl enable ssh
 
 RUN apt-get update \
-    && apt-get install git make conntrack \
+    && DEBIAN_FRONTEND=noninteractive apt-get install git make conntrack \
         net-tools \
         sysstat \
         unzip \
