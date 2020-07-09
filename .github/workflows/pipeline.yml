@@ -56,12 +56,17 @@ jobs:
         sudo apt-get clean
         sudo timedatectl set-timezone Asia/Shanghai
 
-    - name: Build Images
+    - name: Build runtime images
       working-directory: ./test/podman
       run: |
         make build
 
-    - name: Run test pods
+    - name: Create test environment
+      working-directory: ./test/podman
+      run: |
+        make run
+
+    - name: Configuration kube-ansible
       working-directory: ./test/podman
       run: |
         make run
