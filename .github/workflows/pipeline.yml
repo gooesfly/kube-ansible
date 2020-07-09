@@ -64,10 +64,10 @@ jobs:
     - name: Create test environment
       working-directory: ./test/podman
       run: |
-        cat /etc/resolv.conf
         make run
 
     - name: Deploy the Kubernetes cluster
       working-directory: ./test/podman
       run: |
+        podman ps
         make deploy
