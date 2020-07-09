@@ -1,0 +1,62 @@
+name: kube-ansbile
+
+on:
+  push:
+    branches:
+    - master
+
+jobs:
+  build:
+    runs-on: ubuntu-18.04
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@master
+
+    - name: Clean up disk space
+      run: |
+        ls -l
+        pwd
+        set -x
+        [ test -f /swapfile ] && sudo swapoff /swapfile
+        [ test -f ] && sudo rm -rf /swapfile
+        sudo rm -rf /etc/apt/sources.list.d/* /usr/share/dotnet /usr/local/lib/android /opt/ghc
+        docker rmi $(docker images -q)
+        sudo apt-get -y purge \
+          azure-cli \
+          ghc* \
+          zulu* \
+          hhvm \
+          llvm* \
+          firefox \
+          google* \
+          dotnet* \
+          powershell \
+          openjdk* \
+          mysql* \
+          php* \
+          docker* \
+          containerd*
+        sudo apt autoremove --purge -y
+
+    - name: Initialization environment
+      run: |
+        set -x
+        [ -f sources.list ] && (
+          sudo cp -rf sources.list /etc/apt/sources.list
+          sudo rm -rf /etc/apt/sources.list.d/* /var/lib/apt/lists/*
+          sudo apt-get clean all
+        )
+        . /etc/os-release
+        echo "deb https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/xUbuntu_${VERSION_ID}/ /" | sudo tee /etc/apt/sources.list.d/devel:kubic:libcontainers:stable.list
+        curl -L https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/xUbuntu_${VERSION_ID}/Release.key | sudo apt-key add -
+        sudo apt-get update
+        sudo apt-get -y install podman make
+        sudo apt-get autoremove --purge -y
+        sudo apt-get clean
+        sudo timedatectl set-timezone Asia/Shanghai
+
+    - name: Build Images
+      working-directory: ./test/podman
+      run: |
+        make build
