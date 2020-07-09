@@ -25,7 +25,7 @@ clean:
 	sudo podman rm -f ansible || true
 	sudo podman network rm kubernetes || true
 
-test:
+deploy:
 	podman exec -it ansible apt install git make -y
 	podman exec -it ansible git clone https://github.com/buxiaomo/kube-ansible.git /usr/local/src/kube-ansible
 	podman cp all.yml ansible:/usr/local/src/kube-ansible/group_vars/all.yml
