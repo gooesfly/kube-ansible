@@ -1,10 +1,10 @@
 [master]
-172.16.16.11 hostname=master01 nodename=master01
-172.16.16.12 hostname=master02 nodename=master02
-172.16.16.13 hostname=master03 nodename=master03
+172.16.16.11 nodename=master01
+172.16.16.12 nodename=master02
+172.16.16.13 nodename=master03
 
 [worker]
-172.16.16.14 hostname=worker01 nodename=worker01
+172.16.16.14 nodename=worker01
 
 [kubernetes:children]
 master
