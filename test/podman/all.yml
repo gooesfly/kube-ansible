@@ -1,21 +1,22 @@
 ---
 # Ansible settings
-ansible_become: yes
 ansible_ssh_port: 22
 ansible_ssh_user: 'root'
 ansible_ssh_pass: 'password'
 # ansible_sudo_user: 'root'
 # ansible_sudo_pass: 'root'
+ansible_become: "{% if ansible_ssh_user != 'root' %}yes{% else %}no{% endif %}"
 
 # timezone settings, default is Asia/Shanghai
 # timezone: 'Asia/Shanghai'
 
-modprobe:
-  filename: /etc/modules
-  params:
-    - nf_conntrack
-    - nf_conntrack_ipv4
-    - overlay
+# modprobe:
+#   filename: /etc/modules
+#   params:
+#     - nf_conntrack
+#     - nf_conntrack_ipv4
+#     - br_netfilter
+#     - overlay
 
 # ipvs:
 #   filename: /etc/modules
@@ -59,16 +60,20 @@ modprobe:
 #     net.netfilter.nf_conntrack_tcp_timeout_established: 86400
 #     net.netfilter.nf_conntrack_tcp_timeout_close_wait: 3600
 
-ca:
-  # Certificate validity
-  # default: 10 years
-  days: 3652
-  kubernetes:
-    location: /etc/kubernetes/pki
-  etcd:
-    location: /etc/kubernetes/pki/etcd
-
 kubernetes:
+  # project name use for tls directory(/etc/ssl/$project).
+  project: kubernetes
+
+  ssl:
+    # Certificate validity
+    # default: 10 years
+    days: 3652
+    location: /etc/kubernetes/pki
+    # for porxy reserved
+    # extension:
+    #   - *.xiaomo.io
+    #   - 192.168.1.1
+
   # defaullt: kubernetes
   name: kubernetes
 
@@ -91,12 +96,12 @@ kubernetes:
   #   vip: 172.16.16.10
   #   mask: 16
 
-  # choose: none flannel calico canal
+  # choose: none flannel calico canals
   #   none: not deployment any network plugin
-  #   flannel: will deployment flannel plugin
+  #   flannel: will deployment flannel plugin (default)
   #   calico: will deployment calico plugin
-  #   canal: will deployment canal plugin (default)
-  network: canal
+  #   canal: will deployment canal plugin
+  network: flannel
 
   settings:
     master_run_pod: false
@@ -109,13 +114,10 @@ kubernetes:
 
   # etcd parameter configuration
   etcd: 
-    enablepprof: true
-    autocompactionretention: 1
-    debug: true
     datadir: /var/lib/etcd
     initialclustertoken: 'kubernetes'
     initialclusterstate: 'new'
-  
+
   # docker parameter configuration
   docker:
     datadir: /var/lib/docker
@@ -125,14 +127,25 @@ kubernetes:
         - "native.cgroupdriver=systemd"
       registry-mirrors:
         - "https://i3jtbyvy.mirror.aliyuncs.com"
+      storage-driver: "overlay2"
+      storage-opts: 
+        - "overlay2.override_kernel_check=true"
       log-driver: "json-file"
       log-opts: 
-        max-size: "500m"
-        max-file: "2"
-      debug: true
+        max-size: "100m"
+        max-file: "5"
+      max-concurrent-downloads: 20
+      max-concurrent-uploads: 10
+      debug: false
+    # systemd:
+    #   service:
+    #     - Environment="HTTP_PROXY=http://user01:password@10.10.10.10:8080/"
+    #     - Environment="HTTPS_PROXY=https://user01:password@10.10.10.10:8080/"
+    #     - Environment="NO_PROXY=localhost,.docker.io,.docker.com,.daocloud.io"
 
   # kubelet parameter configuration
   kubelet: 
+    bind: 0.0.0.0
     log:
       logLevel: 2
       logDir: /var/log/kubernetes
@@ -143,6 +156,27 @@ kubernetes:
   # kube-apiserver parameter configuration
   apiserver: 
     bind: 0.0.0.0
+    enable_admission_plugins:
+      - AlwaysPullImages
+      - ServiceAccount
+      - NamespaceLifecycle
+      - NodeRestriction
+      - LimitRanger
+      - PersistentVolumeClaimResize
+      - DefaultStorageClass
+      - DefaultTolerationSeconds
+      - MutatingAdmissionWebhook
+      - ValidatingAdmissionWebhook
+      - ResourceQuota
+      - Priority
+      - PodPreset
+    authorization_modes:
+      - Node
+      - RBAC
+    kubelet_preferred_address_types:
+      - InternalIP
+      - ExternalIP
+      - Hostname
     log:
       logLevel: 2
       logDir: /var/log/kubernetes
@@ -174,11 +208,14 @@ kubernetes:
       logFile: kube-proxy.log
 
   addon:
-    # not support
-    # metrics_server_enabled: false
-    # ingress_nginx_enabled: false
+    # add-on manifests directory
     location: /etc/kubernetes/addon
+
+    metrics: true
+
+    # addon images
     image: 
+      metrics: k8s.gcr.io/metrics-server-amd64:v0.3.6
       coredns: coredns/coredns:1.6.9
       flannel: quay.io/coreos/flannel:v0.12.0
       canal:

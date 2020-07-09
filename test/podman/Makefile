@@ -15,7 +15,7 @@ run:
 	@sudo podman run -d --name master02 --network kubernetes --hostname master02 --ip 172.16.16.12 -v ./ssh:/root/.ssh $(RUNTIME)
 	@sudo podman run -d --name master03 --network kubernetes --hostname master03 --ip 172.16.16.13 -v ./ssh:/root/.ssh $(RUNTIME)
 	@sudo podman run -d --name worker01 --network kubernetes --hostname worker01 --ip 172.16.16.14 -v ./ssh:/root/.ssh $(RUNTIME)
-# @sudo podman run -d --name ansible --network kubernetes --privileged --hostname ansible -v ./ssh:/root/.ssh ansible:systemd
+	@sudo podman run -d --name ansible --network kubernetes --hostname ansible --ip 172.16.16.15 -v ./ssh:/root/.ssh ansible:systemd
 
 clean:
 	@sudo podman rm -f master01 || true
