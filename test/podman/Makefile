@@ -10,11 +10,11 @@ run:
 	@[ -d ./ssh ] || mkdir -p ssh
 	@[ -f ./ssh/id_rsa ] || ssh-keygen -t rsa -P "" -f ./ssh/id_rsa
 	@[ -f ./ssh/authorized_keys ] || cp ./ssh/id_rsa.pub ./ssh/authorized_keys
-	@sudo podman network create kubernetes --gateway 192.168.1.1 --subnet 192.168.1.0/24  || true
-	@sudo podman run -d --name master01 --network kubernetes --hostname master01 --ip 192.168.1.11 -v ./ssh:/root/.ssh $(RUNTIME)
-	@sudo podman run -d --name master02 --network kubernetes --hostname master02 --ip 192.168.1.12 -v ./ssh:/root/.ssh $(RUNTIME)
-	@sudo podman run -d --name master03 --network kubernetes --hostname master03 --ip 192.168.1.13 -v ./ssh:/root/.ssh $(RUNTIME)
-	@sudo podman run -d --name worker01 --network kubernetes --hostname worker01 --ip 192.168.1.14 -v ./ssh:/root/.ssh $(RUNTIME)
+	@sudo podman network create kubernetes --gateway 172.16.16.1 --subnet 172.16.16.0/24  || true
+	@sudo podman run -d --name master01 --network kubernetes --hostname master01 --ip 172.16.16.11 -v ./ssh:/root/.ssh $(RUNTIME)
+	@sudo podman run -d --name master02 --network kubernetes --hostname master02 --ip 172.16.16.12 -v ./ssh:/root/.ssh $(RUNTIME)
+	@sudo podman run -d --name master03 --network kubernetes --hostname master03 --ip 172.16.16.13 -v ./ssh:/root/.ssh $(RUNTIME)
+	@sudo podman run -d --name worker01 --network kubernetes --hostname worker01 --ip 172.16.16.14 -v ./ssh:/root/.ssh $(RUNTIME)
 # @sudo podman run -d --name ansible --network kubernetes --privileged --hostname ansible -v ./ssh:/root/.ssh ansible:systemd
 
 clean:
