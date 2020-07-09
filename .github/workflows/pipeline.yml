@@ -58,3 +58,8 @@ jobs:
       working-directory: ./test/podman
       run: |
         make build
+
+    - name: Run test pods
+      working-directory: ./test/podman
+      run: |
+        make run
