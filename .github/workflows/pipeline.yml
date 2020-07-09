@@ -13,31 +13,29 @@ jobs:
     - name: Checkout
       uses: actions/checkout@master
 
-    - name: Clean up disk space
-      run: |
-        ls -l
-        pwd
-        set -x
-        [ test -f /swapfile ] && sudo swapoff /swapfile
-        [ test -f ] && sudo rm -rf /swapfile
-        sudo rm -rf /etc/apt/sources.list.d/* /usr/share/dotnet /usr/local/lib/android /opt/ghc
-        docker rmi $(docker images -q)
-        sudo apt-get -y purge \
-          azure-cli \
-          ghc* \
-          zulu* \
-          hhvm \
-          llvm* \
-          firefox \
-          google* \
-          dotnet* \
-          powershell \
-          openjdk* \
-          mysql* \
-          php* \
-          docker* \
-          containerd*
-        sudo apt autoremove --purge -y
+    # - name: Clean up disk space
+    #   run: |
+    #     set -x
+    #     [ test -f /swapfile ] && sudo swapoff /swapfile
+    #     [ test -f ] && sudo rm -rf /swapfile
+    #     sudo rm -rf /etc/apt/sources.list.d/* /usr/share/dotnet /usr/local/lib/android /opt/ghc
+    #     docker rmi $(docker images -q)
+    #     sudo apt-get -y purge \
+    #       azure-cli \
+    #       ghc* \
+    #       zulu* \
+    #       hhvm \
+    #       llvm* \
+    #       firefox \
+    #       google* \
+    #       dotnet* \
+    #       powershell \
+    #       openjdk* \
+    #       mysql* \
+    #       php* \
+    #       docker* \
+    #       containerd*
+    #     sudo apt autoremove --purge -y
 
     - name: Initialization environment
       run: |
