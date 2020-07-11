@@ -11,6 +11,7 @@ Refer to the `README.md` and `group_vars/template.yml` files for project configu
 ## OS Support
 
 * [x] CentOS 7.*
+* [ ] CentOS 8.*
 * [x] Ubuntu 16.04.6
 * [ ] Ubuntu 18.04.6
 
@@ -49,14 +50,27 @@ if you want to use local package files, reference [here](#local).
 
 if you want to download package from nexus, reference [here](#nexus).
 
+| Parameter  | describe  |  Default | option |
+|---|---|---|---|
+| DOWNLOAD_WAY | Binary download mode  | official  | official or nexus | 
+| KUBE_VERSION | Kubernetes binary version  | 1.14.4  | N/A | 
+| DOCKER_VERSION | Docker binary version  | 19.03.9  | N/A | 
+| ETCD_VERSION | Etcd binary version  | 3.4.5  | N/A | 
+| CNI_VERSION | CNI binary version  | 0.8.5  | N/A | 
+| NEXUS_HTTP_USERNAME | Nexus username  | N/A  | N/A | 
+| NEXUS_HTTP_PASSWORD | Nexus password  | N/A  | N/A | 
+| NEXUS_DOMAIN_NAME | Nexus domain name  | nexus.xiaomo.site  | N/A | 
+| NEXUS_REPOSITORY | binary repository name, you can use 'upload-nexus.py'  | N/A  | N/A | 
+
+##### official download
+
 ```
-# default version
-make download
+make download DOWNLOAD_WAY=official
+```
 
-# custom version
-make download KUBE_VERSION=1.16.8 DOCKER_VERSION=19.03.8 FLANNEL_VERSION=0.12.0 ETCD_VERSION=3.4.5
+##### nexus download
 
-# download from nexus
+```
 make download DOWNLOAD_WAY=nexus \
 NEXUS_DOMAIN_NAME=nexus.xiaomo.site \
 NEXUS_REPOSITORY=kube-ansible \
@@ -101,7 +115,7 @@ make scale KUBE_VERSION=1.16.8 DOCKER_VERSION=19.03.8 FLANNEL_VERSION=0.12.0 ETC
 Download new kubernetes binaries, Reference [here](#download).
 
 ```
-make upgrade KUBE_VERSION=1.18.2 DOCKER_VERSION=19.03.8
+make upgrade KUBE_VERSION=1.18.5
 ```
 
 ### Kubernetes Extended application
@@ -164,19 +178,6 @@ wget https://github.com/containernetworking/plugins/releases/download/v0.8.5/cni
 * [canal](https://docs.projectcalico.org/getting-started/kubernetes/flannel/flannel) 
 * [flannel](https://github.com/coreos/flannel#flannel)
 
-# issue
-
-* Add check svc、pod ip is on host cird
-* Flag --experimental-encryption-provider-config has been deprecated, use --encryption-provider-config
-
-# future
-
-* ~~Support version update~~
-* ca update Support
-* Standardize log
-
-
-
 <!-- 
 openssl_certificate                                           Generate and/...
 openssl_certificate_info                                      Provide infor...
@@ -215,10 +216,6 @@ systemctl restart kube-apiserver.service kube-scheduler.service kube-controller-
 
 Minion: 
 systemctl stop kube-proxy.service kubelet.service 
-
-
-
-
 
     {% if groups['master'] | length == 1 and kubernetes.cloud.type == "local" %}
       {% set KUBE_APISERVER_ADDR=ansible_default_ipv4.address %}
@@ -262,4 +259,27 @@ systemctl stop kube-proxy.service kubelet.service
       --server=https://{% if groups['master'] | length !=1 %}{{ kubernetes.ha.vip }}:{% if kubernetes.cloud.type != "local" %}6443{% else %}8443{% endif %}{% else %}{{  }}:{% if kubernetes.cloud.type != "local" %}6443{% else %}8443{% endif %}{% endif %} \
 
 
+openssl genrsa -out kubelet.key 2048
+openssl req -new -key kubelet.key -subj "/CN=system:node:worker04" -out kubelet.csr
+openssl x509 -req -in kubelet.csr -CA ca.crt -CAkey ca.key -CAcreateserial -extensions v3_req_client -extfile openssl.cnf -out kubelet.crt -days 3652
+
+
+kubectl config set-cluster kubernetes \
+--certificate-authority=/etc/kubernetes/pki/ca.crt \
+--embed-certs=true \
+--server=https://172.16.16.10:6443 \
+--kubeconfig=kubelet.kubeconfig
+
+kubectl config set-credentials system:node:worker04 \
+--client-certificate=/etc/kubernetes/pki/kubelet.crt \
+--client-key=/etc/kubernetes/pki/kubelet.key \
+--embed-certs=true \
+--kubeconfig=kubelet.kubeconfig
+
+kubectl config set-context default \
+--cluster=kubernetes \
+--user=system:node:worker04 \
+--kubeconfig=kubelet.kubeconfig
+
+kubectl config use-context default --kubeconfig=kubelet.kubeconfig
 -->
