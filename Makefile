@@ -77,3 +77,13 @@ sync:
 
 test:
 	@./test/podman/Makefile test
+
+version: 
+	@command -v jq 2> /dev/null || echo -e "\033[32mPlease install jq\033[0m"
+	@echo "etcd" > .etcd
+	@curl -s `curl -s https://api.github.com/repos/coreos/etcd/releases | jq -r .url` | jq -r '.[].name' | grep -Ev 'rc|beta|alpha' | sed 's/v//g' | sort -r | head -n 5 >> .etcd
+	@echo "docker" > .docker
+	@curl -s https://api.github.com/repos/docker/docker-ce/releases | jq -r '.[].name' | grep -Ev 'rc|beta|alpha' | sed 's/v//g' | sort -r  | head -n 5 >> .docker
+	@echo "kubernetes" > .kubernetes
+	@curl -s https://api.github.com/repos/kubernetes/kubernetes/releases | jq -r '.[].name' | grep -Ev 'rc|beta|alpha' | sed 's/v//g' | sort -r  | head -n 5 >> .kubernetes
+	@paste .etcd .docker .kubernetes

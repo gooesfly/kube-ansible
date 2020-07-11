@@ -9,26 +9,26 @@
       with_items:
         - '{{ kubernetes.addon.location }}/metrics'
 
-    - name: Stat metrics yaml file
-      stat: 
-        path: '{{ kubernetes.addon.location }}/metrics/metrics.yaml'
-      register: metrics_yaml_file
-      run_once: true
+    # - name: Stat metrics yaml file
+    #   stat: 
+    #     path: '{{ kubernetes.addon.location }}/metrics/metrics.yaml'
+    #   register: metrics_yaml_file
+    #   run_once: true
 
-    - name: Clean old deployment
-      shell: '/usr/local/bin/kubectl delete -f {{ kubernetes.addon.location }}/metrics/metrics.yaml'
-      run_once: true
-      when: metrics_yaml_file.stat.exists
+    # - name: Clean old deployment
+    #   shell: '/usr/local/bin/kubectl delete -f {{ kubernetes.addon.location }}/metrics/metrics.yaml'
+    #   run_once: true
+    #   when: metrics_yaml_file.stat.exists
 
-    - name: Waiting deployment delete
-      shell: /usr/local/bin/kubectl get po -n kube-system
-      register: waiting_for_delete_deployment_done
-      until: waiting_for_delete_deployment_done.rc == 0 and waiting_for_delete_deployment_done.stdout.find("metrics-server") == -1
-      retries: 30
-      delay: 5
-      changed_when: false
-      when: metrics_yaml_file.stat.exists
-      run_once: true
+    # - name: Waiting deployment delete
+    #   shell: /usr/local/bin/kubectl get po -n kube-system
+    #   register: waiting_for_delete_deployment_done
+    #   until: waiting_for_delete_deployment_done.rc == 0 and waiting_for_delete_deployment_done.stdout.find("metrics-server") == -1
+    #   retries: 30
+    #   delay: 5
+    #   changed_when: false
+    #   when: metrics_yaml_file.stat.exists
+    #   run_once: true
 
     - name: Deployment metrics --- part.1
       template: 

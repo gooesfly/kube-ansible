@@ -9,6 +9,7 @@
     group: root
   with_items:
     - kube-controller-manager
+  register: controllermanager_bin
 
 - name: Create log directory
   file: 
@@ -35,6 +36,16 @@
     - '/etc/ssl/{{ kubernetes.project }}/ca.crt'
     - '/etc/ssl/{{ kubernetes.project }}/ca.key'
 
+- name: Check kube-controller-manager certificate expired(30 days)
+  shell: |
+    [ -f kube-controller-manager.crt ] && 
+    openssl x509 -in kube-controller-manager.crt -noout -text -checkend 2592000
+  register: kube_controller_manager_certificate_expired
+  ignore_errors: True
+  args:
+    chdir: '{{ kubernetes.ssl.location }}'
+    executable: /bin/bash
+
 - name: Create kube-controller-manager
   shell: |
     openssl genrsa -out kube-controller-manager.key 2048 && \
@@ -43,6 +54,8 @@
   args:
     chdir: '{{ kubernetes.ssl.location }}'
     executable: /bin/bash
+  register: kube_controller_manager_certificate
+  when: kube_controller_manager_certificate_expired.rc != 0
 
 - name: Create kubeconfig
   shell: |
@@ -89,16 +102,14 @@
     /usr/local/bin/kubectl config use-context {{ item.KUBE_USER }}@{{ kubernetes.name | default("kubernetes") }} --kubeconfig=/etc/kubernetes/{{ item.KUBE_CONFIG }} 
   with_items:
     - { KUBE_USER: 'system:kube-controller-manager', KUBE_CERT: "kube-controller-manager", KUBE_CONFIG: 'kube-controller-manager.kubeconfig' }
-
-- name: Change file permissions
-  file:
-    path: /etc/kubernetes/kube-controller-manager.kubeconfig
-    mode: '0644'
+  register: controllermanager_kubeconfig
+  when: kube_controller_manager_certificate.changed
 
 - name: Install systemd file
   template: 
     src: kube-controller-manager.service.j2
     dest: /etc/systemd/system/kube-controller-manager.service
+  register: controllermanager_systemd
 
 - name: Start the service
   systemd:
@@ -106,12 +117,15 @@
     state: restarted
     enabled: yes
     daemon_reload: yes
+  register: controllermanager_service
+  when: controllermanager_bin.changed or kube_controller_manager_certificate.changed or controllermanager_kubeconfig.changed or controllermanager_systemd.changed
 
 - name: Waiting for the service
   wait_for:
     port: 10252
     delay: 30
     state: started
+  when: controllermanager_service.changed
 
 - name: Health check
   uri: 
@@ -123,3 +137,4 @@
   retries: 30
   delay: 5
   connection: local
+  when: controllermanager_service.changed

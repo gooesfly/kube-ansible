@@ -9,6 +9,7 @@
     group: root
   with_items:
     - kube-scheduler
+  register: kube_scheduler_bin
 
 - name: Create log directory
   file: 
@@ -35,7 +36,17 @@
     - '/etc/ssl/{{ kubernetes.project }}/ca.crt'
     - '/etc/ssl/{{ kubernetes.project }}/ca.key'
 
-- name: kube-scheduler tls
+- name: Check kube-scheduler certificate expired(30 days)
+  shell: |
+    [ -f kube-scheduler.crt ] && 
+    openssl x509 -in kube-scheduler.crt -noout -text -checkend 2592000
+  register: kube_scheduler_certificate_expired
+  ignore_errors: True
+  args:
+    chdir: '{{ kubernetes.ssl.location }}'
+    executable: /bin/bash
+
+- name: Create kube-scheduler certificate
   shell: |
     openssl genrsa -out kube-scheduler.key 2048 && \
     openssl req -new -key kube-scheduler.key -subj "/CN=system:kube-scheduler" -out kube-scheduler.csr && \
@@ -43,6 +54,8 @@
   args:
     chdir: '{{ kubernetes.ssl.location }}'
     executable: /bin/bash
+  register: kube_scheduler_certificate
+  when: kube_scheduler_certificate_expired.rc != 0
 
 - name: Create kubeconfig
   shell: |
@@ -89,6 +102,8 @@
     /usr/local/bin/kubectl config use-context {{ item.KUBE_USER }}@{{ kubernetes.name | default("kubernetes") }} --kubeconfig=/etc/kubernetes/{{ item.KUBE_CONFIG }}
   with_items:
     - { KUBE_USER: 'system:kube-scheduler', KUBE_CERT: "kube-scheduler", KUBE_CONFIG: 'kube-scheduler.kubeconfig'}
+  register: kube_scheduler_kubeconfig
+  when: kube_scheduler_certificate.changed
 
 - name: Change file permissions
   file:
@@ -99,6 +114,7 @@
   template: 
     src: kube-scheduler.service.j2
     dest: /etc/systemd/system/kube-scheduler.service
+  register: kube_scheduler_systemd
 
 - name: Start the service
   systemd:
@@ -106,12 +122,15 @@
     state: restarted
     enabled: yes
     daemon_reload: yes
+  register: kube_scheduler_service
+  when: kube_scheduler_bin.changed or kube_scheduler_certificate.changed or kube_scheduler_kubeconfig.changed or kube_scheduler_systemd.changed
 
 - name: Waiting for the service
   wait_for:
     port: 10251
     delay: 30
     state: started
+  when: kube_scheduler_service.changed
 
 - name: Health check
   uri: 
@@ -123,3 +142,4 @@
   retries: 30
   delay: 1
   connection: local
+  when: kube_scheduler_service.changed

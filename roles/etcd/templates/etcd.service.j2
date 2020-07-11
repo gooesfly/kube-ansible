@@ -39,6 +39,7 @@ ExecStart=/usr/local/bin/etcd \
   --peer-cert-file={{ kubernetes.ssl.location }}/etcd/peer.crt \
   --peer-key-file={{ kubernetes.ssl.location }}/etcd/peer.key \
   --snapshot-count=10000 \
+  --auto-compaction-retention=1 \
   --listen-metrics-urls=http://127.0.0.1:2381
 
 [Install]

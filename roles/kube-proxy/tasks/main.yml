@@ -35,7 +35,17 @@
     - '/etc/ssl/{{ kubernetes.project }}/ca.crt'
     - '/etc/ssl/{{ kubernetes.project }}/ca.key'
 
-- name: Create kube-proxy
+- name: Check kube-proxy certificate expired(30 days)
+  shell: |
+    [ -f kube-proxy.crt ] && 
+    openssl x509 -in kube-proxy.crt -noout -text -checkend 2592000
+  register: kube_proxy_certificate_expired
+  ignore_errors: True
+  args:
+    chdir: '{{ kubernetes.ssl.location }}'
+    executable: /bin/bash
+
+- name: Create kube-proxy certificate
   shell: |
     openssl genrsa -out kube-proxy.key 2048 && \
     openssl req -new -key kube-proxy.key -subj "/CN=system:kube-proxy" -out kube-proxy.csr && \
@@ -43,6 +53,8 @@
   args:
     chdir: '{{ kubernetes.ssl.location }}'
     executable: /bin/bash
+  register: kube_proxy_certificate
+  when: kube_proxy_certificate_expired.rc != 0
 
 # - name: Create kube-proxy sa crb --- part.1
 #   copy: 

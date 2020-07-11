@@ -9,6 +9,7 @@
     group: root
   with_items:
     - kube-apiserver
+  register: apiserver_bin
 
 - name: Create log directory
   file: 
@@ -34,7 +35,17 @@
     - { src: '/etc/ssl/{{ kubernetes.project }}/ca.crt', "dest": '{{ kubernetes.ssl.location }}/ca.crt' }
     - { src: '/etc/ssl/{{ kubernetes.project }}/ca.key', "dest": '{{ kubernetes.ssl.location }}/ca.key' }
 
-- name: Create kube-apiserver
+- name: Check kube-apiserver certificate expired(30 days)
+  shell: |
+    [ -f apiserver.crt ] && 
+    openssl x509 -in apiserver.crt -noout -text -checkend 2592000
+  register: apiserver_certificate_expired
+  ignore_errors: True
+  args:
+    chdir: '{{ kubernetes.ssl.location }}'
+    executable: /bin/bash
+
+- name: Create kube-apiserver certificate
   shell: |
     openssl genrsa -out apiserver.key 2048 && \
     openssl req -new -key apiserver.key -subj "/CN=kube-apiserver" -config openssl.cnf -out apiserver.csr && \
@@ -42,8 +53,20 @@
   args:
     chdir: '{{ kubernetes.ssl.location }}'
     executable: /bin/bash
+  register: apiserver_certificate
+  when: apiserver_certificate_expired.rc != 0
 
-- name: Create front-proxy-client
+- name: Check front-proxy-client certificate expired(30 days)
+  shell: |
+    [ -f front-proxy-client.crt ] && 
+    openssl x509 -in front-proxy-client.crt -noout -text -checkend 2592000
+  register: front_proxy_client_certificate_expired
+  ignore_errors: True
+  args:
+    chdir: '{{ kubernetes.ssl.location }}'
+    executable: /bin/bash
+
+- name: Create front-proxy-client certificate
   shell: |
     openssl genrsa -out front-proxy-client.key 2048 && \
     openssl req -new -key front-proxy-client.key -subj "/CN=front-proxy-client" -out front-proxy-client.csr && \
@@ -51,8 +74,20 @@
   args:
     chdir: '{{ kubernetes.ssl.location }}'
     executable: /bin/bash
+  register: front_proxy_client_certificate
+  when: front_proxy_client_certificate_expired.rc != 0
 
-- name: Create apiserver-kubelet-client
+- name: Check apiserver-kubelet-client certificate expired(30 days)
+  shell: |
+    [ -f apiserver-kubelet-client.crt ] && 
+    openssl x509 -in apiserver-kubelet-client.crt -noout -text -checkend 2592000
+  register: kubelet_client_certificate_expired
+  ignore_errors: True
+  args:
+    chdir: '{{ kubernetes.ssl.location }}'
+    executable: /bin/bash
+
+- name: Create apiserver-kubelet-client certificate
   shell: |
     openssl genrsa -out apiserver-kubelet-client.key 2048 && \
     openssl req -new -key apiserver-kubelet-client.key -subj "/CN=apiserver-kubelet-client/O=system:masters" -out apiserver-kubelet-client.csr && \
@@ -60,8 +95,20 @@
   args:
     chdir: '{{ kubernetes.ssl.location }}'
     executable: /bin/bash
+  register: kubelet_client_certificate
+  when: kubelet_client_certificate_expired.rc != 0
 
-- name: Create apiserver etcd client
+- name: Check apiserver-etcd-client certificate expired(30 days)
+  shell: |
+    [ -f apiserver-etcd-client.crt ] && 
+    openssl x509 -in apiserver-etcd-client.crt -noout -text -checkend 2592000
+  register: apiserver_etcd_client_certificate_expired
+  ignore_errors: True
+  args:
+    chdir: '{{ kubernetes.ssl.location }}'
+    executable: /bin/bash
+
+- name: Create apiserver etcd client certificate
   shell: |
     openssl genrsa -out apiserver-etcd-client.key 2048 && \
     openssl req -new -key apiserver-etcd-client.key -subj "/CN=apiserver-etcd-client/O=system:masters" -out apiserver-etcd-client.csr && \
@@ -69,6 +116,8 @@
   args:
     chdir: '{{ kubernetes.ssl.location }}'
     executable: /bin/bash
+  register: apiserver_etcd_client_certificate
+  when: apiserver_etcd_client_certificate_expired.rc != 0
 
 - name: Stat encryption config file
   stat: 
@@ -93,11 +142,13 @@
     src: audit-policy-minimal.yaml.j2
     dest: /etc/kubernetes/audit-policy-minimal.yaml
     mode: '0644'
+  register: audit_policy
 
 - name: Install systemd file
   template: 
     src: kube-apiserver.service.j2
     dest: /etc/systemd/system/kube-apiserver.service
+  register: apiserver_systemd
 
 - name: Start the service
   systemd:
@@ -105,12 +156,15 @@
     state: restarted
     enabled: yes
     daemon_reload: yes
+  register: apiserver_service
+  when: apiserver_bin.changed or apiserver_certificate.changed or front_proxy_client_certificate.changed or kubelet_client_certificate.changed or apiserver_etcd_client_certificate.changed or audit_policy.changed or apiserver_systemd.changed
 
 - name: Waiting for the service
   wait_for:
     port: 6443
     delay: 30
     state: started
+  when: apiserver_service.changed
 
 - name: Health check
   uri: 
@@ -122,3 +176,4 @@
   retries: 30
   delay: 5
   connection: local
+  when: apiserver_service.changed

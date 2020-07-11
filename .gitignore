@@ -29,3 +29,8 @@ inventory/terraform
 
 inventory/hosts
 group_vars/all.yml
+
+# temp file
+.etcd 
+.docker 
+.kubernetes

@@ -78,6 +78,7 @@ mkdir -p binaries/kubernetes/${KUBE_VERSION}
 grep -q "^${KUBE_VERSION}\$" binaries/kubernetes/${KUBE_VERSION}/.kubernetes 2>/dev/null || {
   if [ ! -f src/kubernetes-client-linux-amd64.v${KUBE_VERSION}.tar.gz ] || [ ! -f src/kubernetes-server-linux-amd64.v${KUBE_VERSION}.tar.gz ];then
     printb "Download from the Internet..."
+    chmod +x binaries/kubernetes/${KUBE_VERSION}/*
     curl ${DOWNLOAD_OPTION} "http://${NEXUS_DOMAIN_NAME}/repository/${NEXUS_REPOSITORY}/kubernetes-release/release/v${KUBE_VERSION}/bin/linux/amd64/kube-apiserver" -o binaries/kubernetes/${KUBE_VERSION}/kube-apiserver
     curl ${DOWNLOAD_OPTION} "http://${NEXUS_DOMAIN_NAME}/repository/${NEXUS_REPOSITORY}/kubernetes-release/release/v${KUBE_VERSION}/bin/linux/amd64/kube-controller-manager" -o binaries/kubernetes/${KUBE_VERSION}/kube-controller-manager
     curl ${DOWNLOAD_OPTION} "http://${NEXUS_DOMAIN_NAME}/repository/${NEXUS_REPOSITORY}/kubernetes-release/release/v${KUBE_VERSION}/bin/linux/amd64/kube-scheduler" -o binaries/kubernetes/${KUBE_VERSION}/kube-scheduler
