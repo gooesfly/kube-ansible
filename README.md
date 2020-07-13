@@ -11,7 +11,7 @@ Refer to the `README.md` and `group_vars/template.yml` files for project configu
 ## OS Support
 
 * [x] CentOS 7.*
-* [ ] CentOS 8.*
+* [x] CentOS 8.*
 * [x] Ubuntu 16.04.6
 * [ ] Ubuntu 18.04.6
 
