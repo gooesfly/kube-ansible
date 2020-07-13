@@ -175,20 +175,20 @@
     src: kubelet.service.j2
     dest: /etc/systemd/system/kubelet.service
 
-- name: Clean old tls file --- part.1
-  find:
-    paths: '{{ kubernetes.ssl.location }}'
-    patterns: 
-      - "kubelet*"
-    use_regex: yes
-    recurse: yes
-  register: kubelet_files
+# - name: Clean old tls file --- part.1
+#   find:
+#     paths: '{{ kubernetes.ssl.location }}'
+#     patterns: 
+#       - "kubelet*"
+#     use_regex: yes
+#     recurse: yes
+#   register: kubelet_files
 
-- name: Clean old tls file --- part.2
-  file:
-    path: '{{ item.path }}'
-    state: absent
-  with_items: '{{ kubelet_files.files }}'
+# - name: Clean old tls file --- part.2
+#   file:
+#     path: '{{ item.path }}'
+#     state: absent
+#   with_items: '{{ kubelet_files.files }}'
 
 - name: Start the service
   systemd:
@@ -209,7 +209,7 @@
   connection: local
 
 - name: Waiting node on-line
-  shell: /usr/local/bin/kubectl get node {% if nodename is defined %}{{ nodename | lower }}{% else %}{{ hostvars[inventory_hostname].hostname | lower }}{% endif %}
+  shell: /usr/local/bin/kubectl get node {% if nodename is defined %}{{ nodename | lower }}{% else %}{{ hostvars[inventory_hostname].ansible_fqdn | lower }}{% endif %}
   register: waiting_for_node
   until: waiting_for_node.rc == 0 and (waiting_for_node.stdout.find("NotReady") != -1 or waiting_for_node.stdout.find("Ready") != -1)
   retries: 15
