@@ -60,7 +60,7 @@ mkdir -p binaries/etcd/${ETCD_VERSION}
 grep -q "^${ETCD_VERSION}\$" binaries/etcd/${ETCD_VERSION}/.etcd 2>/dev/null || {
   if [ ! -f src/etcd-v${ETCD_VERSION}-linux-amd64.tar.gz ];then
     printb "Download from the Internet..."
-    curl ${DOWNLOAD_OPTION} http://${NEXUS_DOMAIN_NAME}/repository/${NEXUS_REPOSITORY}/coreos/etcd/releases/download/v${ETCD_VERSION}/etcd-v${ETCD_VERSION}-linux-amd64.tar.gz -o binaries/etcd/${ETCD_VERSION}/etcd-v${ETCD_VERSION}-linux-amd64.tar.gz
+    binaries/etcd/${ETCD_VERSION}/etcd -version > /dev/null 2>&1 || curl ${DOWNLOAD_OPTION} http://${NEXUS_DOMAIN_NAME}/repository/${NEXUS_REPOSITORY}/coreos/etcd/releases/download/v${ETCD_VERSION}/etcd-v${ETCD_VERSION}-linux-amd64.tar.gz -o binaries/etcd/${ETCD_VERSION}/etcd-v${ETCD_VERSION}-linux-amd64.tar.gz
     tar -zxf binaries/etcd/${ETCD_VERSION}/etcd-v${ETCD_VERSION}-linux-amd64.tar.gz --strip-components 1 -C binaries/etcd/${ETCD_VERSION}/ etcd-v${ETCD_VERSION}-linux-amd64/etcd etcd-v${ETCD_VERSION}-linux-amd64/etcdctl 
     rm -rf binaries/etcd/${ETCD_VERSION}/etcd-v${ETCD_VERSION}-linux-amd64.tar.gz
   else
