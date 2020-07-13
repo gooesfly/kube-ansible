@@ -79,11 +79,11 @@ test:
 	@./test/podman/Makefile test
 
 version: 
-	@command -v jq 2> /dev/null || echo -e "\033[32mPlease install jq\033[0m"
+	@command -v jq > /dev/null 2>&1 || ( echo -e "\033[32mPlease install jq\033[0m" &&  exit 1)
 	@echo "etcd" > .etcd
-	@curl -s `curl -s https://api.github.com/repos/coreos/etcd/releases | jq -r .url` | jq -r '.[].name' | grep -Ev 'rc|beta|alpha' | sed 's/v//g' | sort -r | head -n 5 >> .etcd
+	@curl -s `curl -s https://api.github.com/repos/coreos/etcd/releases | jq -r .url` | jq -r '.[].name' | grep -Ev 'rc|beta|alpha' | sed 's/v//g' | head -n 15 | sort -r >> .etcd
 	@echo "docker" > .docker
-	@curl -s https://api.github.com/repos/docker/docker-ce/releases | jq -r '.[].name' | grep -Ev 'rc|beta|alpha' | sed 's/v//g' | sort -r  | head -n 5 >> .docker
+	@curl -s https://api.github.com/repos/docker/docker-ce/releases | jq -r '.[].name' | grep -Ev 'rc|beta|alpha' | sed 's/v//g' | head -n 15 | sort -r >> .docker
 	@echo "kubernetes" > .kubernetes
-	@curl -s https://api.github.com/repos/kubernetes/kubernetes/releases | jq -r '.[].name' | grep -Ev 'rc|beta|alpha' | sed 's/v//g' | sort -r  | head -n 5 >> .kubernetes
+	@curl -s https://api.github.com/repos/kubernetes/kubernetes/releases | jq -r '.[].name' | grep -Ev 'rc|beta|alpha' | sed 's/v//g' | head -n 15 | sort -r >> .kubernetes
 	@paste .etcd .docker .kubernetes

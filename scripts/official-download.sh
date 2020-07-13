@@ -38,7 +38,7 @@ chmod +x binaries/flannel/${FLANNEL_VERSION}/*  > /dev/null 2>&1
 grep -q "^${FLANNEL_VERSION}\$" binaries/flannel/${FLANNEL_VERSION}/.flannel 2>/dev/null || {
   if [ ! -f src/flannel-v${FLANNEL_VERSION}-linux-amd64.tar.gz ];then
     printb "Download from the Internet..."
-    binaries/flannel/${FLANNEL_VERSION}/flanneld -version > /dev/null || curl -k -f --connect-timeout 20 --retry 5 --location --insecure https://github.com/coreos/flannel/releases/download/v${FLANNEL_VERSION}/flannel-v${FLANNEL_VERSION}-linux-amd64.tar.gz -o binaries/flannel/${FLANNEL_VERSION}/flannel-v${FLANNEL_VERSION}-linux-amd64.tar.gz
+    binaries/flannel/${FLANNEL_VERSION}/flanneld -version > /dev/null 2>&1 || curl -k -f --connect-timeout 20 --retry 5 --location --insecure https://github.com/coreos/flannel/releases/download/v${FLANNEL_VERSION}/flannel-v${FLANNEL_VERSION}-linux-amd64.tar.gz -o binaries/flannel/${FLANNEL_VERSION}/flannel-v${FLANNEL_VERSION}-linux-amd64.tar.gz
     tar -zxf binaries/flannel/${FLANNEL_VERSION}/flannel-v${FLANNEL_VERSION}-linux-amd64.tar.gz -C binaries/flannel/${FLANNEL_VERSION}/ flanneld mk-docker-opts.sh
     rm -rf binaries/flannel/${FLANNEL_VERSION}/flannel-v${FLANNEL_VERSION}-linux-amd64.tar.gz
   else

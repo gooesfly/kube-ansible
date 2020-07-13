@@ -11,10 +11,7 @@
   when: timezone is defined
 
 - name: Install some applications
-  package: 
-    name: '{{ item }}'
-    state: present
-  with_items: "{{ package }}"
+  include: "{{ ansible_os_family }}.yml"
 
 - name: Set the Hostname
   hostname: 
