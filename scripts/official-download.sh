@@ -15,6 +15,7 @@ mkdir -p binaries
 DOCKER_VERSION=${DOCKER_VERSION:-"19.03.9"}
 printb "Prepare docker ${DOCKER_VERSION} release ..."
 mkdir -p binaries/docker/${DOCKER_VERSION}
+chmod +x binaries/docker/${DOCKER_VERSION}/*  > /dev/null 2>&1
 grep -q "^${DOCKER_VERSION}\$" binaries/docker/${DOCKER_VERSION}/.docker 2>/dev/null || {
   if [ ! -f src/docker-${DOCKER_VERSION}.tgz ];then
     printb "Download from the Internet..."
@@ -33,6 +34,7 @@ grep -q "^${DOCKER_VERSION}\$" binaries/docker/${DOCKER_VERSION}/.docker 2>/dev/
 FLANNEL_VERSION=${FLANNEL_VERSION:-"0.12.0"}
 printb "Prepare flannel ${FLANNEL_VERSION} release ..."
 mkdir -p binaries/flannel/${FLANNEL_VERSION}
+chmod +x binaries/flannel/${FLANNEL_VERSION}/*  > /dev/null 2>&1
 grep -q "^${FLANNEL_VERSION}\$" binaries/flannel/${FLANNEL_VERSION}/.flannel 2>/dev/null || {
   if [ ! -f src/flannel-v${FLANNEL_VERSION}-linux-amd64.tar.gz ];then
     printb "Download from the Internet..."
@@ -51,6 +53,7 @@ grep -q "^${FLANNEL_VERSION}\$" binaries/flannel/${FLANNEL_VERSION}/.flannel 2>/
 ETCD_VERSION=${ETCD_VERSION:-"3.4.5"}
 printb "Prepare etcd ${ETCD_VERSION} release ..."
 mkdir -p binaries/etcd/${ETCD_VERSION}
+chmod +x binaries/etcd/${ETCD_VERSION}/*  > /dev/null 2>&1
 grep -q "^${ETCD_VERSION}\$" binaries/etcd/${ETCD_VERSION}/.etcd 2>/dev/null || {
   if [ ! -f src/etcd-v${ETCD_VERSION}-linux-amd64.tar.gz ];then
     printb "Download from the Internet..."
@@ -68,8 +71,8 @@ grep -q "^${ETCD_VERSION}\$" binaries/etcd/${ETCD_VERSION}/.etcd 2>/dev/null || 
 # kubernetes
 KUBE_VERSION=${KUBE_VERSION:-"1.14.4"}
 printb "Prepare kubernetes ${KUBE_VERSION} release ..."
-[ -d binaries/kubernetes/${KUBE_VERSION} ] || chmod +x binaries/kubernetes/${KUBE_VERSION}/*
 mkdir -p binaries/kubernetes/${KUBE_VERSION}
+chmod +x binaries/kubernetes/${KUBE_VERSION}/*  > /dev/null 2>&1
 grep -q "^${KUBE_VERSION}\$" binaries/kubernetes/${KUBE_VERSION}/.kubernetes 2>/dev/null || {
   if [ ! -f src/kubernetes-client-linux-amd64.v${KUBE_VERSION}.tar.gz ] || [ ! -f src/kubernetes-server-linux-amd64.v${KUBE_VERSION}.tar.gz ];then
     printb "Download from the Internet..."
