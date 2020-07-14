@@ -34,3 +34,8 @@ group_vars/all.yml
 .etcd 
 .docker 
 .kubernetes
+
+# terraform
+test/kube-ansible/.terraform
+test/kube-ansible/*.tfstate
+test/kube-ansible/*.backup

@@ -1,0 +1,11 @@
+[master]
+172.16.18.11
+172.16.18.12
+172.16.18.13
+
+[worker]
+172.16.18.14
+
+[kubernetes:children]
+master
+worker
