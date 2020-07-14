@@ -75,11 +75,11 @@ sync:
 	@rsync -a ./scripts/binaries/cni-plugins/$(CNI_VERSION)/* ./roles/cni-plugins/files/ --delete
 	@echo -e "\033[32mPlaybook is ready. Enjoy!\033[0m"
 
+.PHONY: test
 test:
-	@ls
-	# @terraform init
-	# @terraform fmt
-	# @terraform apply -auto-approve
+	@make apply -C ./test/terraform
+	@make auto
+	@make destroy -C ./test/terraform
 
 version: 
 	@command -v jq > /dev/null 2>&1 || ( echo -e "\033[32mPlease install jq\033[0m" &&  exit 1)
