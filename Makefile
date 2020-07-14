@@ -76,7 +76,10 @@ sync:
 	@echo -e "\033[32mPlaybook is ready. Enjoy!\033[0m"
 
 test:
-	@./test/podman/Makefile test
+	@ls
+	# @terraform init
+	# @terraform fmt
+	# @terraform apply -auto-approve
 
 version: 
 	@command -v jq > /dev/null 2>&1 || ( echo -e "\033[32mPlease install jq\033[0m" &&  exit 1)

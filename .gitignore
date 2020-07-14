@@ -36,6 +36,6 @@ group_vars/all.yml
 .kubernetes
 
 # terraform
-test/kube-ansible/.terraform
-test/kube-ansible/*.tfstate
-test/kube-ansible/*.backup
+test/terraform/.terraform
+test/terraform/*.tfstate
+test/terraform/*.backup
