@@ -5,7 +5,7 @@
     name: /opt/cni/bin
     state: directory
     mode: '0755'
-  when: kubernetes.network == "flannel"
+  when: kubernetes.network == "flannel"  or kubernetes.network == "cilium"
 
 - name: Install the binary
   copy: 
@@ -29,4 +29,4 @@
     - static
     - tuning
     - vlan
-  when: kubernetes.network == "flannel"
+  when: kubernetes.network == "flannel"  or kubernetes.network == "cilium"

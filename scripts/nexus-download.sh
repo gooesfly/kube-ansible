@@ -18,7 +18,7 @@ else
 fi
 
 # docker
-DOCKER_VERSION=${DOCKER_VERSION:-"19.03.8"}
+DOCKER_VERSION=${DOCKER_VERSION:-"18.09.9"}
 printb "Prepare docker ${DOCKER_VERSION} release ..."
 mkdir -p binaries/docker/${DOCKER_VERSION}
 grep -q "^${DOCKER_VERSION}\$" binaries/docker/${DOCKER_VERSION}/.docker 2>/dev/null || {
@@ -54,7 +54,7 @@ grep -q "^${FLANNEL_VERSION}\$" binaries/flannel/${FLANNEL_VERSION}/.flannel 2>/
 }
 
 # ectd
-ETCD_VERSION=${ETCD_VERSION:-"3.4.5"}
+ETCD_VERSION=${ETCD_VERSION:-"3.3.10"}
 printb "Prepare etcd ${ETCD_VERSION} release ..."
 mkdir -p binaries/etcd/${ETCD_VERSION}
 grep -q "^${ETCD_VERSION}\$" binaries/etcd/${ETCD_VERSION}/.etcd 2>/dev/null || {
@@ -102,7 +102,7 @@ grep -q "^${KUBE_VERSION}\$" binaries/kubernetes/${KUBE_VERSION}/.kubernetes 2>/
 }
 
 # CNI
-CNI_VERSION=${CNI_VERSION:-"0.8.5"}
+CNI_VERSION=${CNI_VERSION:-"0.7.5"}
 printb "Prepare cni-plugins ${CNI_VERSION} release ..."
 mkdir -p binaries/cni-plugins/${CNI_VERSION}
 grep -q "^${CNI_VERSION}\$" binaries/cni-plugins/${CNI_VERSION}/.cni 2>/dev/null || {
@@ -117,3 +117,6 @@ grep -q "^${CNI_VERSION}\$" binaries/cni-plugins/${CNI_VERSION}/.cni 2>/dev/null
   fi
   echo ${CNI_VERSION} > binaries/cni-plugins/${CNI_VERSION}/.cni
 }
+
+echo "Done! All your binaries locate in scripts/binaries directory"
+popd > /dev/null 2>&1

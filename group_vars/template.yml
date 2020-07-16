@@ -101,6 +101,7 @@ kubernetes:
   #   flannel: will deployment flannel plugin (default)
   #   calico: will deployment calico plugin
   #   canal: will deployment canal plugin
+  #   cilium: will deployment cilium plugin
   network: flannel
 
   settings:
@@ -229,3 +230,5 @@ kubernetes:
         typha: quay.io/calico/typha:v3.1.7
         flexvol: calico/pod2daemon-flexvol:v3.13.2
         controllers: calico/kube-controllers:v3.13.2
+      cilium:
+        operator: docker.io/cilium/operator-generic:v1.8.1

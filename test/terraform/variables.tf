@@ -44,3 +44,17 @@ variable "ssh_username" {
 variable "ssh_password" {
   type = "string"
 }
+
+# variable "endpoint" {
+#   type = "string"
+# }
+# variable "access_key" {
+#   type = "string"
+# }
+# variable "secret_key" {
+#   type = "string"
+# }
+# variable "bucket" {
+#   type = "string"
+# }
+
