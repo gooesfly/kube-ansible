@@ -7,6 +7,23 @@
   tags:
     - common
 
+- name: Certificate of the cluster
+  hosts: all
+  become: yes
+  roles:
+    - ca
+  tags:
+    - ca
+
+- name: Deployment etcd cluster
+  hosts: "{% if groups['etcd'] is not defined %}master{% else %}kube-etcd{% endif %}"
+  become: yes
+  serial: 1
+  roles:
+    - etcd
+  tags:
+    - etcd
+
 - name: Init all kubernetes node
   hosts: kubernetes
   roles:

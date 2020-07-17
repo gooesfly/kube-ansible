@@ -97,5 +97,5 @@ grep -q "^${CNI_VERSION}\$" binaries/cni-plugins/${CNI_VERSION}/.cni 2>/dev/null
   echo ${CNI_VERSION} > binaries/cni-plugins/${CNI_VERSION}/.cni
 }
 
-echo "Done! All your binaries locate in scripts/binaries directory"
+printb "Done! All your binaries locate in scripts/binaries directory"
 popd > /dev/null 2>&1
