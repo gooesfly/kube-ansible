@@ -7,7 +7,7 @@ function printb(){
   echo -e "\033[32m$1\033[0m"
 }
 
-ARTIFACT_HOST="artifact.splunk.org.cn"
+ARTIFACT_HOST="artifacts.splunk.org.cn"
 
 pushd $(dirname $0) > /dev/null 2>&1
 
