@@ -7,7 +7,7 @@ DEBUG := false
 DOWNLOAD_WAY := "official"
 
 # binary version
-KUBE_VERSION := "1.14.4"
+KUBE_VERSION := "1.16.13"
 DOCKER_VERSION := "19.03.9"
 ETCD_VERSION := "3.4.5"
 CNI_VERSION := "0.8.5"
