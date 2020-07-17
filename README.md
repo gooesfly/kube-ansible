@@ -52,8 +52,8 @@ if you want to download package from nexus, reference [here](#nexus).
 
 | Parameter  | describe  |  Default | option |
 |---|---|---|---|
-| DOWNLOAD_WAY | Binary download mode  | official  | official or nexus | 
-| KUBE_VERSION | Kubernetes binary version  | 1.14.4  | N/A | 
+| DOWNLOAD_WAY | Binary download mode  | official  | official or nexus or qiniu| 
+| KUBE_VERSION | Kubernetes binary version  | 1.16.13  | N/A | 
 | DOCKER_VERSION | Docker binary version  | 19.03.9  | N/A | 
 | ETCD_VERSION | Etcd binary version  | 3.4.5  | N/A | 
 | CNI_VERSION | CNI binary version  | 0.8.5  | N/A | 
@@ -177,6 +177,9 @@ wget https://github.com/containernetworking/plugins/releases/download/v0.8.5/cni
 * [calico](https://docs.projectcalico.org/getting-started/kubernetes/quickstart)
 * [canal](https://docs.projectcalico.org/getting-started/kubernetes/flannel/flannel) 
 * [flannel](https://github.com/coreos/flannel#flannel)
+* [cilium](https://docs.cilium.io/en/stable/gettingstarted/#gs-guide)
+* [hubble](https://github.com/cilium/hubble)
+
 
 <!-- 
 openssl_certificate                                           Generate and/...
