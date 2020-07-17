@@ -35,23 +35,23 @@ grep -q "^${DOCKER_VERSION}\$" binaries/docker/${DOCKER_VERSION}/.docker 2>/dev/
   binaries/docker/${DOCKER_VERSION}/dockerd --version > /dev/null 2>&1 && echo ${DOCKER_VERSION} > binaries/docker/${DOCKER_VERSION}/.docker
 }
 
-# flannel
-FLANNEL_VERSION=${FLANNEL_VERSION:-"0.12.0"}
-printb "Prepare flannel ${FLANNEL_VERSION} release ..."
-mkdir -p binaries/flannel/${FLANNEL_VERSION}
-grep -q "^${FLANNEL_VERSION}\$" binaries/flannel/${FLANNEL_VERSION}/.flannel 2>/dev/null || {
-  if [ ! -f src/flannel-v${FLANNEL_VERSION}-linux-amd64.tar.gz ];then
-    printb "Download from the Internet..."
-    curl ${DOWNLOAD_OPTION} http://${NEXUS_DOMAIN_NAME}/repository/${NEXUS_REPOSITORY}/coreos/flannel/releases/download/v${FLANNEL_VERSION}/flannel-v${FLANNEL_VERSION}-linux-amd64.tar.gz -o binaries/flannel/${FLANNEL_VERSION}/flannel-v${FLANNEL_VERSION}-linux-amd64.tar.gz
-    tar -zxf binaries/flannel/${FLANNEL_VERSION}/flannel-v${FLANNEL_VERSION}-linux-amd64.tar.gz -C binaries/flannel/${FLANNEL_VERSION}/ flanneld mk-docker-opts.sh
-    rm -rf binaries/flannel/${FLANNEL_VERSION}/flannel-v${FLANNEL_VERSION}-linux-amd64.tar.gz
-  else
-    printb "Use local binary packages..."
-    tar -zxf src/flannel-v${FLANNEL_VERSION}-linux-amd64.tar.gz --strip-components 1 -C binaries/flannel/${FLANNEL_VERSION}/ flanneld mk-docker-opts.sh
-  fi
-  chmod +x binaries/flannel/${FLANNEL_VERSION}/*
-  binaries/flannel/${FLANNEL_VERSION}/flanneld -version > /dev/null 2>&1 && echo ${FLANNEL_VERSION} > binaries/flannel/${FLANNEL_VERSION}/.flannel
-}
+# # flannel
+# FLANNEL_VERSION=${FLANNEL_VERSION:-"0.12.0"}
+# printb "Prepare flannel ${FLANNEL_VERSION} release ..."
+# mkdir -p binaries/flannel/${FLANNEL_VERSION}
+# grep -q "^${FLANNEL_VERSION}\$" binaries/flannel/${FLANNEL_VERSION}/.flannel 2>/dev/null || {
+#   if [ ! -f src/flannel-v${FLANNEL_VERSION}-linux-amd64.tar.gz ];then
+#     printb "Download from the Internet..."
+#     curl ${DOWNLOAD_OPTION} http://${NEXUS_DOMAIN_NAME}/repository/${NEXUS_REPOSITORY}/coreos/flannel/releases/download/v${FLANNEL_VERSION}/flannel-v${FLANNEL_VERSION}-linux-amd64.tar.gz -o binaries/flannel/${FLANNEL_VERSION}/flannel-v${FLANNEL_VERSION}-linux-amd64.tar.gz
+#     tar -zxf binaries/flannel/${FLANNEL_VERSION}/flannel-v${FLANNEL_VERSION}-linux-amd64.tar.gz -C binaries/flannel/${FLANNEL_VERSION}/ flanneld mk-docker-opts.sh
+#     rm -rf binaries/flannel/${FLANNEL_VERSION}/flannel-v${FLANNEL_VERSION}-linux-amd64.tar.gz
+#   else
+#     printb "Use local binary packages..."
+#     tar -zxf src/flannel-v${FLANNEL_VERSION}-linux-amd64.tar.gz --strip-components 1 -C binaries/flannel/${FLANNEL_VERSION}/ flanneld mk-docker-opts.sh
+#   fi
+#   chmod +x binaries/flannel/${FLANNEL_VERSION}/*
+#   binaries/flannel/${FLANNEL_VERSION}/flanneld -version > /dev/null 2>&1 && echo ${FLANNEL_VERSION} > binaries/flannel/${FLANNEL_VERSION}/.flannel
+# }
 
 # ectd
 ETCD_VERSION=${ETCD_VERSION:-"3.3.10"}
