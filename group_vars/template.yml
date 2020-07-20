@@ -149,8 +149,8 @@ kubernetes:
     bind: 0.0.0.0
     log:
       logLevel: 2
-      logDir: /var/log/kubernetes
-      logFile: kubelet.log
+      logDir: /var/log/kubernetes/kubelet
+      # logFile: kubelet.log
     pod_infra_container_image: registry.aliyuncs.com/google_containers/pause:3.2
     image_pull_progress_deadline: 2m
 
@@ -180,16 +180,16 @@ kubernetes:
       - Hostname
     log:
       logLevel: 2
-      logDir: /var/log/kubernetes
-      logFile: kube-apiserver.log
+      logDir: /var/log/kubernetes/kube-apiserver
+      # logFile: kube-apiserver.log
 
   # kube-scheduler parameter configuration
   scheduler: 
     bind: 0.0.0.0
     log:
       logLevel: 2
-      logDir: /var/log/kubernetes
-      logFile: kube-scheduler.log
+      logDir: /var/log/kubernetes/kube-scheduler
+      # logFile: kube-scheduler.log
 
   # kube-controller-manager parameter configuration
   controllerManager:
@@ -198,15 +198,15 @@ kubernetes:
     nodeStatusUpdate: Medium
     log:
       logLevel: 2
-      logDir: /var/log/kubernetes
-      logFile: kube-controller-manager.log
+      logDir: /var/log/kubernetes/kube-controller-manager
+      # logFile: kube-controller-manager.log
 
   # kube-proxy parameter configuration
   proxy:
     log:
       logLevel: 2
-      logDir: /var/log/kubernetes
-      logFile: kube-proxy.log
+      logDir: /var/log/kubernetes/kube-proxy
+      # logFile: kube-proxy.log
 
   addon:
     # add-on manifests directory

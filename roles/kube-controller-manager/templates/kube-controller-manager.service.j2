@@ -68,9 +68,8 @@ ExecStart=/usr/local/bin/kube-controller-manager \
     {%- endif -%}
 {%- endif %} \
 {% if kubernetes.controllerManager.log is defined %}
-  --logtostderr=true \
+  --logtostderr=false \
   --log-dir={{ kubernetes.controllerManager.log.logDir }} \
-  --log-file={{ kubernetes.controllerManager.log.logDir }}/{{ kubernetes.controllerManager.log.logFile }} \
 {% endif %}
   --v={{ kubernetes.controllerManager.log.logLevel | default(2) }}
 

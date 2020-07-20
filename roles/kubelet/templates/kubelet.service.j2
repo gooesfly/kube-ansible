@@ -23,9 +23,8 @@ ExecStart=/usr/local/bin/kubelet \
   --tls-cipher-suites=TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305,TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305,TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384,TLS_RSA_WITH_AES_256_GCM_SHA384,TLS_RSA_WITH_AES_128_GCM_SHA256 \
 {% if kubernetes.kubelet.log is defined %}
   --alsologtostderr=true \
-  --logtostderr=true \
+  --logtostderr=false \
   --log-dir={{ kubernetes.kubelet.log.logDir }} \
-  --log-file={{ kubernetes.kubelet.log.logDir }}/{{ kubernetes.kubelet.log.logFile }} \
 {% endif %}
   --v={{ kubernetes.kubelet.log.logLevel | default(2)}}
 
