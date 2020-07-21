@@ -131,7 +131,20 @@
     dest: /usr/local/bin/etcd-check
     mode: 755
 
+- name: Install Backup command
+  template: 
+    src: etcd-backup.j2
+    dest: /usr/local/bin/etcd-backup
+    mode: 755
+
 - name: Health check
   shell: |
     ETCDCTL_API=3 /usr/local/bin/etcdctl --endpoints {{ ansible_default_ipv4.address }}:2379 --cacert {{ kubernetes.ssl.location }}/etcd/ca.crt --cert {{ kubernetes.ssl.location }}/etcd/server.crt --key {{ kubernetes.ssl.location }}/etcd/server.key endpoint health
   when: etcd_service.changed
+
+- name: Create backup kubernetes etcd data in cron
+  cron:
+    name: "backup kubernetes etcd data"
+    minute: "0"
+    hour: "2"
+    job: "/usr/local/bin/etcd-backup"

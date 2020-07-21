@@ -1,0 +1,28 @@
+#!/bin/bash
+{%- set etcdnode=[] %}
+{%- if groups['etcd'] is not defined %}
+    {%- for host in groups['master'] %}
+        {{ etcdnode.append(host) }}
+    {%- endfor%}
+{%- else%}
+    {%- for host in groups['etcd'] %}
+        {{ etcdnode.append(host) }}
+    {%- endfor%}
+{%- endif %}
+
+command -v jq > /dev/null 2>&1 || exit 1
+
+ETCDCTL_API=3
+
+FILENAME=$(date +%Y-%m-%d)
+
+LEADER=$(/usr/local/bin/etcdctl --endpoints {% for host in etcdnode %}{{ host }}:2379{% if not loop.last %},{% endif %}{% endfor %} --cacert {{ kubernetes.ssl.location }}/etcd/ca.crt --cert {{ kubernetes.ssl.location }}/etcd/healthcheck-client.crt --key {{ kubernetes.ssl.location }}/etcd/healthcheck-client.key endpoint status --write-out=json | jq .[0].Status.leader)
+
+ENDPOINT=$(/usr/local/bin/etcdctl --endpoints {% for host in etcdnode %}{{ host }}:2379{% if not loop.last %},{% endif %}{% endfor %} --cacert {{ kubernetes.ssl.location }}/etcd/ca.crt --cert {{ kubernetes.ssl.location }}/etcd/healthcheck-client.crt --key {{ kubernetes.ssl.location }}/etcd/healthcheck-client.key endpoint status --write-out=json | jq -r ".[] | select(.Status.header.member_id == ${LEADER}) | .Endpoint")
+
+/usr/local/bin/etcdctl \
+--command-timeout=3s \
+--endpoints ${ENDPOINT} \
+--cacert {{ kubernetes.ssl.location }}/etcd/ca.crt \
+--cert {{ kubernetes.ssl.location }}/etcd/server.crt \
+--key {{ kubernetes.ssl.location }}/etcd/server.key snapshot save /tmp/kubernetes-etcd.${FILENAME}.db
