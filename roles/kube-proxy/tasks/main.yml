@@ -9,12 +9,18 @@
     group: root
   with_items:
     - kube-proxy
+  register: kube_proxy_bin
 
 - name: Create log directory
   file: 
     name: '{{ kubernetes.proxy.log.logDir }}'
     state: directory
     mode: '0755'
+
+- name: Configuration logrotate
+  template: 
+    src: kube-proxy.j2
+    dest: /etc/logrotate.d/kube-proxy
 
 - name: Create ssl directory
   file: 
@@ -48,37 +54,13 @@
 - name: Create kube-proxy certificate
   shell: |
     openssl genrsa -out kube-proxy.key 2048 && \
-    openssl req -new -key kube-proxy.key -subj "/CN=system:kube-proxy" -out kube-proxy.csr && \
+    openssl req -new -key kube-proxy.key -subj "/CN=system:kube-proxy/O=system:node-proxier" -out kube-proxy.csr && \
     openssl x509 -req -in kube-proxy.csr -CA ca.crt -CAkey ca.key -CAcreateserial -extensions v3_req_client -extfile openssl.cnf -out kube-proxy.crt -days {{ kubernetes.ssl.days | default(3652) }}
   args:
     chdir: '{{ kubernetes.ssl.location }}'
     executable: /bin/bash
   register: kube_proxy_certificate
   when: kube_proxy_certificate_expired.rc != 0
-
-# - name: Create kube-proxy sa crb --- part.1
-#   copy: 
-#     src: '{{ item }}'
-#     dest: '/etc/kubernetes/{{ item }}'
-#   run_once: true
-#   with_items:
-#     - kube-proxy-crb.yml
-#     - kube-proxy-sa.yml
-#   when: inventory_hostname in groups['master']
-
-# - name: Create kube-proxy sa crb --- part.2
-#   command: 'kubectl apply -f /etc/kubernetes/{{ item }}'
-#   run_once: true
-#   with_items:
-#     - kube-proxy-crb.yml
-#     - kube-proxy-sa.yml
-#   when: inventory_hostname in groups['master']
-
-# - name: Register jwt token
-#   shell: |
-#     secret=$(kubectl -n kube-system get sa kube-proxy --output=jsonpath='{.secrets[0].name}')
-#     kubectl -n kube-system get secret/${secret} --output=jsonpath='{.data.token}' | base64 -d
-#   register: JWT_TOKEN
 
 - name: Create kubeconfig
   shell: |
@@ -125,6 +107,8 @@
     /usr/local/bin/kubectl config use-context {{ kubernetes.name | default("kubernetes") }} --kubeconfig=/etc/kubernetes/{{ item.KUBE_CONFIG }}
   with_items:
     - { KUBE_USER: 'kube-proxy', KUBE_CERT: 'kube-proxy', KUBE_CONFIG: 'kube-proxy.kubeconfig' }
+  register: kube_proxy_kubeconfig
+  when: kube_proxy_certificate.changed
 
 - name: Change file permissions
   file:
@@ -135,11 +119,13 @@
   template: 
     src: kube-proxy.conf.j2
     dest: /etc/kubernetes/kube-proxy.conf
+  register: kube_proxy_conf
 
 - name: Install systemd file
   template: 
     src: kube-proxy.service.j2
     dest: /etc/systemd/system/kube-proxy.service
+  register: kube_proxy_systemd
 
 - name: Start the service
   systemd:
@@ -147,6 +133,8 @@
     state: restarted
     enabled: yes
     daemon_reload: yes
+  register: kube_proxy_service
+  when: kube_proxy_bin.changed or kube_proxy_certificate.changed or kube_proxy_kubeconfig.changed or kube_proxy_systemd.changed
 
 # - name: Waiting for the service
 #   wait_for:
@@ -163,13 +151,14 @@
   retries: 30
   delay: 5
   connection: local
+  when: kube_proxy_service.changed
 
-- name: Clean kube-proxy ca and crb yml file
-  file:
-    path: '/etc/kubernetes/{{ item }}'
-    state: absent
-  run_once: true
-  with_items:
-    - kube-proxy-crb.yml
-    - kube-proxy-sa.yml
-  when: inventory_hostname in groups['master']
+# - name: Clean kube-proxy ca and crb yml file
+#   file:
+#     path: '/etc/kubernetes/{{ item }}'
+#     state: absent
+#   run_once: true
+#   with_items:
+#     - kube-proxy-crb.yml
+#     - kube-proxy-sa.yml
+#   when: inventory_hostname in groups['master']

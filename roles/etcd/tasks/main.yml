@@ -1,5 +1,21 @@
 ---
 # tasks file for etcd
+- name: Add the group 'etcd'
+  group:
+    name: etcd
+    state: present
+    system: True
+
+- name: Add the user 'etcd'
+  user:
+    name: etcd
+    home: '{{ kubernetes.etcd.datadir }}'
+    comment: etcd service account
+    create_home: False
+    shell: /sbin/nologin
+    system: True
+    group: etcd
+
 - name: Install the binary
   copy: 
     src: '{{ item }}'
@@ -13,21 +29,25 @@
 - name: Create data directory
   file: 
     name: '{{ kubernetes.etcd.datadir }}'
-    recurse: yes
     state: directory
     mode: 0700
+    owner: etcd
+    group: etcd
 
 - name: Create certificate directory
   file: 
     name: '{{ kubernetes.ssl.location }}/etcd'
-    recurse: yes
     state: directory
+    owner: etcd
+    group: etcd
 
 - name: Distribution of certificate
   copy: 
     src: '{{ item }}'
     dest: '{{ kubernetes.ssl.location }}/etcd'
     mode: 0644
+    owner: etcd
+    group: etcd
   with_items:
     - '/etc/ssl/{{ kubernetes.project }}/etcd/ca.crt'
     - '/etc/ssl/{{ kubernetes.project }}/etcd/ca.key'
@@ -47,6 +67,7 @@
     openssl genrsa -out etcd/server.key 2048 && \
     openssl req -new -key etcd/server.key -subj "/CN=etcd-server" -out etcd/server.csr && \
     openssl x509 -in etcd/server.csr -req -CA etcd/ca.crt -CAkey etcd/ca.key -CAcreateserial -extensions v3_req_etcd -extfile openssl.cnf -out etcd/server.crt -days {{ kubernetes.ssl.days | default(3652) }}
+    chown etcd:etcd etcd/server.key etcd/server.csr etcd/server.crt
   args:
     chdir: '{{ kubernetes.ssl.location }}'
     executable: /bin/bash
@@ -94,6 +115,22 @@
     chdir: '{{ kubernetes.ssl.location }}'
     executable: /bin/bash
   when: etcd_healthcheck_certificate_expired.rc != 0
+
+- name: Change file ownership, group and permissions
+  file:
+    path: '{{ item }}'
+    owner: etcd
+    group: etcd
+    mode: '0644'
+  with_items:
+    - '{{ kubernetes.ssl.location }}/etcd/ca.crt'
+    - '{{ kubernetes.ssl.location }}/etcd/ca.key'
+    - '{{ kubernetes.ssl.location }}/etcd/healthcheck-client.crt'
+    - '{{ kubernetes.ssl.location }}/etcd/healthcheck-client.key'
+    - '{{ kubernetes.ssl.location }}/etcd/peer.crt'
+    - '{{ kubernetes.ssl.location }}/etcd/peer.key'
+    - '{{ kubernetes.ssl.location }}/etcd/server.crt'
+    - '{{ kubernetes.ssl.location }}/etcd/server.key'
 
 - name: Install systemd file
   template: 

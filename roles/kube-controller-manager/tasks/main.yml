@@ -17,6 +17,11 @@
     state: directory
     mode: '0755'
 
+- name: Configuration logrotate
+  template: 
+    src: kube-controller-manager.j2
+    dest: /etc/logrotate.d/kube-controller-manager
+
 - name: Create ssl directory
   file: 
     name: '{{ item }}'
@@ -49,7 +54,7 @@
 - name: Create kube-controller-manager
   shell: |
     openssl genrsa -out kube-controller-manager.key 2048 && \
-    openssl req -new -key kube-controller-manager.key -subj "/CN=system:kube-controller-manager" -out kube-controller-manager.csr && \
+    openssl req -new -key kube-controller-manager.key -subj "/CN=system:kube-controller-manager/O=system:kube-controller-manager" -out kube-controller-manager.csr && \
     openssl x509 -req -in kube-controller-manager.csr -CA ca.crt -CAkey ca.key -CAcreateserial -extensions v3_req_client -extfile openssl.cnf -out kube-controller-manager.crt -days {{ kubernetes.ssl.days | default(3652) }}
   args:
     chdir: '{{ kubernetes.ssl.location }}'

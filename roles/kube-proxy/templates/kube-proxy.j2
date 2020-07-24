@@ -1,0 +1,32 @@
+{{ kubernetes.proxy.log.logDir | default("/var/log/kubernetes/kube-proxy") }}/kube-proxy.*.log.ERROR.* {
+    rotate {{ kubernetes.proxy.log.logRotate | default("7") }}
+    size {{ kubernetes.proxy.log.logSize | default("100M") }}
+    olddir {{ kubernetes.proxy.log.logDir | default("/var/log/kubernetes/kube-proxy") }}
+    missingok
+    notifempty
+    compress
+    nodelaycompress
+    copytruncate
+}
+
+{{ kubernetes.proxy.log.logDir | default("/var/log/kubernetes/kube-proxy") }}/kube-proxy.*.log.INFO.* {
+    rotate {{ kubernetes.proxy.log.logRotate | default("7") }}
+    size {{ kubernetes.proxy.log.logSize | default("100M") }}
+    olddir {{ kubernetes.proxy.log.logDir | default("/var/log/kubernetes/kube-proxy") }}
+    missingok
+    notifempty
+    compress
+    nodelaycompress
+    copytruncate
+}
+
+{{ kubernetes.proxy.log.logDir | default("/var/log/kubernetes/kube-proxy") }}/kube-proxy.*.log.WARNING.* {
+    rotate {{ kubernetes.proxy.log.logRotate | default("7") }}
+    size {{ kubernetes.proxy.log.logSize | default("100M") }}
+    olddir {{ kubernetes.proxy.log.logDir | default("/var/log/kubernetes/kube-proxy") }}
+    missingok
+    notifempty
+    compress
+    nodelaycompress
+    copytruncate
+}

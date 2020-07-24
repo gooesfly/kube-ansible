@@ -1,0 +1,10 @@
+{{ kubernetes.scheduler.log.logDir | default("/var/log/kubernetes/kube-scheduler") }}/kube-scheduler.*.log.* {
+    daily
+    rotate {{ kubernetes.scheduler.log.logRotate | default("7") }}
+    olddir {{ kubernetes.scheduler.log.logDir | default("/var/log/kubernetes/kube-scheduler") }}
+    missingok
+    notifempty
+    compress
+    nodelaycompress
+    copytruncate
+}

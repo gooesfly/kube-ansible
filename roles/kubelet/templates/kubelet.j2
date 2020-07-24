@@ -1,0 +1,10 @@
+{{ kubernetes.kubelet.log.logDir | default("/var/log/kubernetes/kubelet") }}/kubelet.*.log.* {
+    daily
+    rotate {{ kubernetes.kubelet.log.logRotate | default("7") }}
+    olddir {{ kubernetes.kubelet.log.logDir | default("/var/log/kubernetes/kubelet") }}
+    missingok
+    notifempty
+    compress
+    nodelaycompress
+    copytruncate
+}

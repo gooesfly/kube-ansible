@@ -1,0 +1,10 @@
+{{ kubernetes.controllerManager.log.logDir | default("/var/log/kubernetes/kube-controller-manager") }}/kube-controller-manager.*.log.* {
+    daily
+    rotate {{ kubernetes.controllerManager.log.logRotate | default("7") }}
+    olddir {{ kubernetes.controllerManager.log.logDir | default("/var/log/kubernetes/kube-controller-manager") }}
+    missingok
+    notifempty
+    compress
+    nodelaycompress
+    copytruncate
+}

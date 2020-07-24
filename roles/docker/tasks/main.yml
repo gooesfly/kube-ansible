@@ -1,5 +1,19 @@
 ---
 # tasks file for docker
+- name: Add the group 'docker'
+  group:
+    name: docker
+    state: present
+    system: True
+
+- name: Add the user 'docker'
+  user:
+    name: docker
+    comment: docker service account
+    shell: /sbin/nologin
+    system: True
+    group: docker
+
 - name: Install the binary
   copy: 
     src: '{{ item }}'

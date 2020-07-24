@@ -1,0 +1,10 @@
+{{ kubernetes.apiserver.log.logDir | default("/var/log/kubernetes/kube-apiserver") }}/kube-apiserver.*.log.* {
+    daily
+    rotate {{ kubernetes.apiserver.log.logRotate | default("7") }}
+    olddir {{ kubernetes.apiserver.log.logDir | default("/var/log/kubernetes/kube-apiserver") }}
+    missingok
+    notifempty
+    compress
+    nodelaycompress
+    copytruncate
+}

@@ -17,6 +17,11 @@
     state: directory
     mode: '0755'
 
+- name: Configuration logrotate
+  template: 
+    src: kube-apiserver.j2
+    dest: /etc/logrotate.d/kube-apiserver
+
 - name: Create ssl directory
   file: 
     name: '{{ kubernetes.ssl.location }}'
@@ -48,7 +53,7 @@
 - name: Create kube-apiserver certificate
   shell: |
     openssl genrsa -out apiserver.key 2048 && \
-    openssl req -new -key apiserver.key -subj "/CN=kube-apiserver" -config openssl.cnf -out apiserver.csr && \
+    openssl req -new -key apiserver.key -subj "/CN=kube-apiserver/O=Kubernetes" -config openssl.cnf -out apiserver.csr && \
     openssl x509 -req -in apiserver.csr -CA ca.crt -CAkey ca.key -CAcreateserial -extensions v3_req_apiserver -extfile openssl.cnf -out apiserver.crt -days {{ kubernetes.ssl.days | default(3652) }}
   args:
     chdir: '{{ kubernetes.ssl.location }}'

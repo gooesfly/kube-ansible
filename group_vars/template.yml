@@ -149,8 +149,9 @@ kubernetes:
     bind: 0.0.0.0
     log:
       logLevel: 2
+      logRotate: 7
+      logSize: 100M
       logDir: /var/log/kubernetes/kubelet
-      # logFile: kubelet.log
     pod_infra_container_image: registry.aliyuncs.com/google_containers/pause:3.2
     image_pull_progress_deadline: 2m
 
@@ -179,17 +180,19 @@ kubernetes:
       - ExternalIP
       - Hostname
     log:
-      logLevel: 2
       logDir: /var/log/kubernetes/kube-apiserver
-      # logFile: kube-apiserver.log
+      logLevel: 2
+      logRotate: 7
+      logSize: 100M
 
   # kube-scheduler parameter configuration
   scheduler: 
     bind: 0.0.0.0
     log:
-      logLevel: 2
       logDir: /var/log/kubernetes/kube-scheduler
-      # logFile: kube-scheduler.log
+      logLevel: 2
+      logRotate: 7
+      logSize: 100M
 
   # kube-controller-manager parameter configuration
   controllerManager:
@@ -197,16 +200,18 @@ kubernetes:
     terminatedPodGcThreshold: 12500
     nodeStatusUpdate: Medium
     log:
-      logLevel: 2
       logDir: /var/log/kubernetes/kube-controller-manager
-      # logFile: kube-controller-manager.log
+      logLevel: 2
+      logRotate: 7
+      logSize: 100M
 
   # kube-proxy parameter configuration
   proxy:
     log:
-      logLevel: 2
       logDir: /var/log/kubernetes/kube-proxy
-      # logFile: kube-proxy.log
+      logLevel: 2
+      logRotate: 7
+      logSize: 100M
 
   addon:
     # add-on manifests directory

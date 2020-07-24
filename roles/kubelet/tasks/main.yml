@@ -9,6 +9,7 @@
     group: root
   with_items:
     - kubelet
+  register: kubelet_bin
 
 - name: Create data directory
   file: 
@@ -26,21 +27,15 @@
     state: directory
     mode: '0755'
 
+- name: Configuration logrotate
+  template: 
+    src: kubelet.j2
+    dest: /etc/logrotate.d/kubelet
+
 - name: Install config file
   template: 
     src: kubelet-conf.yml.j2
     dest: /etc/kubernetes/kubelet-conf.yml
-
-- name: Create kube endpoints
-  template: 
-    src: '{{ item.src }}'
-    dest: '/etc/kubernetes/manifests/{{ item.dest }}'
-  with_items:
-    - { src: 'kube-controller-manager.ep.yaml.j2', dest: 'kube-controller-manager.ep.yaml' }
-    - { src: 'kube-controller-manager.svc.yaml.j2', dest: 'kube-controller-manager.svc.yaml' }
-    - { src: 'kube-scheduler.ep.yaml.j2', dest: 'kube-scheduler.ep.yaml' }
-    - { src: 'kube-scheduler.svc.yaml.j2', dest: 'kube-scheduler.svc.yaml' }
-  when: inventory_hostname in groups['master']
 
 - name: Distribution of certificate
   copy: 
@@ -51,62 +46,32 @@
   with_items:
     - '/etc/ssl/{{ kubernetes.project }}/ca.crt'
 
-- name: Check bootstrap token
-  command: /usr/local/bin/kubectl get secret -n kube-system -l ansible=true --output="jsonpath={.items[0].metadata.name}"
-  register: bootstrap_token
+- name: Check kubelet certificate expired(30 days)
+  shell: |
+    [ -f kubelet.crt ] && 
+    openssl x509 -in kubelet.crt -noout -text -checkend 2592000
+  register: kubelet_certificate_expired
   ignore_errors: True
-  run_once: true
+  args:
+    chdir: '{{ kubernetes.ssl.location }}'
+    executable: /bin/bash
 
-- name: Register token id
+- name: Create kubelet certificate
   shell: |
-    {% if bootstrap_token.rc == 0 %}
-    /usr/local/bin/kubectl get secret -n kube-system -l ansible=true --output="jsonpath={.items[0].data.token-id}"
-    {% else %}
-      {% if inventory_hostname in groups['master'] %}
-      openssl rand -hex 3 | base64
-      {% else %}
-      /usr/local/bin/kubectl get secret -n kube-system -l ansible=true --output="jsonpath={.items[0].data.token-id}"
-      {% endif %}
+    {% set hostname_override = ansible_hostname %}
+    {% if nodename is defined %}
+      {%- set hostname_override = nodename %}
     {% endif %}
-  register: TOKEN_ID
-  run_once: true
+    openssl genrsa -out kubelet.key 2048
+    openssl req -new -key kubelet.key -subj "/CN=system:node:{{ hostname_override }}/O=system:nodes" -out kubelet.csr
+    openssl x509 -req -in kubelet.csr -CA ca.crt -CAkey ca.key -CAcreateserial -extensions v3_req_client -extfile openssl.cnf -out kubelet.crt -days {{ kubernetes.ssl.days | default(3652) }}
+  args:
+    chdir: '{{ kubernetes.ssl.location }}'
+    executable: /bin/bash
+  register: kubelet_certificate
+  when: kubelet_certificate_expired.rc != 0
 
-- name: Register token secret
-  shell: |
-    {% if bootstrap_token.rc == 0 %}
-      /usr/local/bin/kubectl get secret -n kube-system -l ansible=true --output="jsonpath={.items[0].data.token-secret}"
-    {% else %}
-      {% if inventory_hostname in groups['master'] %}
-        openssl rand -hex 8 | base64
-      {% else %}
-        /usr/local/bin/kubectl get secret -n kube-system -l ansible=true --output="jsonpath={.items[0].data.token-secret}"
-      {% endif %}
-    {% endif %}
-  register: TOKEN_SECRET
-  run_once: true
-
-- name: Create bootstrap token
-  shell: |
-    /usr/local/bin/kubectl -n kube-system create secret generic bootstrap-token-{{ TOKEN_ID.stdout | b64decode | trim  }} \
-    --type 'bootstrap.kubernetes.io/token' \
-    --from-literal description="cluster bootstrap token" \
-    --from-literal token-id={{ TOKEN_ID.stdout | b64decode | trim }} \
-    --from-literal token-secret={{ TOKEN_SECRET.stdout | b64decode | trim }} \
-    --from-literal usage-bootstrap-authentication=true \
-    --from-literal usage-bootstrap-signing=true
-
-    /usr/local/bin/kubectl label secrets -n kube-system bootstrap-token-{{ TOKEN_ID.stdout | b64decode | trim }} ansible=true
-  run_once: true
-  when: bootstrap_token.rc != 0 and inventory_hostname in groups['master']
-
-- name: debug TOKEN_ID
-  debug: 
-    msg: '{{TOKEN_ID}}'
-- name: debug TOKEN_SECRET
-  debug: 
-    msg: '{{TOKEN_SECRET}}'
-
-- name: Create bootstrap kubeconfig
+- name: Create kubeconfig
   shell: |
     {% set KUBE_APISERVER_ADDR, KUBE_APISERVER_PORT = ansible_default_ipv4.address, 6443 %}
     {% if kubernetes.ha is defined %}
@@ -137,58 +102,28 @@
       --server=https://{{ KUBE_APISERVER_ADDR }}:{{ KUBE_APISERVER_PORT }} \
       --kubeconfig=/etc/kubernetes/{{ item.KUBE_CONFIG }}
 
-    /usr/local/bin/kubectl config set-context {{ item.KUBE_USER }}@{{ kubernetes.name | default("kubernetes") }} \
+    /usr/local/bin/kubectl config set-credentials {{ item.KUBE_USER }} \
+      --embed-certs=true \
+      --client-certificate={{ kubernetes.ssl.location }}/{{ item.KUBE_CERT }}.crt \
+      --client-key={{ kubernetes.ssl.location }}/{{ item.KUBE_CERT }}.key \
+      --kubeconfig=/etc/kubernetes/{{ item.KUBE_CONFIG }}
+
+    /usr/local/bin/kubectl config set-context {{ kubernetes.name | default("kubernetes") }} \
       --cluster={{ kubernetes.name | default("kubernetes") }} \
       --user={{ item.KUBE_USER }} \
       --kubeconfig=/etc/kubernetes/{{ item.KUBE_CONFIG }}
 
-    /usr/local/bin/kubectl config set-credentials {{ item.KUBE_USER }} \
-      --token={{ TOKEN_ID.stdout | b64decode | trim }}.{{ TOKEN_SECRET.stdout | b64decode | trim }} \
-      --kubeconfig=/etc/kubernetes/{{ item.KUBE_CONFIG }}
-
-    /usr/local/bin/kubectl config use-context {{ item.KUBE_USER }}@{{ kubernetes.name | default("kubernetes") }} --kubeconfig=/etc/kubernetes/{{ item.KUBE_CONFIG }}
+    /usr/local/bin/kubectl config use-context {{ kubernetes.name | default("kubernetes") }} --kubeconfig=/etc/kubernetes/{{ item.KUBE_CONFIG }}
   with_items:
-    - { KUBE_USER: 'kubelet-bootstrap', KUBE_CONFIG: 'bootstrap.kubeconfig' }
-
-- name: Create auto-approve --- part.1
-  copy: 
-    src: '{{ item }}'
-    dest: '/etc/kubernetes/{{ item }}'
-  run_once: true
-  with_items:
-    - auto-approve-csrs-for-group.yml
-    - auto-approve-renewals-for-nodes.yml
-    - create-csrs-for-bootstrapping.yml
-  when: inventory_hostname in groups['master']
-
-- name: Create auto-approve --- part.2
-  command: '/usr/local/bin/kubectl apply -f /etc/kubernetes/{{ item }}'
-  run_once: true
-  with_items:
-    - auto-approve-csrs-for-group.yml
-    - auto-approve-renewals-for-nodes.yml
-    - create-csrs-for-bootstrapping.yml
-  when: inventory_hostname in groups['master']
+    - { KUBE_USER: 'system:node:{{ ansible_hostname }}', KUBE_CERT: 'kubelet', KUBE_CONFIG: 'kubelet.kubeconfig' }
+  register: kubelet_kubeconfig
+  when: kubelet_certificate.changed
 
 - name: Install systemd file
   template: 
     src: kubelet.service.j2
     dest: /etc/systemd/system/kubelet.service
-
-# - name: Clean old tls file --- part.1
-#   find:
-#     paths: '{{ kubernetes.ssl.location }}'
-#     patterns: 
-#       - "kubelet*"
-#     use_regex: yes
-#     recurse: yes
-#   register: kubelet_files
-
-# - name: Clean old tls file --- part.2
-#   file:
-#     path: '{{ item.path }}'
-#     state: absent
-#   with_items: '{{ kubelet_files.files }}'
+  register: kubelet_systemd
 
 - name: Start the service
   systemd:
@@ -196,6 +131,8 @@
     state: restarted
     enabled: yes
     daemon_reload: yes
+  register: kubelet_service
+  when: kubelet_bin.changed or kubelet_certificate.changed or kubelet_kubeconfig.changed or kubelet_systemd.changed
 
 - name: Health check
   uri: 
@@ -207,6 +144,7 @@
   retries: 30
   delay: 5
   connection: local
+  when: kubelet_service.changed
 
 - name: Waiting node on-line
   shell: /usr/local/bin/kubectl get node {% if nodename is defined %}{{ nodename | lower }}{% else %}{{ hostvars[inventory_hostname].ansible_fqdn | lower }}{% endif %}
@@ -215,14 +153,4 @@
   retries: 15
   delay: 5
   changed_when: false
-
-- name: Clean auto-approve yml file
-  file:
-    path: '/etc/kubernetes/{{ item }}'
-    state: absent
-  run_once: true
-  with_items:
-    - auto-approve-csrs-for-group.yml
-    - auto-approve-renewals-for-nodes.yml
-    - create-csrs-for-bootstrapping.yml
-  when: inventory_hostname in groups['master']
+  when: kubelet_service.changed

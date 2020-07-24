@@ -17,6 +17,11 @@
     state: directory
     mode: '0755'
 
+- name: Configuration logrotate
+  template: 
+    src: kube-scheduler.j2
+    dest: /etc/logrotate.d/kube-scheduler
+
 - name: Create ssl directory
   file: 
     name: '{{ item }}'
@@ -49,7 +54,7 @@
 - name: Create kube-scheduler certificate
   shell: |
     openssl genrsa -out kube-scheduler.key 2048 && \
-    openssl req -new -key kube-scheduler.key -subj "/CN=system:kube-scheduler" -out kube-scheduler.csr && \
+    openssl req -new -key kube-scheduler.key -subj "/CN=system:kube-scheduler/O=system:kube-scheduler" -out kube-scheduler.csr && \
     openssl x509 -req -in kube-scheduler.csr -CA ca.crt -CAkey ca.key -CAcreateserial -extensions v3_req_client -extfile openssl.cnf -out kube-scheduler.crt -days {{ kubernetes.ssl.days | default(3652) }}
   args:
     chdir: '{{ kubernetes.ssl.location }}'
