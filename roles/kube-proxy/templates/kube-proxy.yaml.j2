@@ -1,11 +1,3 @@
-{% set AllNode=[] %}
-{% for host in groups['all'] %}
-{% if hostvars[host].ansible_default_ipv4.netmask == "255.255.0.0" %}
-    {{ AllNode.append( hostvars[host].inventory_hostname + '/16') }}
-{% elif hostvars[host].ansible_default_ipv4.netmask == "255.255.255.0" %}
-    {{ AllNode.append(hostvars[host].inventory_hostname + '/24') }}
-{% endif %}
-{% endfor %}
 apiVersion: kubeproxy.config.k8s.io/v1alpha1
 bindAddress: {{ ansible_default_ipv4.address }}
 clientConnection:
@@ -31,7 +23,7 @@ iptables:
     minSyncPeriod: 0s
     syncPeriod: 30s
 ipvs:
-    excludeCIDRs: {{ AllNode }}
+    excludeCIDRs: null
     minSyncPeriod: 0s
     scheduler: ""
     syncPeriod: 30s

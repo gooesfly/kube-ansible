@@ -59,7 +59,7 @@
     chdir: '{{ kubernetes.ssl.location }}'
     executable: /bin/bash
   register: apiserver_certificate
-  when: apiserver_certificate_expired.rc != 0
+  when: apiserver_certificate_expired.rc != 0 or openssl_conf.changed
 
 - name: Check front-proxy-client certificate expired(30 days)
   shell: |
@@ -80,7 +80,7 @@
     chdir: '{{ kubernetes.ssl.location }}'
     executable: /bin/bash
   register: front_proxy_client_certificate
-  when: front_proxy_client_certificate_expired.rc != 0
+  when: front_proxy_client_certificate_expired.rc != 0 or openssl_conf.changed
 
 - name: Check apiserver-kubelet-client certificate expired(30 days)
   shell: |
@@ -101,7 +101,7 @@
     chdir: '{{ kubernetes.ssl.location }}'
     executable: /bin/bash
   register: kubelet_client_certificate
-  when: kubelet_client_certificate_expired.rc != 0
+  when: kubelet_client_certificate_expired.rc != 0 or openssl_conf.changed
 
 - name: Check apiserver-etcd-client certificate expired(30 days)
   shell: |
@@ -122,7 +122,7 @@
     chdir: '{{ kubernetes.ssl.location }}'
     executable: /bin/bash
   register: apiserver_etcd_client_certificate
-  when: apiserver_etcd_client_certificate_expired.rc != 0
+  when: apiserver_etcd_client_certificate_expired.rc != 0 or openssl_conf.changed
 
 - name: Stat encryption config file
   stat: 

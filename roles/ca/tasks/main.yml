@@ -59,6 +59,7 @@
   template: 
     src: 'openssl.cnf.j2'
     dest: '{{ kubernetes.ssl.location }}/openssl.cnf'
+  register: openssl_conf
 
 # - name: Create certificate directory
 #   file: 

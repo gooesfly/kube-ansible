@@ -16,4 +16,3 @@ package:
   - bash-completion
   - nfs-common
   - dnsutils
-  - python3-pip

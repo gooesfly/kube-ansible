@@ -16,4 +16,3 @@ package:
   - bash-completion
   - nfs-utils
   - bind-utils
-  - python3-pip

@@ -36,6 +36,8 @@
   hosts: master
   become: yes
   roles:
+    - haproxy
+    - keepalived
     - docker
     - kubectl
     - kube-apiserver

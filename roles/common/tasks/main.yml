@@ -13,10 +13,6 @@
 - name: Install some applications
   include: "{{ ansible_os_family }}.yml"
 
-- name: Install python modules
-  pip:
-    name: pyyaml
-
 - name: Set the Hostname
   hostname: 
     name: '{{ hostname }}'
