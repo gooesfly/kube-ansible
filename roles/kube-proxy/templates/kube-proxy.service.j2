@@ -14,7 +14,7 @@ After=network.target
 [Service]
 ExecStart=/usr/local/bin/kube-proxy \
   --hostname-override={{ hostname_override }} \
-  --config=/etc/kubernetes/kube-proxy.conf \
+  --config=/etc/kubernetes/kube-proxy.yaml \
 {% if kubernetes.proxy.log is defined %}
   --logtostderr=false \
   --log-dir={{ kubernetes.proxy.log.logDir }} \

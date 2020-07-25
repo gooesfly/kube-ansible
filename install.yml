@@ -36,8 +36,6 @@
   hosts: master
   become: yes
   roles:
-    - haproxy
-    - keepalived
     - docker
     - kubectl
     - kube-apiserver
@@ -81,10 +79,3 @@
     - metrics
   tags:
     - addons
-
-# - name: Deployment test
-#   hosts: kubernetes
-#   roles:
-#     - test
-#   tags:
-#     - test

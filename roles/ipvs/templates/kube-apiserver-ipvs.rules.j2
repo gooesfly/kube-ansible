@@ -1,0 +1,6 @@
+#!/bin/bash
+ipvsadm -D -t {{ ansible_default_ipv4.address }}:443
+ipvsadm -A -t {{ ansible_default_ipv4.address }}:443 -s rr
+{% for host in groups['master'] %}
+ipvsadm -a -t {{ ansible_default_ipv4.address }}:443 -r {{ hostvars[host].inventory_hostname }}:6443 -m -w 1
+{% endfor %}

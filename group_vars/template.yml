@@ -70,9 +70,10 @@ kubernetes:
     days: 3652
     location: /etc/kubernetes/pki
     # for porxy reserved
+    # If the external network accesses the kube-apiserver you can add LB ip on here
     # extension:
     #   - *.xiaomo.io
-    #   - 192.168.1.1
+    #   - 172.16.18.10
 
   # defaullt: kubernetes
   name: kubernetes
@@ -90,11 +91,6 @@ kubernetes:
     #          if ha.vip and ha.mask is defined will use cloud slb keep HA
     type: local
     # file: /etc/kubernetes/cloud.conf
-
-  # kube-apiserver HA configuration
-  # ha:
-  #   vip: 172.16.16.10
-  #   mask: 16
 
   # choose: none flannel calico canals
   #   none: not deployment any network plugin

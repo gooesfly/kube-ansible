@@ -19,7 +19,7 @@
 
 - name: Configuration logrotate
   template: 
-    src: kube-apiserver.j2
+    src: kube-apiserver.logrotate.j2
     dest: /etc/logrotate.d/kube-apiserver
 
 - name: Create ssl directory

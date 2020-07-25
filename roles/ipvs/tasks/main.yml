@@ -8,6 +8,22 @@
     - ipset
     - ipvsadm
 
+- name: Install kube-apiserver ipvs
+  template: 
+    src: kube-apiserver-ipvs.rules.j2
+    dest: /etc/kubernetes/kube-apiserver-ipvs.rules
+    mode: 755
+
+- name: Install kube-apiserver ipvs
+  shell: /etc/kubernetes/kube-apiserver-ipvs.rules
+  ignore_errors: True
+
+- name: Create kube-apiserver ipvs in cron
+  cron:
+    name: "Load kube-apiserver ipvs"
+    minute: "*"
+    job: "/etc/kubernetes/kube-apiserver-ipvs.rules"
+
 - name: Load kernel modules
   modprobe:
     name: '{{ item }}'
