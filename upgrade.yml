@@ -16,7 +16,7 @@
     - ca
 
 - name: Deployment etcd cluster
-  hosts: "{% if groups['etcd'] is not defined %}master{% else %}kube-etcd{% endif %}"
+  hosts: "{% if groups['etcd'] is not defined %}master{% else %}etcd{% endif %}"
   become: yes
   roles:
     - etcd

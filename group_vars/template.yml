@@ -6,6 +6,7 @@ ansible_ssh_user: 'root'
 # ansible_sudo_user: 'root'
 # ansible_sudo_pass: 'root'
 ansible_become: "{% if ansible_ssh_user != 'root' %}yes{% else %}no{% endif %}"
+ansible_python_interpreter: "/usr/bin/python3"
 
 # timezone settings, default is Asia/Shanghai
 timezone: 'Asia/Shanghai'
@@ -239,3 +240,9 @@ kubernetes:
         controllers: calico/kube-controllers:v3.13.2
       cilium:
         operator: docker.io/cilium/operator-generic:v1.8.1
+
+  # apps:
+  #   location: /etc/kubernetes/apps
+  #   files:
+  #     - jenkins
+  #     - traefik

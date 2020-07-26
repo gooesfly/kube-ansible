@@ -3,7 +3,7 @@
 !.gitignore
 
 scripts/binaries
-
+roles/apps/files/*.yaml
 # cni-plugins
 roles/cni-plugins/files/*
 

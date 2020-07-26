@@ -16,6 +16,7 @@
 - name: Install python applications
   pip: 
     name: '{{ item }}'
+    extra_args: "-i https://mirrors.aliyun.com/pypi/simple"
   with_items:
     - pyopenssl>=0.15
     - pyyaml
