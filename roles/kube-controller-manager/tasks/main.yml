@@ -41,15 +41,22 @@
     - '/etc/ssl/{{ kubernetes.project }}/ca.crt'
     - '/etc/ssl/{{ kubernetes.project }}/ca.key'
 
+# - name: Check kube-controller-manager certificate expired(30 days)
+#   shell: |
+#     [ -f kube-controller-manager.crt ] && 
+#     openssl x509 -in kube-controller-manager.crt -noout -text -checkend 2592000
+#   register: kube_controller_manager_certificate_expired
+#   ignore_errors: True
+#   args:
+#     chdir: '{{ kubernetes.ssl.location }}'
+#     executable: /bin/bash
 - name: Check kube-controller-manager certificate expired(30 days)
-  shell: |
-    [ -f kube-controller-manager.crt ] && 
-    openssl x509 -in kube-controller-manager.crt -noout -text -checkend 2592000
+  openssl_certificate:
+    path: '{{ kubernetes.ssl.location }}/kube-controller-manager.crt'
+    provider: assertonly
+    valid_in: "2592000"
+  ignore_errors: yes
   register: kube_controller_manager_certificate_expired
-  ignore_errors: True
-  args:
-    chdir: '{{ kubernetes.ssl.location }}'
-    executable: /bin/bash
 
 - name: Create kube-controller-manager
   shell: |
@@ -60,7 +67,7 @@
     chdir: '{{ kubernetes.ssl.location }}'
     executable: /bin/bash
   register: kube_controller_manager_certificate
-  when: kube_controller_manager_certificate_expired.rc != 0
+  when: kube_controller_manager_certificate_expired.failed
 
 - name: Create kubeconfig
   shell: |

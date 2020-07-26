@@ -15,11 +15,12 @@
     - ca
 
 - name: Init all kubernetes node
-  hosts: worker
+  hosts: kubernetes
+  become: yes
   roles:
-    - ipvs
+    - ipvsadm
   tags:
-    - kubernetes-init
+    - ipvsadm
 
 - name: Deployment kube worker
   hosts: worker

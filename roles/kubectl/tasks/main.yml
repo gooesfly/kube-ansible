@@ -28,15 +28,22 @@
     - '/etc/ssl/{{ kubernetes.project }}/ca.crt'
     - '/etc/ssl/{{ kubernetes.project }}/ca.key'
 
+# - name: Check admin certificate expired(30 days)
+#   shell: |
+#     [ -f admin.crt ] && 
+#     openssl x509 -in admin.crt -noout -text -checkend 2592000
+#   register: admin_certificate_expired
+#   ignore_errors: True
+#   args:
+#     chdir: '{{ kubernetes.ssl.location }}'
+#     executable: /bin/bash
 - name: Check admin certificate expired(30 days)
-  shell: |
-    [ -f admin.crt ] && 
-    openssl x509 -in admin.crt -noout -text -checkend 2592000
+  openssl_certificate:
+    path: '{{ kubernetes.ssl.location }}/admin.crt'
+    provider: assertonly
+    valid_in: "2592000"
+  ignore_errors: yes
   register: admin_certificate_expired
-  ignore_errors: True
-  args:
-    chdir: '{{ kubernetes.ssl.location }}'
-    executable: /bin/bash
 
 - name: Create admin certificate
   shell: |
@@ -47,7 +54,7 @@
     chdir: '{{ kubernetes.ssl.location }}'
     executable: /bin/bash
   register: admin_certificate
-  when: admin_certificate_expired.rc != 0
+  when: admin_certificate_expired.failed
 
 - name: Create admin kubeconfig
   shell: |

@@ -28,9 +28,9 @@
   hosts: kubernetes
   become: yes
   roles:
-    - ipvs
+    - ipvsadm
   tags:
-    - kubernetes-init
+    - ipvsadm
 
 - name: Deployment kube master
   hosts: master
@@ -73,11 +73,11 @@
   hosts: master
   become: yes
   roles:
-    - coredns
-    - flannel
-    - canal
-    - calico
-    - cilium
-    - metrics
+    - addons/coredns
+    - addons/flannel
+    - addons/canal
+    - addons/calico
+    - addons/cilium
+    - addons/metrics
   tags:
     - addons

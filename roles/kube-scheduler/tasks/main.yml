@@ -41,16 +41,22 @@
     - '/etc/ssl/{{ kubernetes.project }}/ca.crt'
     - '/etc/ssl/{{ kubernetes.project }}/ca.key'
 
+# - name: Check kube-scheduler certificate expired(30 days)
+#   shell: |
+#     [ -f kube-scheduler.crt ] && 
+#     openssl x509 -in kube-scheduler.crt -noout -text -checkend 2592000
+#   register: kube_scheduler_certificate_expired
+#   ignore_errors: True
+#   args:
+#     chdir: '{{ kubernetes.ssl.location }}'
+#     executable: /bin/bash
 - name: Check kube-scheduler certificate expired(30 days)
-  shell: |
-    [ -f kube-scheduler.crt ] && 
-    openssl x509 -in kube-scheduler.crt -noout -text -checkend 2592000
+  openssl_certificate:
+    path: '{{ kubernetes.ssl.location }}/kube-scheduler.crt'
+    provider: assertonly
+    valid_in: "2592000"
+  ignore_errors: yes
   register: kube_scheduler_certificate_expired
-  ignore_errors: True
-  args:
-    chdir: '{{ kubernetes.ssl.location }}'
-    executable: /bin/bash
-
 - name: Create kube-scheduler certificate
   shell: |
     openssl genrsa -out kube-scheduler.key 2048 && \
@@ -60,7 +66,7 @@
     chdir: '{{ kubernetes.ssl.location }}'
     executable: /bin/bash
   register: kube_scheduler_certificate
-  when: kube_scheduler_certificate_expired.rc != 0
+  when: kube_scheduler_certificate_expired.failed
 
 - name: Create kubeconfig
   shell: |

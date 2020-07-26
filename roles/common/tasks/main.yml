@@ -13,6 +13,13 @@
 - name: Install some applications
   include: "{{ ansible_os_family }}.yml"
 
+- name: Install python applications
+  pip: 
+    name: '{{ item }}'
+  with_items:
+    - pyopenssl>=0.15
+    - pyyaml
+
 - name: Set the Hostname
   hostname: 
     name: '{{ hostname }}'

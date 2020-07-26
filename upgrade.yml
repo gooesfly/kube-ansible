@@ -25,10 +25,11 @@
 
 - name: Init all kubernetes node
   hosts: kubernetes
+  become: yes
   roles:
-    - ipvs
+    - ipvsadm
   tags:
-    - kubernetes-init
+    - ipvsadm
 
 - name: Deployment kube master
   hosts: master

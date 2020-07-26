@@ -2,11 +2,7 @@
 # tasks file for ipvs
 - name: Install package
   package:
-    name: "{{ packages }}"
-  vars:
-    packages:
-    - ipset
-    - ipvsadm
+    name: ipvsadm
 
 - name: Load kernel modules
   modprobe:
