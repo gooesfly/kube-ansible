@@ -89,4 +89,4 @@ version:
 	@curl -s https://api.github.com/repos/docker/docker-ce/releases | jq -r '.[].name' | grep -Ev 'rc|beta|alpha' | sed 's/v//g' | head -n 15 | sort -r >> .docker
 	@echo "kubernetes" > .kubernetes
 	@curl -s https://api.github.com/repos/kubernetes/kubernetes/releases | jq -r '.[].name' | grep -Ev 'rc|beta|alpha' | sed 's/v//g' | head -n 15 | sort -r >> .kubernetes
-	@paste .etcd .docker .kubernetes
+	@paste -d '|' .etcd .docker .kubernetes | column -t -s '|'

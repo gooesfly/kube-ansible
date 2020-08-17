@@ -141,6 +141,12 @@ kubernetes:
       max-concurrent-downloads: 20
       max-concurrent-uploads: 10
       debug: false
+      default-ulimits:
+        nofile:
+          Name: nofile
+          Hard: 655360
+          Soft: 655360
+
     # systemd:
     #   service:
     #     - Environment="HTTP_PROXY=http://user01:password@10.10.10.10:8080/"
@@ -244,5 +250,5 @@ kubernetes:
   # apps:
   #   location: /etc/kubernetes/apps
   #   files:
-  #     - jenkins
-  #     - traefik
+  #     - jenkins.yaml
+  #     - traefik.yaml

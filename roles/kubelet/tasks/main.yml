@@ -55,7 +55,7 @@
 #   args:
 #     chdir: '{{ kubernetes.ssl.location }}'
 #     executable: /bin/bash
-- name: Check kube-controller-manager certificate expired(30 days)
+- name: Check kubelet certificate expired(30 days)
   openssl_certificate:
     path: '{{ kubernetes.ssl.location }}/kubelet.crt'
     provider: assertonly
