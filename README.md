@@ -1,5 +1,7 @@
 # kube-ansible
 
+This project will used ansible to deployment kubernetes.
+
 Refer to the `README.md` and `group_vars/template.yml` files for project configuration
 
 ## Cloud Support
@@ -182,6 +184,25 @@ wget https://github.com/containernetworking/plugins/releases/download/v0.8.5/cni
 
 
 <!-- 
+kubectl config set-cluster kubernetes \
+--certificate-authority=/etc/kubernetes/pki/ca.crt \
+--embed-certs=false \
+--server=https://172.16.18.10:8443 \
+--kubeconfig=/etc/kubernetes/tmp.kubeconfig
+
+kubectl config set-credentials admin \
+--client-certificate=/etc/kubernetes/pki/admin.crt \
+--client-key=/etc/kubernetes/pki/admin.key \
+--embed-certs=false \
+--kubeconfig=/etc/kubernetes/tmp.kubeconfig
+
+kubectl config set-context default \
+--cluster=kubernetes \
+--user=admin \
+--kubeconfig=/etc/kubernetes/tmp.kubeconfig
+
+kubectl config use-context default --kubeconfig=/etc/kubernetes/tmp.kubeconfig
+
 openssl_certificate                                           Generate and/...
 openssl_certificate_info                                      Provide infor...
 openssl_csr                                                   Generate Open...
@@ -210,7 +231,7 @@ ansible-playbook -i inventory/hosts install.yml -t kube-master
 ansible-playbook -i inventory/hosts install.yml -t kube-worker
 ansible-playbook -i inventory/hosts install.yml -t cleanup
 ansible-playbook -i inventory/hosts install.yml -t addons
-ansible-playbook -i inventory/hosts install.yml -t test
+ansible-playbook -i inventory/hosts install.yml -t apps
 
 Master: 
 systemctl stop kube-apiserver.service kube-scheduler.service kube-controller-manager.service kube-proxy.service kubelet.service etcd.service
@@ -263,26 +284,129 @@ systemctl stop kube-proxy.service kubelet.service
 
 
 openssl genrsa -out kubelet.key 2048
-openssl req -new -key kubelet.key -subj "/CN=system:node:worker04" -out kubelet.csr
+openssl req -new -key kubelet.key -subj "/CN=system:node:vm018011/O=system:nodes" -out kubelet.csr
 openssl x509 -req -in kubelet.csr -CA ca.crt -CAkey ca.key -CAcreateserial -extensions v3_req_client -extfile openssl.cnf -out kubelet.crt -days 3652
-
 
 kubectl config set-cluster kubernetes \
 --certificate-authority=/etc/kubernetes/pki/ca.crt \
 --embed-certs=true \
---server=https://172.16.16.10:6443 \
---kubeconfig=kubelet.kubeconfig
+--server=https://172.16.18.10:8443 \
+--kubeconfig=/etc/kubernetes/kubelet.kubeconfig
 
-kubectl config set-credentials system:node:worker04 \
+kubectl config set-credentials system:node:vm018011 \
 --client-certificate=/etc/kubernetes/pki/kubelet.crt \
 --client-key=/etc/kubernetes/pki/kubelet.key \
 --embed-certs=true \
---kubeconfig=kubelet.kubeconfig
+--kubeconfig=/etc/kubernetes/kubelet.kubeconfig
 
 kubectl config set-context default \
 --cluster=kubernetes \
---user=system:node:worker04 \
---kubeconfig=kubelet.kubeconfig
+--user=system:node:vm018011 \
+--kubeconfig=/etc/kubernetes/kubelet.kubeconfig
 
-kubectl config use-context default --kubeconfig=kubelet.kubeconfig
+kubectl config use-context default --kubeconfig=/etc/kubernetes/kubelet.kubeconfig
+
+
+/usr/local/bin/kubelet \
+--kubeconfig=/etc/kubernetes/kubelet.kubeconfig \
+--config=/etc/kubernetes/kubelet-conf.yml \
+--pod-infra-container-image=registry.aliyuncs.com/google_containers/pause:3.2 \
+--image-pull-progress-deadline=2m \
+--network-plugin=cni \
+--cni-conf-dir=/etc/cni/net.d \
+--cni-bin-dir=/opt/cni/bin \
+--cert-dir=/etc/kubernetes/pki \
+--register-node=true \
+--feature-gates=RotateKubeletServerCertificate=true \
+--tls-cipher-suites=TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305,TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305,TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384,TLS_RSA_WITH_AES_256_GCM_SHA384,TLS_RSA_WITH_AES_128_GCM_SHA256 \
+--alsologtostderr=true \
+--logtostderr=false \
+--log-dir=/var/log/kubernetes/kubelet \
+--v=2
 -->
+
+<!-- RUNNING HANDLER -->
+
+<!-- 
+cat <<EOF | kubectl apply --kubeconfig admin.kubeconfig -f -
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRole
+metadata:
+  annotations:
+    rbac.authorization.kubernetes.io/autoupdate: "true"
+  labels:
+    kubernetes.io/bootstrapping: rbac-defaults
+  name: system:kube-apiserver-to-kubelet
+rules:
+  - apiGroups:
+      - ""
+    resources:
+      - nodes/proxy
+      - nodes/stats
+      - nodes/log
+      - nodes/spec
+      - nodes/metrics
+    verbs:
+      - "*"
+EOF
+
+cat <<EOF | kubectl apply --kubeconfig admin.kubeconfig -f -
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRoleBinding
+metadata:
+  name: system:kube-apiserver
+  namespace: ""
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: system:kube-apiserver-to-kubelet
+subjects:
+  - apiGroup: rbac.authorization.k8s.io
+    kind: User
+    name: kubernetes
+EOF
+
+
+cat <<EOF | sudo tee kubelet-config.yaml
+kind: KubeletConfiguration
+apiVersion: kubelet.config.k8s.io/v1beta1
+authentication:
+  anonymous:
+    enabled: false
+  webhook:
+    enabled: true
+  x509:
+    clientCAFile: "/var/lib/kubernetes/ca.pem"
+authorization:
+  mode: Webhook
+clusterDomain: "cluster.local"
+clusterDNS:
+  - "10.32.0.10"
+podCIDR: "${POD_CIDR}"
+resolvConf: "/run/systemd/resolve/resolv.conf"
+runtimeRequestTimeout: "15m"
+tlsCertFile: "/var/lib/kubelet/${HOSTNAME}.pem"
+tlsPrivateKeyFile: "/var/lib/kubelet/${HOSTNAME}-key.pem"
+EOF
+
+cat <<EOF | sudo tee /etc/systemd/system/kubelet.service
+[Unit]
+Description=Kubernetes Kubelet
+Documentation=https://github.com/kubernetes/kubernetes
+After=containerd.service
+Requires=containerd.service
+
+[Service]
+ExecStart=/usr/local/bin/kubelet \
+  --config=/var/lib/kubelet/kubelet-config.yaml \
+  --image-pull-progress-deadline=2m \
+  --kubeconfig=/var/lib/kubelet/kubeconfig \
+  --network-plugin=cni \
+  --register-node=true \
+  --v=2
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
+EOF -->
