@@ -41,8 +41,8 @@
         - /etc/kubernetes
         - /etc/docker
         - /etc/bash_completion.d/kubectl
-        # - /var/lib/kubelet
-        # - /var/lib/docker
+        - /opt/cni
+        - /opt/containerd
 
     - name: Remove systemd
       file:
@@ -135,8 +135,8 @@
         - /etc/docker
         - /var/lib/etcd
         - /etc/bash_completion.d/kubectl
-        # - /var/lib/kubelet
-        # - /var/lib/docker
+        - /opt/cni
+        - /opt/containerd
 
     - name: Remove systemd
       file:

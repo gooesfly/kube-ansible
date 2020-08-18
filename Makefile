@@ -30,7 +30,7 @@ install:
 
 scale: download sync
 	@echo -e "\033[32mScale kubernetes node...\033[0m"
-	@ansible-playbook scale.yml	
+	@ansible-playbook scale.yml
 
 upgrade: download sync
 	@echo -e "\033[32mUpgrade kubernetes...\033[0m"
