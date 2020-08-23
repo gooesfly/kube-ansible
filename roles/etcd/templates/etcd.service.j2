@@ -41,6 +41,8 @@ ExecStart=/usr/local/bin/etcd \
   --peer-key-file={{ kubernetes.ssl.location }}/etcd/peer.key \
   --snapshot-count=10000 \
   --auto-compaction-retention=1 \
+  --max-request-bytes=10485760 \
+  --quota-backend-bytes=8589934592 \
   --listen-metrics-urls=http://127.0.0.1:2381
 
 [Install]
