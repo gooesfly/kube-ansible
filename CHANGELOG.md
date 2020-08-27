@@ -1,3 +1,14 @@
+## v1.0.2
+
+- 增加七牛OSS下载方式
+- 增加k8s各组件日志配置
+- 增加Etcd定时备份、用户以及目录和文件权限
+- kubelet取消bootstrap token认证改为证书
+- 统一配置文件名称格式(配置文件为*.yaml, *.kubeconfig)
+- 优化etcd大规模数据量下可能出现的异常问题
+- 增加apps role
+- 调整目录结构, 修改证书过期验证方式
+
 ## v1.0.1
 
 - makefile增加version参数方便获取相关组件版本
