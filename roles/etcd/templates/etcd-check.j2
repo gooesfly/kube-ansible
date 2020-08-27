@@ -23,3 +23,10 @@ ETCDCTL_API=3 /usr/local/bin/etcdctl --endpoints {% for host in etcdnode %}{{ ho
 --cert {{ kubernetes.ssl.location }}/etcd/healthcheck-client.crt \
 --key {{ kubernetes.ssl.location }}/etcd/healthcheck-client.key \
 endpoint status --write-out=table
+
+# echo -e "\033[32m=> defrag <=\033[0m"
+# ETCDCTL_API=3 /usr/local/bin/etcdctl --endpoints {% for host in etcdnode %}{{ host }}:2379{% if not loop.last %},{% endif %}{% endfor %} \
+# --cacert {{ kubernetes.ssl.location }}/etcd/ca.crt \
+# --cert {{ kubernetes.ssl.location }}/etcd/healthcheck-client.crt \
+# --key {{ kubernetes.ssl.location }}/etcd/healthcheck-client.key \
+# defrag

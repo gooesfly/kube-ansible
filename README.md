@@ -24,6 +24,7 @@ Refer to the `README.md` and `group_vars/template.yml` files for project configu
 * [x] 1.16.x
 * [x] 1.17.x
 * [x] 1.18.x
+* [x] 1.19.x
 
 ## How to use
 
