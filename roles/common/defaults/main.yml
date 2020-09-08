@@ -4,7 +4,6 @@ modprobe:
   filename: /etc/modules
   params:
     - nf_conntrack
-    - nf_conntrack_ipv4
     - br_netfilter
     - overlay
 

@@ -1,0 +1,43 @@
+# ------------------- vSphere -------------------
+vsphere_server                   = "********"
+vsphere_user                     = "********"
+vsphere_password                 = "********"
+vsphere_datacenter               = "********"
+vsphere_compute_cluster          = "********"
+vsphere_datastore_cluster        = "********"
+vsphere_network                  = "********"
+vsphere_virtual_machine_template = "********"
+# -----------------------------------------------
+
+# ------- Virtual Machine Template Setup --------
+project_name = "kubernetes"
+vms = {
+  master01 = {
+    hostname = "********"
+    ipaddr   = "xxx.xxx.xxx.xxx"
+    cpu      = 2
+    memory   = 2048
+  },
+  master02 = {
+    hostname = "********"
+    ipaddr   = "xxx.xxx.xxx.xxx"
+    cpu      = 2
+    memory   = 2048
+  },
+  master03 = {
+    hostname = "********"
+    ipaddr   = "xxx.xxx.xxx.xxx"
+    cpu      = 2
+    memory   = 2048
+  },
+  worker01 = {
+    hostname = "********"
+    ipaddr   = "xxx.xxx.xxx.xxx"
+    cpu      = 4
+    memory   = 4096
+  }
+}
+gateway      = "xxx.xxx.xxx.xxx"
+ipv4_netmask = "24"
+dns          = ["xxx.xxx.xxx.xxx"]
+# -----------------------------------------------

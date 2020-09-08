@@ -231,7 +231,7 @@ kubernetes:
     # addon images
     image: 
       metrics: k8s.gcr.io/metrics-server-amd64:v0.3.6
-      coredns: coredns/coredns:1.6.9
+      coredns: coredns/coredns:1.7.0
       flannel: quay.io/coreos/flannel:v0.12.0
       canal:
         node: calico/node:v3.13.2

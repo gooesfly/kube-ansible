@@ -26,6 +26,26 @@ Refer to the `README.md` and `group_vars/template.yml` files for project configu
 * [x] 1.18.x
 * [x] 1.19.x
 
+## Size of master and master components
+
+### GCP
+
+* 1-5 nodes: n1-standard-1
+* 6-10 nodes: n1-standard-2
+* 11-100 nodes: n1-standard-4
+* 101-250 nodes: n1-standard-8
+* 251-500 nodes: n1-standard-16
+* more than 500 nodes: n1-standard-32
+
+### AWS
+
+* 1-5 nodes: m3.medium
+* 6-10 nodes: m3.large
+* 11-100 nodes: m3.xlarge
+* 101-250 nodes: m3.2xlarge
+* 251-500 nodes: c4.4xlarge
+* more than 500 nodes: c4.8xlarge
+
 ## How to use
 
 ### Preparation work

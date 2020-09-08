@@ -15,13 +15,15 @@ Documentation=https://github.com/kubernetes/kubernetes
 
 [Service]
 ExecStart=/usr/local/bin/kube-apiserver \
+  --service-account-issuer=api \
+  --api-audiences=api \
+  --service-account-signing-key-file={{ kubernetes.ssl.location }}/ca.key \
   --authorization-mode={{ kubernetes.apiserver.authorization_modes | join(',') }} \
   --enable-admission-plugins={{ kubernetes.apiserver.enable_admission_plugins | join(',') }} \
   --tls-cipher-suites=TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305,TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305,TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384,TLS_RSA_WITH_AES_256_GCM_SHA384,TLS_RSA_WITH_AES_128_GCM_SHA256 \
   --advertise-address={{ ansible_default_ipv4.address }} \
   --bind-address={{ kubernetes.apiserver.bind | default('0.0.0.0') }}  \
   --secure-port=6443 \
-  --insecure-port=0 \
   --allow-privileged=true \
   --audit-log-path=/var/log/audit.log \
   --audit-policy-file=/etc/kubernetes/audit-policy-minimal.yaml \
@@ -45,7 +47,7 @@ ExecStart=/usr/local/bin/kube-apiserver \
   --runtime-config=api/all=true \
   --service-cluster-ip-range={{ kubernetes.settings.SvcCIDR }} \
   --service-node-port-range={{ kubernetes.settings.NodePortRange }} \
-  --service-account-key-file={{ kubernetes.ssl.location }}/ca.crt \
+  --service-account-key-file={{ kubernetes.ssl.location }}/ca.key \
   --tls-cert-file={{ kubernetes.ssl.location }}/apiserver.crt \
   --tls-private-key-file={{ kubernetes.ssl.location }}/apiserver.key \
   --requestheader-client-ca-file={{ kubernetes.ssl.location }}/ca.crt \

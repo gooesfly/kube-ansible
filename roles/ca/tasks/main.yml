@@ -8,26 +8,6 @@
   delegate_to: localhost
   run_once: true
 
-- name: Check etcd certificate expired(30 days)
-  openssl_certificate:
-    path: '/etc/ssl/{{ kubernetes.project }}/etcd/ca.crt'
-    provider: assertonly
-    valid_in: "2592000"
-  ignore_errors: yes
-  register: etcd_certificate_expired
-  delegate_to: localhost
-  run_once: true
-
-# - name: Check etcd certificate expired(30 days)
-#   shell: |
-#     [ -f /etc/ssl/{{ kubernetes.project }}/etcd/ca.crt ] &&
-#     openssl x509 -in /etc/ssl/{{ kubernetes.project }}/etcd/ca.crt -noout -text -checkend 2592000
-#   register: etcd_certificate_expired
-#   ignore_errors: True
-#   delegate_to: localhost
-#   run_once: true
-
-
 - name: Check kubernetes certificate expired(30 days)
   openssl_certificate:
     path: '/etc/ssl/{{ kubernetes.project }}/ca.crt'
@@ -38,14 +18,24 @@
   delegate_to: localhost
   run_once: true
 
-# - name: Check kubernetes certificate expired(30 days)
-#   shell: |
-#     [ -f /etc/ssl/{{ kubernetes.project }}/ca.crt ] && 
-#     openssl x509 -in /etc/ssl/{{ kubernetes.project }}/ca.crt -noout -text -checkend 2592000
-#   register: kubernetes_certificate_expired
-#   ignore_errors: True
-#   delegate_to: localhost
-#   run_once: true
+# - name: Create kubernetes ca step 1
+#   openssl_privatekey:
+#     path: '/etc/ssl/{{ kubernetes.project }}/ca.key'
+#     size: 2048
+
+# - name: Create kubernetes ca step 2
+#   openssl_csr:
+#     path: '/etc/ssl/{{ kubernetes.project }}/ca.csr'
+#     privatekey_path: '/etc/ssl/{{ kubernetes.project }}/ca.key'
+
+# - name: Create kubernetes ca step 3
+#   openssl_certificate:
+#     provider: assertonly
+#     path: '/etc/ssl/{{ kubernetes.project }}/ca.crt'
+#     privatekey_path: '/etc/ssl/{{ kubernetes.project }}/ca.key'
+#     csr_path: '/etc/ssl/{{ kubernetes.project }}/ca.csr'
+#     subject:
+#       CN: kubernetes-ca
 
 - name: Create kubernetes ca
   shell: |
@@ -58,6 +48,16 @@
   delegate_to: localhost
   run_once: true
   when: kubernetes_certificate_expired.failed
+
+- name: Check etcd certificate expired(30 days)
+  openssl_certificate:
+    path: '/etc/ssl/{{ kubernetes.project }}/etcd/ca.crt'
+    provider: assertonly
+    valid_in: "2592000"
+  ignore_errors: yes
+  register: etcd_certificate_expired
+  delegate_to: localhost
+  run_once: true
 
 - name: Create etcd ca
   shell: |

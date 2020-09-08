@@ -4,6 +4,7 @@
 
 scripts/binaries
 roles/apps/files/*.yaml
+
 # cni-plugins
 roles/cni-plugins/files/*
 
@@ -36,7 +37,7 @@ group_vars/all.yml
 .kubernetes
 
 # terraform
-test/terraform/.terraform
-test/terraform/*.tfvars
-test/terraform/*.tfstate
-test/terraform/*.backup
+test/terraform/*/.terraform
+test/terraform/*/*.tfvars
+test/terraform/*/*.tfstate
+test/terraform/*/*.backup

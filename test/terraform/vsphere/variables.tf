@@ -1,60 +1,69 @@
 # ------------------- vSphere -------------------
 variable "vsphere_server" {
   description = "vsphere server url"
-  type        = "string"
+  type        = string
 }
 
 variable "vsphere_user" {
   description = "login vsphere server username"
-  type        = "string"
+  type        = string
 }
 
 variable "vsphere_password" {
   description = "login vsphere server password"
-  type        = "string"
+  type        = string
 }
 
 variable "vsphere_datacenter" {
   description = "vsphere datacenter name"
-  type        = "string"
+  type        = string
 }
 
 variable "vsphere_network" {
   description = "virtual machine network name"
-  type        = "string"
+  type        = string
   default     = "VM Network"
 }
 
-variable "datastore_cluster" {
+variable "vsphere_datastore_cluster" {
   description = "datastore cluster name"
-  type        = "string"
+  type        = string
 }
 
 # -----------------------------------------------
 
 # --------------- Template Setup ----------------
 variable "vsphere_virtual_machine_template" {
-  type = "string"
+  type = string
 }
 
-variable "ssh_username" {
-  type = "string"
+variable "project_name" {
+  type = string
 }
 
-variable "ssh_password" {
-  type = "string"
+
+variable "dns" {
+  type = list
 }
 
-# variable "endpoint" {
-#   type = "string"
-# }
-# variable "access_key" {
-#   type = "string"
-# }
-# variable "secret_key" {
-#   type = "string"
-# }
-# variable "bucket" {
-#   type = "string"
-# }
+variable "vms" {
+  type = map(object({
+    hostname = string
+    ipaddr   = string
+    cpu      = number
+    memory   = number
+  }))
+}
 
+variable "ipv4_netmask" {
+  type = string
+}
+
+variable "gateway" {
+  type = string
+}
+
+
+variable "vsphere_compute_cluster" {
+  type = string
+}
