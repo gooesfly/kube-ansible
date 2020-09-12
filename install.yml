@@ -19,23 +19,18 @@
 - name: Deployment etcd cluster
   hosts: "{% if groups['etcd'] is not defined %}master{% else %}etcd{% endif %}"
   become: yes
+  vars:
+    scale: false
   roles:
     - etcd
   tags:
     - etcd
-
-- name: Init all kubernetes node
-  hosts: kubernetes
-  become: yes
-  roles:
-    - ipvsadm
-  tags:
-    - ipvsadm
 
 - name: Deployment kube master
   hosts: master
   become: yes
   roles:
+    - ipvsadm
     - haproxy
     - keepalived
     - docker
@@ -53,6 +48,7 @@
   hosts: worker
   become: yes
   roles:
+    - ipvsadm
     - docker
     - kubectl
     - kubelet

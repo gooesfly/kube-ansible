@@ -52,16 +52,6 @@
     - '/etc/ssl/{{ kubernetes.project }}/etcd/ca.crt'
     - '/etc/ssl/{{ kubernetes.project }}/etcd/ca.key'
 
-# - name: Check etcd server certificate expired(30 days)
-#   shell: |
-#     [ -f etcd/server.crt ] && 
-#     openssl x509 -in etcd/server.crt -noout -text -checkend 2592000
-#   register: etcd_server_certificate_expired
-#   ignore_errors: True
-#   args:
-#     chdir: '{{ kubernetes.ssl.location }}'
-#     executable: /bin/bash
-
 - name: Check etcd server certificate expired(30 days)
   openssl_certificate:
     path: '{{ kubernetes.ssl.location }}/etcd/server.crt'
@@ -82,17 +72,6 @@
   register: etcd_server_certificate
   when: etcd_server_certificate_expired.failed
 
-
-# - name: Check etcd peer certificate expired(30 days)
-#   shell: |
-#     [ -f etcd/peer.crt ] && 
-#     openssl x509 -in etcd/peer.crt -noout -text -checkend 2592000
-#   register: etcd_peer_certificate_expired
-#   ignore_errors: True
-#   args:
-#     chdir: '{{ kubernetes.ssl.location }}'
-#     executable: /bin/bash
-
 - name: Check etcd peer certificate expired(30 days)
   openssl_certificate:
     path: '{{ kubernetes.ssl.location }}/etcd/peer.crt'
@@ -111,16 +90,6 @@
     executable: /bin/bash
   register: etcd_peer_certificate
   when: etcd_peer_certificate_expired.failed
-
-# - name: Check etcd healthcheck certificate expired(30 days)
-#   shell: |
-#     [ -f etcd/healthcheck-client.crt ] && 
-#     openssl x509 -in etcd/healthcheck-client.crt -noout -text -checkend 2592000
-#   register: etcd_healthcheck_certificate_expired
-#   ignore_errors: True
-#   args:
-#     chdir: '{{ kubernetes.ssl.location }}'
-#     executable: /bin/bash
 
 - name: Check etcd healthcheck certificate expired(30 days)
   openssl_certificate:

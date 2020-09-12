@@ -1,6 +1,7 @@
 ---
 - name: Base environment configuration
   hosts: worker
+  become: yes
   roles:
     - common
     - chrony
@@ -9,32 +10,56 @@
 
 - name: Certificate of the cluster
   hosts: all
+  become: yes
   roles:
     - ca
   tags:
     - ca
 
-- name: Init all kubernetes node
-  hosts: kubernetes
-  become: yes
-  roles:
-    - ipvsadm
-  tags:
-    - ipvsadm
+# - name: Deployment etcd cluster
+#   hosts: "{% if groups['etcd'] is not defined %}master{% else %}etcd{% endif %}"
+#   become: yes
+#   vars:
+#     scale: true
+#   roles:
+#     - etcd
+#   tags:
+#     - etcd
+
+# - name: Deployment kube master
+#   hosts: master
+#   become: yes
+#   roles:
+#     - ipvsadm
+#     - haproxy
+#     - keepalived
+#     - docker
+#     - kubectl
+#     - kube-apiserver
+#     - kube-scheduler
+#     - kube-controller-manager
+#     - kubelet
+#     - kube-proxy
+#     - cni-plugins
+#   tags:
+#     - kube-master
 
 - name: Deployment kube worker
   hosts: worker
+  become: yes
   roles:
-    - cni-plugins
+    - ipvsadm
     - docker
     - kubectl
     - kubelet
     - kube-proxy
+    - cni-plugins
   tags:
     - kube-worker
 
 - name: Clean up the data
   hosts: all
+  become: yes
   roles:
     - cleanup
   tags:

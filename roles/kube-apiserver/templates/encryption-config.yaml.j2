@@ -7,5 +7,5 @@ resources:
       - aescbc:
           keys:
             - name: key1
-              secret: {{ encryption_config.stdout }}
+              secret: {{ kubernetes.apiserver.encryption }}
       - identity: {}

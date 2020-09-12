@@ -29,8 +29,12 @@ ExecStart=/usr/local/bin/etcd \
   --listen-peer-urls=https://{{ ansible_default_ipv4.address }}:2380 \
   --initial-advertise-peer-urls=https://{{ ansible_default_ipv4.address }}:2380 \
   --initial-cluster={% for host in etcdnode %}etcd-{{ play_hosts.index(host) }}=https://{{ host }}:2380{% if not loop.last %},{% endif %}{% endfor %} \
-  --initial-cluster-token={{ kubernetes.etcd.initialclustertoken }} \
-  --initial-cluster-state={{ kubernetes.etcd.initialclusterstate }} \
+  --initial-cluster-token=kubernetes-etcd-cluster \
+{% if scale | default(false) %}
+  --initial-cluster-state=existing \
+{% else %}
+  --initial-cluster-state=new \
+{% endif %}
   --client-cert-auth=true \
   --trusted-ca-file={{ kubernetes.ssl.location }}/etcd/ca.crt \
   --cert-file={{ kubernetes.ssl.location }}/etcd/server.crt \

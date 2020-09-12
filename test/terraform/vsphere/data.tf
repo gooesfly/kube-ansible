@@ -7,8 +7,8 @@ data "vsphere_compute_cluster" "compute_cluster" {
   datacenter_id = data.vsphere_datacenter.datacenter.id
 }
 
-data "vsphere_datastore_cluster" "datastore_cluster" {
-  name          = var.datastore_cluster
+data "vsphere_datastore_cluster" "vsphere_datastore_cluster" {
+  name          = var.vsphere_datastore_cluster
   datacenter_id = data.vsphere_datacenter.datacenter.id
 }
 

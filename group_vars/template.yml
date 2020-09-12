@@ -119,8 +119,6 @@ kubernetes:
   # etcd parameter configuration
   etcd: 
     datadir: /var/lib/etcd
-    initialclustertoken: 'kubernetes'
-    initialclusterstate: 'new'
 
   # docker parameter configuration
   docker:
@@ -167,6 +165,7 @@ kubernetes:
   # kube-apiserver parameter configuration
   apiserver: 
     bind: 0.0.0.0
+    encryption: Tsg7sO4Ki/W3s9bfwGfTi8ECcp+/3uDedQMq6rLQTIY= # head -c 32 /dev/urandom | base64
     enable_admission_plugins:
       - AlwaysPullImages
       - ServiceAccount

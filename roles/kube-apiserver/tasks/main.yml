@@ -151,23 +151,11 @@
   register: apiserver_etcd_client_certificate
   when: apiserver_etcd_client_certificate_expired.failed or openssl_conf.changed
 
-- name: Stat encryption config file
-  stat: 
-    path: /etc/kubernetes/encryption-config.yaml
-  register: encryption_config_file
-
-- name: Register encryption config
-  shell: head -c 32 /dev/urandom | base64
-  register: encryption_config
-  run_once: true
-  when: not encryption_config_file.stat.exists
-
 - name: Install encryption config
   template: 
     src: encryption-config.yaml.j2
     dest: /etc/kubernetes/encryption-config.yaml
     mode: '0644'
-  when: not encryption_config_file.stat.exists
 
 - name: Install audit policy
   template: 
