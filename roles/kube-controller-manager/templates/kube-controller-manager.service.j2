@@ -23,7 +23,7 @@ ExecStart=/usr/local/bin/kube-controller-manager \
   --root-ca-file={{ kubernetes.ssl.location }}/ca.crt \
   --use-service-account-credentials=true \
   --controllers=*,bootstrapsigner,tokencleaner \
-  --experimental-cluster-signing-duration=86700h \
+  --experimental-cluster-signing-duration=8760h \
   --feature-gates=RotateKubeletServerCertificate=true \
   --profiling=false \
 {% if kubernetes.controllerManager.terminatedPodGcThreshold is defined %}

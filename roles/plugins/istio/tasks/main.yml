@@ -1,0 +1,17 @@
+---
+# tasks file for istio
+- name: Download the istio binary
+  get_url: 
+    url: https://github.com/istio/istio/releases/download/{{ istio.version }}/istio-{{ istio.version }}-linux-amd64.tar.gz
+    dest: /usr/local/src/istio-{{ istio.version }}-linux-amd64.tar.gz
+  when: istio.enabled | bool
+
+- name: Install the istio binary
+  unarchive: 
+    src: /usr/local/src/istio-{{ istio.version }}-linux-amd64.tar.gz
+    dest: /usr/local/bin
+    mode: 0755
+    extra_opts:
+      - --strip-components=2
+      - istio-{{ istio.version }}/bin/istioctl
+  when: istio.enabled | bool

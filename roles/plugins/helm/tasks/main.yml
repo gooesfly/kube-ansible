@@ -1,0 +1,17 @@
+---
+# tasks file for helm
+- name: Download the helm binary
+  get_url: 
+    url: https://get.helm.sh/helm-v{{ helm.version }}-linux-amd64.tar.gz
+    dest: /usr/local/src/helm-v{{ helm.version }}-linux-amd64.tar.gz
+  when: helm.enabled | bool
+
+- name: Install the helm binary
+  unarchive: 
+    src: /usr/local/src/helm-v{{ helm.version }}-linux-amd64.tar.gz
+    dest: /usr/local/bin
+    mode: 0755
+    extra_opts:
+      - --strip-components=1
+      - linux-amd64/helm
+  when: helm.enabled | bool

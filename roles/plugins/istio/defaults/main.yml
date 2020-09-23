@@ -1,0 +1,5 @@
+---
+# defaults file for istio
+istio:
+  enabled: false
+  version: 1.7.2

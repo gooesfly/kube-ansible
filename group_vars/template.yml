@@ -96,7 +96,6 @@ kubernetes:
   # kube-apiserver HA configuration
   # ha:
   #   vip: 172.16.16.10
-  #   port: 8443
   #   mask: 16
 
   # choose: none flannel calico canals
@@ -251,3 +250,11 @@ kubernetes:
   #   files:
   #     - jenkins.yaml
   #     - traefik.yaml
+
+helm:
+  enabled: false
+  version: v3.3.4
+
+istio:
+  enabled: false
+  version: 1.7.2
