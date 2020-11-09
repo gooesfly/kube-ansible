@@ -31,6 +31,7 @@ ExecStart=/usr/local/bin/kube-apiserver \
   --audit-log-maxage=30 \
   --audit-log-maxbackup=3 \
   --audit-log-maxsize=100 \
+  --service-account-lookup=true \
   --storage-backend=etcd3 \
   --etcd-cafile={{ kubernetes.ssl.location }}/etcd/ca.crt \
   --etcd-certfile={{ kubernetes.ssl.location }}/apiserver-etcd-client.crt \
