@@ -3,18 +3,18 @@
 - block:
     - name: Create application directory
       file: 
-        name: '{{ kubernetes.apps.location | default("/etc/kubernetes/apps") }}'
+        name: '{{ apps.location | default("/etc/kubernetes/apps") }}'
         state: directory
         mode: '0755'
 
-    - name: Distributed application
-      copy: 
-        src: '{{ item }}'
-        dest: '{{ kubernetes.apps.location | default("/etc/kubernetes/apps") }}/{{ item }}'
-      with_items: '{{ kubernetes.apps.files }}'
+    - name: Download manifests
+      get_url: 
+        url: '{{ item }}'
+        dest: '{{ apps.location | default("/etc/kubernetes/apps") }}'
+      with_items: '{{ apps.files }}'
 
     - name: Deployment application
-      shell: '/usr/local/bin/kubectl apply -f {{ kubernetes.apps.location | default("/etc/kubernetes/apps") }}/{{ item }}'
+      shell: '/usr/local/bin/kubectl apply -f {{ item }}'
       run_once: true
-      with_items: '{{ kubernetes.apps.files }}'
-  when: kubernetes.apps is defined
+      with_items: '{{ apps.files }}'
+  when: apps is defined

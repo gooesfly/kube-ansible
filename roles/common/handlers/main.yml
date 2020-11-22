@@ -1,2 +1,7 @@
 ---
 # handlers file for common
+- name: restart journald
+  systemd:
+    name: systemd-journald
+    state: restarted
+    daemon_reload: yes

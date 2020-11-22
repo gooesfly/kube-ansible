@@ -174,7 +174,7 @@
 
 - name: Create backup kubernetes etcd data in cron
   cron:
-    name: "backup kubernetes etcd data"
+    name: "backup kubernetes etcd data by kube-ansible"
     minute: "0"
     hour: "2"
     job: "/usr/local/bin/etcd-backup"
