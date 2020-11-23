@@ -137,7 +137,6 @@ kubernetes:
         max-file: "5"
       max-concurrent-downloads: 20
       max-concurrent-uploads: 10
-      live-restore: true
       debug: false
       default-ulimits:
         nofile:
