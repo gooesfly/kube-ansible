@@ -5,7 +5,7 @@
     {% if nodename is defined %}
       /usr/local/bin/kubectl taint node {{ nodename | lower}} node-role.kubernetes.io/master="":NoSchedule --overwrite
     {% else %}
-      /usr/local/bin/kubectl taint node {{ hostvars[inventory_hostname].ansible_fqdn | lower }} node-role.kubernetes.io/master="":NoSchedule --overwrite
+      /usr/local/bin/kubectl taint node {{ hostvars[inventory_hostname].ansible_hostname | lower }} node-role.kubernetes.io/master="":NoSchedule --overwrite
     {% endif %}
   when: 
     - not kubernetes.settings.master_run_pod | default(false) | bool and inventory_hostname in groups['master']
@@ -15,7 +15,7 @@
     {% if nodename is defined %}
       /usr/local/bin/kubectl label node {{ nodename | lower }} {% if inventory_hostname in groups['master'] %} node-role.kubernetes.io/master=""{% else %} node-role.kubernetes.io/worker=""{% endif %} --overwrite
     {% else %}
-      /usr/local/bin/kubectl label node {{ hostvars[inventory_hostname].ansible_fqdn | lower }} {% if inventory_hostname in groups['master'] %} node-role.kubernetes.io/master=""{% else %} node-role.kubernetes.io/worker=""{% endif %} --overwrite
+      /usr/local/bin/kubectl label node {{ hostvars[inventory_hostname].ansible_hostname | lower }} {% if inventory_hostname in groups['master'] %} node-role.kubernetes.io/master=""{% else %} node-role.kubernetes.io/worker=""{% endif %} --overwrite
     {% endif %}
 
 - name: Clean kubeconfig for kube-minion nodes
