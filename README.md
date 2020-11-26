@@ -26,6 +26,9 @@ Refer to the `README.md` and `group_vars/template.yml` files for project configu
 * [x] 1.18.x
 * [x] 1.19.x
 
+## Docker Support
+* >= 18.06.3
+
 ## Size of master and master components
 
 ### GCP
@@ -56,7 +59,7 @@ Refer to the `README.md` and `group_vars/template.yml` files for project configu
 # ubuntu
 apt install git make -y
 # centos
-yum install git make -y
+yum install git make vim -y
 git clone https://github.com/buxiaomo/kube-ansible.git /usr/local/src/kube-ansible
 cd /usr/local/src/kube-ansible
 ```
