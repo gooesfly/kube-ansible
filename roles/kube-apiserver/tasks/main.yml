@@ -34,11 +34,12 @@
     dest: '{{ item.dest }}'
     owner: root
     group: root
+    mode: 0644
   with_items:
-    - { src: '/etc/ssl/{{ kubernetes.project }}/etcd/ca.crt', "dest": '{{ kubernetes.ssl.location }}/etcd/ca.crt' }
-    - { src: '/etc/ssl/{{ kubernetes.project }}/etcd/ca.key', "dest": '{{ kubernetes.ssl.location }}/etcd/ca.key' }
-    - { src: '/etc/ssl/{{ kubernetes.project }}/ca.crt', "dest": '{{ kubernetes.ssl.location }}/ca.crt' }
-    - { src: '/etc/ssl/{{ kubernetes.project }}/ca.key', "dest": '{{ kubernetes.ssl.location }}/ca.key' }
+    - { src: '/etc/ssl/{{ kubernetes.project }}/etcd/ca.crt', dest: '{{ kubernetes.ssl.location }}/etcd/ca.crt' }
+    - { src: '/etc/ssl/{{ kubernetes.project }}/etcd/ca.key', dest: '{{ kubernetes.ssl.location }}/etcd/ca.key' }
+    - { src: '/etc/ssl/{{ kubernetes.project }}/ca.crt', dest: '{{ kubernetes.ssl.location }}/ca.crt' }
+    - { src: '/etc/ssl/{{ kubernetes.project }}/ca.key', dest: '{{ kubernetes.ssl.location }}/ca.key' }
 
 # - name: Check kube-apiserver certificate expired(30 days)
 #   shell: |

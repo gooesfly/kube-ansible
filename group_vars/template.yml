@@ -138,6 +138,9 @@ kubernetes:
       max-concurrent-downloads: 20
       max-concurrent-uploads: 10
       live-restore: true
+      userland-proxy: false
+      experimental: false
+      icc: false
       debug: false
       default-ulimits:
         nofile:

@@ -41,16 +41,16 @@
     owner: etcd
     group: etcd
 
-- name: Distribution of certificate
+- name: Distribution certificate
   copy: 
-    src: '{{ item }}'
-    dest: '{{ kubernetes.ssl.location }}/etcd'
+    src: '{{ item.src }}'
+    dest: '{{ item.dest }}'
     mode: 0644
-    owner: etcd
-    group: etcd
+    owner: root
+    group: root
   with_items:
-    - '/etc/ssl/{{ kubernetes.project }}/etcd/ca.crt'
-    - '/etc/ssl/{{ kubernetes.project }}/etcd/ca.key'
+    - { src: '/etc/ssl/{{ kubernetes.project }}/etcd/ca.crt', dest: '{{ kubernetes.ssl.location }}/etcd/ca.crt' }
+    - { src: '/etc/ssl/{{ kubernetes.project }}/etcd/ca.key', dest: '{{ kubernetes.ssl.location }}/etcd/ca.key' }
 
 - name: Check etcd server certificate expired(30 days)
   openssl_certificate:
