@@ -25,12 +25,13 @@ ExecStart=/usr/local/bin/kube-apiserver \
   --bind-address={{ kubernetes.apiserver.bind | default('0.0.0.0') }}  \
   --secure-port=6443 \
   --insecure-port=0 \
+  --anonymous-auth=false \
   --allow-privileged=true \
   --audit-log-path=/var/log/audit.log \
   --audit-policy-file=/etc/kubernetes/audit-policy-minimal.yaml \
   --audit-log-format=json \
   --audit-log-maxage=30 \
-  --audit-log-maxbackup=3 \
+  --audit-log-maxbackup=10 \
   --audit-log-maxsize=100 \
   --service-account-lookup=true \
   --storage-backend=etcd3 \
@@ -43,6 +44,7 @@ ExecStart=/usr/local/bin/kube-apiserver \
   --enable-bootstrap-token-auth \
   --client-ca-file={{ kubernetes.ssl.location }}/ca.crt \
   --kubelet-https \
+  --kubelet-certificate-authority={{ kubernetes.ssl.location }}/ca.crt \
   --kubelet-client-certificate={{ kubernetes.ssl.location }}/apiserver-kubelet-client.crt \
   --kubelet-client-key={{ kubernetes.ssl.location }}/apiserver-kubelet-client.key \
   --kubelet-preferred-address-types={{ kubernetes.apiserver.kubelet_preferred_address_types | join(',') }} \
@@ -69,5 +71,6 @@ ExecStart=/usr/local/bin/kube-apiserver \
 Restart=on-failure
 RestartSec=5
 LimitNOFILE=65536
+
 [Install]
 WantedBy=multi-user.target

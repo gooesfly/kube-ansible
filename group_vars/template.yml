@@ -76,7 +76,7 @@ kubernetes:
     #   - *.xiaomo.io
     #   - 172.16.18.10
 
-  # defaullt: kubernetes
+  # cluster name. defaullt: kubernetes
   name: kubernetes
 
   # cloud support
@@ -183,6 +183,7 @@ kubernetes:
       - ResourceQuota
       - Priority
       - PodPreset
+      - EventRateLimit
     authorization_modes:
       - Node
       - RBAC

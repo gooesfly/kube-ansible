@@ -34,12 +34,12 @@
     dest: '{{ item.dest }}'
     owner: root
     group: root
-    mode: 0644
+    mode: '{{ item.mode }}'
   with_items:
-    - { src: '/etc/ssl/{{ kubernetes.project }}/etcd/ca.crt', dest: '{{ kubernetes.ssl.location }}/etcd/ca.crt' }
-    - { src: '/etc/ssl/{{ kubernetes.project }}/etcd/ca.key', dest: '{{ kubernetes.ssl.location }}/etcd/ca.key' }
-    - { src: '/etc/ssl/{{ kubernetes.project }}/ca.crt', dest: '{{ kubernetes.ssl.location }}/ca.crt' }
-    - { src: '/etc/ssl/{{ kubernetes.project }}/ca.key', dest: '{{ kubernetes.ssl.location }}/ca.key' }
+    - { src: '/etc/ssl/{{ kubernetes.project }}/etcd/ca.crt', dest: '{{ kubernetes.ssl.location }}/etcd/ca.crt', mode: 644 }
+    - { src: '/etc/ssl/{{ kubernetes.project }}/etcd/ca.key', dest: '{{ kubernetes.ssl.location }}/etcd/ca.key', mode: 600 }
+    - { src: '/etc/ssl/{{ kubernetes.project }}/ca.crt', dest: '{{ kubernetes.ssl.location }}/ca.crt', mode: 644 }
+    - { src: '/etc/ssl/{{ kubernetes.project }}/ca.key', dest: '{{ kubernetes.ssl.location }}/ca.key', mode: 600 }
 
 # - name: Check kube-apiserver certificate expired(30 days)
 #   shell: |
@@ -190,6 +190,8 @@
 - name: Health check
   uri: 
     url: 'https://{% if kubernetes.apiserver.bind != "0.0.0.0" %}127.0.0.1{% else %}{{ ansible_default_ipv4.address }}{% endif %}:6443/healthz'
+    client_cert: '{{ kubernetes.ssl.location }}/admin.crt'
+    client_key: '{{ kubernetes.ssl.location }}/admin.key'
     validate_certs: no
     return_content: yes
   register: this
