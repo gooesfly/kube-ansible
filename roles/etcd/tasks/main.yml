@@ -111,19 +111,17 @@
 
 - name: Change file ownership, group and permissions
   file:
-    path: '{{ item }}'
+    path: '{{ item.src }}'
     owner: etcd
     group: etcd
-    mode: '0644'
+    mode: '{{ item.mode }}'
   with_items:
-    - '{{ kubernetes.ssl.location }}/etcd/ca.crt'
-    - '{{ kubernetes.ssl.location }}/etcd/ca.key'
-    - '{{ kubernetes.ssl.location }}/etcd/healthcheck-client.crt'
-    - '{{ kubernetes.ssl.location }}/etcd/healthcheck-client.key'
-    - '{{ kubernetes.ssl.location }}/etcd/peer.crt'
-    - '{{ kubernetes.ssl.location }}/etcd/peer.key'
-    - '{{ kubernetes.ssl.location }}/etcd/server.crt'
-    - '{{ kubernetes.ssl.location }}/etcd/server.key'
+    - { src: '{{ kubernetes.ssl.location }}/etcd/healthcheck-client.crt', mode: 644 }
+    - { src: '{{ kubernetes.ssl.location }}/etcd/healthcheck-client.key', mode: 600 }
+    - { src: '{{ kubernetes.ssl.location }}/etcd/peer.crt', mode: 644 }
+    - { src: '{{ kubernetes.ssl.location }}/etcd/peer.key', mode: 600 }
+    - { src: '{{ kubernetes.ssl.location }}/etcd/server.crt', mode: 644 }
+    - { src: '{{ kubernetes.ssl.location }}/etcd/server.key', mode: 600 }
 
 - name: Install systemd file
   template: 
