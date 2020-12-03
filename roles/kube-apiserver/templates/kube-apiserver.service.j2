@@ -44,7 +44,6 @@ ExecStart=/usr/local/bin/kube-apiserver \
   --enable-bootstrap-token-auth \
   --client-ca-file={{ kubernetes.ssl.location }}/ca.crt \
   --kubelet-https \
-  --kubelet-certificate-authority={{ kubernetes.ssl.location }}/ca.crt \
   --kubelet-client-certificate={{ kubernetes.ssl.location }}/apiserver-kubelet-client.crt \
   --kubelet-client-key={{ kubernetes.ssl.location }}/apiserver-kubelet-client.key \
   --kubelet-preferred-address-types={{ kubernetes.apiserver.kubelet_preferred_address_types | join(',') }} \
