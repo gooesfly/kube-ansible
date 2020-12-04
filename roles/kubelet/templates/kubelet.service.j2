@@ -1,6 +1,13 @@
 [Unit]
 Description=Kubernetes Kubelet
 Documentation=https://github.com/kubernetes/kubernetes
+{% if runtime == "containerd" %}
+After=containerd.service
+Requires=containerd.service
+{% else %}
+After=docker.service
+Requires=docker.service
+{% endif %}
 
 [Service]
 ExecStart=/usr/local/bin/kubelet \
