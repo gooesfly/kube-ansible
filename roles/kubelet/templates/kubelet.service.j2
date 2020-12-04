@@ -1,8 +1,6 @@
 [Unit]
 Description=Kubernetes Kubelet
 Documentation=https://github.com/kubernetes/kubernetes
-After=docker.service
-Requires=docker.service
 
 [Service]
 ExecStart=/usr/local/bin/kubelet \
@@ -20,6 +18,11 @@ ExecStart=/usr/local/bin/kubelet \
   --register-node=true \
   --feature-gates=RotateKubeletServerCertificate=true \
   --tls-cipher-suites=TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305,TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305,TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384,TLS_RSA_WITH_AES_256_GCM_SHA384,TLS_RSA_WITH_AES_128_GCM_SHA256 \
+{% if runtime == "containerd" %}
+  --container-runtime=remote \
+  --runtime-request-timeout=15m \
+  --container-runtime-endpoint=unix:///run/containerd/containerd.sock \
+{% endif %}
 {% if kubernetes.kubelet.log is defined %}
   --alsologtostderr=true \
   --logtostderr=false \

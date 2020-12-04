@@ -11,6 +11,7 @@ KUBE_VERSION := "1.19.1"
 DOCKER_VERSION := "19.03.9"
 ETCD_VERSION := "3.4.5"
 CNI_VERSION := "0.8.5"
+RUNTIME := "containerd"
 
 # nexus information
 NEXUS_HTTP_USERNAME := ""
@@ -25,7 +26,7 @@ install:
 	@echo -e "\033[32mDeploy kubernetes...\033[0m"
 	@[ -f group_vars/all.yml ] || ( echo -e "\033[31mPlease Create group vars...\033[0m" && exit 1 )
 	@[ -f ./inventory/hosts ] || ( echo -e "\033[31mPlease Create asset information...\033[0m" && exit 1 )
-	@ansible-playbook install.yml
+	@ansible-playbook install.yml -e runtime=$(RUNTIME)
 	@echo "source /etc/bash_completion.d/kubectl"
 
 scale: download sync

@@ -62,6 +62,9 @@ timezone: 'Asia/Shanghai'
 #     net.netfilter.nf_conntrack_tcp_timeout_close_wait: 3600
 
 kubernetes:
+  # container runtime. docker or containerd
+  runtime: docker
+
   # project name use for tls directory(/etc/ssl/$project).
   project: kubernetes
 
