@@ -186,7 +186,6 @@ kubernetes:
       - ResourceQuota
       - Priority
       - PodPreset
-      - EventRateLimit
     authorization_modes:
       - Node
       - RBAC
