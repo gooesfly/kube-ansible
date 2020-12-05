@@ -26,8 +26,10 @@ Refer to the `README.md` and `group_vars/template.yml` files for project configu
 * [x] 1.18.x
 * [x] 1.19.x
 
-## Docker Support
-* >= 18.06.3
+## Runtime Support
+
+* Docker >= 18.06.3
+* Containerd >= 1.3.0
 
 ## Size of master and master components
 
