@@ -3,7 +3,7 @@ SHELL := /bin/bash
 # Debug model
 DEBUG := false
 
-# binary file download way, official or nexus
+# binary file download way, official、nexus or local
 DOWNLOAD_WAY := "official"
 
 # binary version
@@ -11,7 +11,7 @@ KUBE_VERSION := "1.19.1"
 DOCKER_VERSION := "19.03.9"
 ETCD_VERSION := "3.4.5"
 CNI_VERSION := "0.8.5"
-RUNTIME := "containerd"
+RUNTIME := "docker"
 
 # nexus information
 NEXUS_HTTP_USERNAME := ""
