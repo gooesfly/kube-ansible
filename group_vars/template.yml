@@ -185,7 +185,6 @@ kubernetes:
       - ValidatingAdmissionWebhook
       - ResourceQuota
       - Priority
-      - PodPreset
     authorization_modes:
       - Node
       - RBAC
