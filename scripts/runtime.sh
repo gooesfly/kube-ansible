@@ -15,4 +15,4 @@ case ${PKG} in
         exit 1
         ;;
 esac
-pip install --upgrade -i https://mirrors.aliyun.com/pypi/simple/ "ansible==2.9.6"
+pip2 install --upgrade -i https://mirrors.aliyun.com/pypi/simple/ "ansible==2.9.6"
