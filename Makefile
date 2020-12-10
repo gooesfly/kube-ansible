@@ -9,7 +9,7 @@ DOWNLOAD_WAY := "official"
 # binary version
 KUBE_VERSION := "1.19.1"
 DOCKER_VERSION := "19.03.9"
-ETCD_VERSION := "3.4.5"
+ETCD_VERSION := "3.4.13"
 CNI_VERSION := "0.8.5"
 RUNTIME := "docker"
 
@@ -89,5 +89,5 @@ version:
 	@echo "docker" > .docker
 	@curl -s https://api.github.com/repos/docker/docker-ce/releases | jq -r '.[].name' | grep -Ev 'rc|beta|alpha' | sed 's/v//g' | head -n 15 | sort -r >> .docker
 	@echo "kubernetes" > .kubernetes
-	@curl -s https://api.github.com/repos/kubernetes/kubernetes/releases | jq -r '.[].name' | grep -Ev 'rc|beta|alpha' | sed 's/v//g' | head -n 15 | sort -r >> .kubernetes
+	@curl -s https://api.github.com/repos/kubernetes/kubernetes/releases | jq -r '.[].name' | grep -Ev 'rc|beta|alpha' | sed 's/v//g' | sed 's/Kubernetes //g' | head -n 15 | sort -r >> .kubernetes
 	@paste -d '|' .etcd .docker .kubernetes | column -t -s '|'
