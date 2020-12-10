@@ -49,7 +49,7 @@
   become: yes
   roles:
     - ipvsadm
-    - docker
+    - "{% if RUNTIME == 'docker' %}docker{% else %}containerd{% endif %}"
     - kubectl
     - kubelet
     - kube-proxy
