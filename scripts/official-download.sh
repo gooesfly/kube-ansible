@@ -114,5 +114,26 @@ grep -q "^${CNI_VERSION}\$" binaries/cni-plugins/${CNI_VERSION}/.cni 2>/dev/null
   echo ${CNI_VERSION} > binaries/cni-plugins/${CNI_VERSION}/.cni
 }
 
+# # Containerd
+# CONTAINERD_VERSION=${CONTAINERD_VERSION:-"1.3.0"}
+# printb "Prepare containerd ${CONTAINERD_VERSION} release ..."
+# mkdir -p binaries/containerd/${CONTAINERD_VERSION}
+# grep -q "^${CONTAINERD_VERSION}\$" binaries/containerd/${CONTAINERD_VERSION}/.cni 2>/dev/null || {
+#   if [ ! -f src/cni-plugins-linux-amd64-v${CONTAINERD_VERSION}.tgz ];then
+#     printb "Download from the Internet..."
+#     curl -k -f --connect-timeout 20 --retry 5 --location --insecure "https://github.com/opencontainers/runc/releases/download/v1.0.0-rc8/runc.amd64" -o binaries/containerd/${CONTAINERD_VERSION}/runc
+#     curl -k -f --connect-timeout 20 --retry 5 --location --insecure "https://github.com/containerd/containerd/releases/download/v${CONTAINERD_VERSION}/containerd-${CONTAINERD_VERSION}.linux-amd64.tar.gz" -o binaries/containerd/${CONTAINERD_VERSION}/containerd-${CONTAINERD_VERSION}.linux-amd64.tar.gz
+#     tar -zxf binaries/containerd/${CONTAINERD_VERSION}/containerd-${CONTAINERD_VERSION}.linux-amd64.tar.gz --strip-components 1 -C binaries/containerd/${CONTAINERD_VERSION}/
+#     rm -rf binaries/containerd/${CONTAINERD_VERSION}/containerd-${CONTAINERD_VERSION}.linux-amd64.tar.gz
+#     curl -k -f --connect-timeout 20 --retry 5 --location --insecure "https://github.com/kubernetes-sigs/cri-tools/releases/download/v1.16.1/crictl-v1.16.1-linux-amd64.tar.gz" -o binaries/containerd/${CONTAINERD_VERSION}/crictl-v1.16.1-linux-amd64.tar.gz
+#     tar -zxf binaries/containerd/${CONTAINERD_VERSION}/crictl-v1.16.1-linux-amd64.tar.gz -C binaries/containerd/${CONTAINERD_VERSION}/
+#     rm -rf binaries/containerd/${CONTAINERD_VERSION}/crictl-v1.16.1-linux-amd64.tar.gz
+#   else
+#     printb "Use local binary packages..."
+#     tar -zxf src/cni-plugins-linux-amd64-v${CNI_VERSION}.tgz --strip-components 1 -C binaries/cni-plugins/${CNI_VERSION}/
+#   fi
+#   echo ${CNI_VERSION} > binaries/containerd/${CONTAINERD_VERSION}/.cni
+# }
+
 echo "Done! All your binaries locate in scripts/binaries directory"
 popd > /dev/null 2>&1

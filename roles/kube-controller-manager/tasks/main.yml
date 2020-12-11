@@ -1,22 +1,18 @@
 ---
 # tasks file for kube-controller-manager
-- name: Try Install the binary of local file
-  copy: 
-    src: '{{ item }}'
-    dest: /usr/local/bin/
-    mode: 0755
-    owner: root
-    group: root
-  with_items:
-    - kube-controller-manager
-  register: controllermanager_pkg
-
-- name: Download some applications
-  include: "download.yml"
+# - name: Try Install the binary of local file
+#   copy: 
+#     src: '{{ item }}'
+#     dest: /usr/local/bin/
+#     mode: 0755
+#     owner: root
+#     group: root
+#   with_items:
+#     - kube-controller-manager
+#   register: controllermanager_pkg
 
 - name: Set OS dependent variables
   include_vars: '{{ DOWNLOAD_WAY }}.yml'
-  when: controllermanager_pkg.failed
 
 - name: Download binary
   get_url:
@@ -30,7 +26,6 @@
   register: controllermanager_bin
   until: controllermanager_bin is succeeded
   retries: 5
-  when: controllermanager_pkg.failed
 
 - name: Create log directory
   file: 

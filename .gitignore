@@ -26,6 +26,7 @@ roles/kube-proxy/files/kube-proxy
 scripts/src/*.gz
 scripts/src/*.tgz
 scripts/tmp
+scripts/kube-check
 inventory/terraform
 
 inventory/hosts
