@@ -9,7 +9,25 @@
     group: root
   with_items:
     - kube-apiserver
+  register: apiserver_pkg
+
+- name: Set OS dependent variables
+  include_vars: '{{ DOWNLOAD_WAY }}.yml'
+  when: apiserver_pkg.failed
+
+- name: Download binary
+  get_url:
+    url: "{{ download_url }}"
+    dest: /usr/local/bin/kube-apiserver
+    mode: 0755
+    owner: root
+    group: root
+    url_password: "{{ NEXUS_HTTP_USERNAME }}"
+    url_username: "{{ NEXUS_HTTP_PASSWORD }}"
   register: apiserver_bin
+  until: apiserver_bin is succeeded
+  retries: 10
+  when: apiserver_pkg.failed
 
 - name: Create log directory
   file: 

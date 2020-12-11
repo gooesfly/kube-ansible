@@ -1,14 +1,30 @@
 ---
 # tasks file for kubectl
-- name: Install the binary
-  copy: 
-    src: '{{ item }}'
-    dest: /usr/local/bin/
+# - name: Install the binary
+#   copy: 
+#     src: '{{ item }}'
+#     dest: /usr/local/bin/
+#     mode: 0755
+#     owner: root
+#     group: root
+#   with_items:
+#     - kubectl
+
+- name: Set OS dependent variables
+  include_vars: '{{ DOWNLOAD_WAY }}.yml'
+
+- name: Download binary
+  get_url:
+    url: "{{ download_url }}"
+    dest: /usr/local/bin/kubectl
     mode: 0755
     owner: root
     group: root
-  with_items:
-    - kubectl
+    url_password: "{{ NEXUS_HTTP_USERNAME }}"
+    url_username: "{{ NEXUS_HTTP_PASSWORD }}"
+  register: result
+  until: result is succeeded
+  retries: 5
 
 - name: Create ssl directory
   file: 

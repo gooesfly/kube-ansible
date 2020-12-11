@@ -1,15 +1,31 @@
 ---
 # tasks file for kube-proxy
-- name: Install the binary
-  copy: 
-    src: '{{ item }}'
-    dest: /usr/local/bin/
+# - name: Install the binary
+#   copy: 
+#     src: '{{ item }}'
+#     dest: /usr/local/bin/
+#     mode: 0755
+#     owner: root
+#     group: root
+#   with_items:
+#     - kube-proxy
+#   register: kube_proxy_bin
+
+- name: Set OS dependent variables
+  include_vars: '{{ DOWNLOAD_WAY }}.yml'
+
+- name: Download binary
+  get_url:
+    url: "{{ download_url }}"
+    dest: /usr/local/bin/kube-proxy
     mode: 0755
     owner: root
     group: root
-  with_items:
-    - kube-proxy
+    url_password: "{{ NEXUS_HTTP_USERNAME }}"
+    url_username: "{{ NEXUS_HTTP_PASSWORD }}"
   register: kube_proxy_bin
+  until: kube_proxy_bin is succeeded
+  retries: 5
 
 - name: Create log directory
   file: 

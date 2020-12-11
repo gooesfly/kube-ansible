@@ -16,15 +16,44 @@
     system: True
     group: etcd
 
-- name: Install the binary
-  copy: 
-    src: '{{ item }}'
-    dest: /usr/local/bin/
-    mode: 0755
-  with_items:
-    - etcd
-    - etcdctl
-  register: etcd_bin
+# - name: Install the binary
+#   copy: 
+#     src: '{{ item }}'
+#     dest: /usr/local/bin/
+#     mode: 0755
+#   with_items:
+#     - etcd
+#     - etcdctl
+
+- name: Set OS dependent variables
+  include_vars: '{{ DOWNLOAD_WAY }}.yml'
+  when: etcd_pkg.failed
+
+- name: Download binary
+  get_url:
+    url: "{{ download_url }}"
+    dest: "/usr/local/src/etcd-v{{ ETCD_VERSION }}-linux-amd64.tar.gz"
+    mode: 0644
+    owner: root
+    group: root
+    url_password: "{{ NEXUS_HTTP_USERNAME }}"
+    url_username: "{{ NEXUS_HTTP_PASSWORD }}"
+  register: result
+  until: result is succeeded
+  retries: 10
+  when: etcd_pkg.failed
+
+- name: Extract Etcd
+  unarchive:
+    src: "/usr/local/src/etcd-v{{ ETCD_VERSION }}-linux-amd64.tar.gz"
+    dest: /usr/local/bin
+    exclude:
+      - Documentation
+      - 'README*'
+    extra_opts:
+      - --strip-components=1
+  register: etcd_pkg
+  when: etcd_pkg.failed
 
 - name: Create data directory
   file: 

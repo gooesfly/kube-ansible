@@ -73,42 +73,58 @@ cd /usr/local/src/kube-ansible
 make runtime
 ```
 
-#### <span id = "download">Download binaries</span>
+#### <span id = "download">Download the way</span>
 
-if you want to use local package files, reference [here](#local).
+* nexus
+	if you don't have internet, you can run `scripts/upload-nexus.py` script on internet virtual machine and upload to nexus.
+  
+* official
 
-if you want to download package from nexus, reference [here](#nexus).
+  It will be download from Github or Google
+
+* qiniu
+
+  this is a mirrors on qiniu, you can reference [here](https://github.com/buxiaomo/kube-binaries)
+
+
+about Makefile parameter
 
 | Parameter  | describe  |  Default | option |
 |---|---|---|---|
-| DOWNLOAD_WAY | Binary download mode  | official  | official or nexus or qiniu| 
-| KUBE_VERSION | Kubernetes binary version  | 1.16.13  | N/A | 
-| DOCKER_VERSION | Docker binary version  | 19.03.9  | N/A | 
-| ETCD_VERSION | Etcd binary version  | 3.4.5  | N/A | 
-| CNI_VERSION | CNI binary version  | 0.8.5  | N/A | 
-| NEXUS_HTTP_USERNAME | Nexus username  | N/A  | N/A | 
-| NEXUS_HTTP_PASSWORD | Nexus password  | N/A  | N/A | 
-| NEXUS_DOMAIN_NAME | Nexus domain name  | nexus.xiaomo.site  | N/A | 
-| NEXUS_REPOSITORY | binary repository name, you can use 'upload-nexus.py'  | N/A  | N/A | 
+| DOWNLOAD_WAY | Binary download mode  | official  | official or nexus or qiniu|
+| RUNTIME | container runtime  | docker  | docker or containerd|
+| CONTAINERD_VERSION | containerd binary version | 1.3.0  | N/A|
+| CRICTL_VERSION | crictl binary version | 1.16.1  | N/A|
+| RUNC_VERSION | runc binary version | 1.0.0-rc8  | N/A|
+| KUBE_VERSION | Kubernetes binary version  | 1.20.0 | N/A |
+| DOCKER_VERSION | Docker binary version  | 19.03.9 | N/A |
+| ETCD_VERSION | Etcd binary version  | 3.4.5  | N/A |
+| CNI_VERSION | CNI binary version  | 0.8.5  | N/A |
+| NEXUS_HTTP_USERNAME | Nexus username  | N/A  | N/A |
+| NEXUS_HTTP_PASSWORD | Nexus password  | N/A  | N/A |
+| NEXUS_DOMAIN_NAME | Nexus domain name  | N/A | N/A |
+| NEXUS_REPOSITORY | Nexus repository name | kube-ansible | N/A |
 
-##### official download
-
-```
-make download DOWNLOAD_WAY=official
-```
-
-##### nexus download
+##### Download the default version using official
 
 ```
-make download DOWNLOAD_WAY=nexus \
-NEXUS_DOMAIN_NAME=nexus.xiaomo.site \
+make install DOWNLOAD_WAY=official
+```
+
+##### Download the default version using Qiniu
+
+```
+make install DOWNLOAD_WAY=qiniu
+```
+
+##### Download the default version using Nexus
+
+```
+make install DOWNLOAD_WAY=nexus \
+NEXUS_DOMAIN_NAME=172.16.0.206:8081 \
 NEXUS_REPOSITORY=kube-ansible \
 NEXUS_HTTP_USERNAME=admin \
-NEXUS_HTTP_PASSWORD=admin \
-KUBE_VERSION=1.16.8 \
-DOCKER_VERSION=19.03.8 \
-FLANNEL_VERSION=0.12.0 \
-ETCD_VERSION=3.4.5
+NEXUS_HTTP_PASSWORD=admin
 ```
 
 ### Kubernetes management
@@ -119,12 +135,18 @@ ETCD_VERSION=3.4.5
 
 ```
 # default version
-make sync
-make install
+## docker runtime
+make install DOWNLOAD_WAY=official RUNTIME=docker
+
+## containerd runtime
+make install DOWNLOAD_WAY=official RUNTIME=containerd
 
 # custom version
-make sync KUBE_VERSION=1.14.4
-make install KUBE_VERSION=1.14.4 DOCKER_VERSION=19.03.8 FLANNEL_VERSION=0.12.0 ETCD_VERSION=3.4.5
+## docker runtime
+make install DOWNLOAD_WAY=official RUNTIME=docker KUBE_VERSION=1.14.4 DOCKER_VERSION=19.03.8 FLANNEL_VERSION=0.12.0 ETCD_VERSION=3.4.5
+
+## containerd runtime
+make install DOWNLOAD_WAY=official RUNTIME=containerd KUBE_VERSION=1.14.4 DOCKER_VERSION=19.03.8 FLANNEL_VERSION=0.12.0 ETCD_VERSION=3.4.5
 ```
 
 #### Scale
@@ -170,34 +192,6 @@ component attributes of directory format:
 * /kubernetes-release/release/v${KUBE_VERSION}/bin/linux/amd64/kubectl
 * /kubernetes-release/release/v${KUBE_VERSION}/bin/linux/amd64/kube-proxy
 * /kubernetes-release/release/v${KUBE_VERSION}/bin/linux/amd64/kubelet
-
-## <span id = "local">use local package</span>
-
-download package save to `scripts/src` directory.
-
-package name format:
-
-* docker-${DOCKER_VERSION}.tgz
-* flannel-v${FLANNEL_VERSION}-linux-amd64.tar.gz
-* etcd-v${ETCD_VERSION}-linux-amd64.tar.gz
-* kubernetes-client-linux-amd64.v${KUBE_VERSION}.tar.gz
-* kubernetes-server-linux-amd64.v${KUBE_VERSION}.tar.gz
-* cni-plugins-linux-amd64-v${CNI_VERSION}.tgz
-
-all version please consistent with the makefile or make command
-
-example: 
-
-```
-cd scripts/src
-KUBE_VERSION=1.14.4
-wget https://download.docker.com/linux/static/stable/x86_64/docker-19.03.8.tgz
-wget https://github.com/coreos/flannel/releases/download/v0.12.0/flannel-v0.12.0-linux-amd64.tar.gz
-wget https://dl.k8s.io/v${KUBE_VERSION}/kubernetes-client-linux-amd64.tar.gz -O kubernetes-client-linux-amd64.v${KUBE_VERSION}.tar.gz
-wget https://dl.k8s.io/v${KUBE_VERSION}/kubernetes-server-linux-amd64.tar.gz -O kubernetes-server-linux-amd64.v${KUBE_VERSION}.tar.gz
-wget https://github.com/coreos/etcd/releases/download/v3.4.5/etcd-v3.4.5-linux-amd64.tar.gz
-wget https://github.com/containernetworking/plugins/releases/download/v0.8.5/cni-plugins-linux-amd64-v0.8.5.tgz
-```
 
 # knowledge
 
@@ -306,7 +300,7 @@ systemctl stop kube-proxy.service kubelet.service
     {% else %}
     {% set KUBE_APISERVER_ADDR=ansible_default_ipv4.address %}
     {% set KUBE_APISERVER_PORT=6443 %}
-
+    
       --server=https://{% if groups['master'] | length !=1 %}{{ kubernetes.ha.vip }}:{% if kubernetes.cloud.type != "local" %}6443{% else %}8443{% endif %}{% else %}{{  }}:{% if kubernetes.cloud.type != "local" %}6443{% else %}8443{% endif %}{% endif %} \
 
 

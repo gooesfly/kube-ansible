@@ -1,15 +1,31 @@
 ---
 # tasks file for kube-scheduler
-- name: Install the binary
-  copy: 
-    src: '{{ item }}'
-    dest: /usr/local/bin/
+# - name: Install the binary
+#   copy: 
+#     src: '{{ item }}'
+#     dest: /usr/local/bin/
+#     mode: 0755
+#     owner: root
+#     group: root
+#   with_items:
+#     - kube-scheduler
+#   register: kube_scheduler_bin
+
+- name: Set OS dependent variables
+  include_vars: '{{ DOWNLOAD_WAY }}.yml'
+
+- name: Download binary
+  get_url:
+    url: "{{ download_url }}"
+    dest: /usr/local/bin/kube-scheduler
     mode: 0755
     owner: root
     group: root
-  with_items:
-    - kube-scheduler
+    url_password: "{{ NEXUS_HTTP_USERNAME }}"
+    url_username: "{{ NEXUS_HTTP_PASSWORD }}"
   register: kube_scheduler_bin
+  until: kube_scheduler_bin is succeeded
+  retries: 5
 
 - name: Create log directory
   file: 

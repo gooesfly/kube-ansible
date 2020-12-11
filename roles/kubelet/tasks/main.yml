@@ -1,15 +1,31 @@
 ---
 # tasks file for kubelet
-- name: Install the binary
-  copy: 
-    src: '{{ item }}'
-    dest: /usr/local/bin/
+# - name: Install the binary
+#   copy: 
+#     src: '{{ item }}'
+#     dest: /usr/local/bin/
+#     mode: 0755
+#     owner: root
+#     group: root
+#   with_items:
+#     - kubelet
+#   register: kubelet_bin
+
+- name: Set OS dependent variables
+  include_vars: '{{ DOWNLOAD_WAY }}.yml'
+
+- name: Download binary
+  get_url:
+    url: "{{ download_url }}"
+    dest: /usr/local/bin/kubelet
     mode: 0755
     owner: root
     group: root
-  with_items:
-    - kubelet
+    url_password: "{{ NEXUS_HTTP_USERNAME }}"
+    url_username: "{{ NEXUS_HTTP_PASSWORD }}"
   register: kubelet_bin
+  until: kubelet_bin is succeeded # "msg": "Request failed
+  retries: 5
 
 - name: Create data directory
   file: 

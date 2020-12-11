@@ -1,0 +1,1 @@
+download_url: http://artifacts.splunk.org.cn/coreos/etcd/releases/download/v{{ ETCD_VERSION }}/etcd-v{{ ETCD_VERSION }}-linux-amd64.tar.gz
