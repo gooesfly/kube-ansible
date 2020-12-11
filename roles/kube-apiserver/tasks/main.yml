@@ -1,19 +1,18 @@
 ---
 # tasks file for kube-apiserver
-- name: Install the binary
-  copy: 
-    src: '{{ item }}'
-    dest: /usr/local/bin/
-    mode: 0755
-    owner: root
-    group: root
-  with_items:
-    - kube-apiserver
-  register: apiserver_pkg
+# - name: Install the binary
+#   copy: 
+#     src: '{{ item }}'
+#     dest: /usr/local/bin/
+#     mode: 0755
+#     owner: root
+#     group: root
+#   with_items:
+#     - kube-apiserver
+#   register: apiserver_pkg
 
 - name: Set OS dependent variables
   include_vars: '{{ DOWNLOAD_WAY }}.yml'
-  when: apiserver_pkg.failed
 
 - name: Download binary
   get_url:
@@ -27,7 +26,6 @@
   register: apiserver_bin
   until: apiserver_bin is succeeded
   retries: 10
-  when: apiserver_pkg.failed
 
 - name: Create log directory
   file: 
