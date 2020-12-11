@@ -4,6 +4,7 @@ package:
   - conntrack
   - net-tools
   - sysstat
+  - tar
   - unzip
   - tcpdump
   - telnet
@@ -16,4 +17,4 @@ package:
   - bash-completion
   - nfs-common
   - dnsutils
-  - python-pip
+  - python3-pip
