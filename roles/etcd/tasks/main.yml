@@ -40,7 +40,6 @@
   register: result
   until: result is succeeded
   retries: 10
-  when: etcd_pkg.failed
 
 - name: Extract Etcd
   unarchive:
@@ -51,8 +50,7 @@
       - 'README*'
     extra_opts:
       - --strip-components=1
-  register: etcd_pkg
-  when: etcd_pkg.failed
+  register: etcd_bin
 
 - name: Create data directory
   file: 
