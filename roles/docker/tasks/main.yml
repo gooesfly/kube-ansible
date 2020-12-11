@@ -36,7 +36,6 @@
 
 - name: Set OS dependent variables
   include_vars: '{{ DOWNLOAD_WAY }}.yml'
-  when: docker_pkg.failed
 
 - name: Download binary
   get_url:
@@ -51,7 +50,6 @@
   until: result is succeeded
   retries: 10
   notify: Start docker
-  when: docker_pkg.failed
 
 - name: Extract docker
   unarchive:
@@ -60,7 +58,6 @@
     extra_opts:
       - --strip-components=1
   notify: Start docker
-  when: docker_pkg.failed
 
 - name: Create data directory
   file: 
