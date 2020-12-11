@@ -76,6 +76,7 @@ make runtime
 #### <span id = "download">Download the way</span>
 
 * nexus
+
 	if you don't have internet, you can run `scripts/upload-nexus.py` script on internet virtual machine and upload to nexus.
   
 * official

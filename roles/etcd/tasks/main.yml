@@ -27,7 +27,6 @@
 
 - name: Set OS dependent variables
   include_vars: '{{ DOWNLOAD_WAY }}.yml'
-  when: etcd_pkg.failed
 
 - name: Download binary
   get_url:
