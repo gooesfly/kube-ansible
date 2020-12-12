@@ -18,3 +18,4 @@ package:
   - nfs-common
   - dnsutils
   - python3-pip
+  - python2-pip
