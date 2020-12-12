@@ -165,7 +165,6 @@
   until: this.status == 200
   retries: 30
   delay: 5
-  connection: local
   when: kube_proxy_service.changed
 
 # - name: Clean kube-proxy ca and crb yml file

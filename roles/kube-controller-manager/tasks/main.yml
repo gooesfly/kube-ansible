@@ -156,5 +156,4 @@
   until: "'ok' in this.content"
   retries: 30
   delay: 5
-  connection: local
   when: controllermanager_service.changed

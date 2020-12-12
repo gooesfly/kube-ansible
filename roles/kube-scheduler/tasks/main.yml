@@ -160,5 +160,4 @@
   until: "'ok' in this.content"
   retries: 30
   delay: 1
-  connection: local
   when: kube_scheduler_service.changed

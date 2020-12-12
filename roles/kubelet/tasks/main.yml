@@ -150,7 +150,6 @@
   until: "'ok' in this.content"
   retries: 30
   delay: 5
-  connection: local
   when: kubelet_service.changed
 
 - name: Waiting node on-line
