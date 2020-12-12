@@ -31,18 +31,6 @@ vms = {
     ipaddr   = "172.16.4.14"
     cpu      = 8
     memory   = 8192
-  },
-  worker02 = {
-    hostname = "vm004015"
-    ipaddr   = "172.16.4.15"
-    cpu      = 8
-    memory   = 8192
-  },
-  worker03 = {
-    hostname = "vm004016"
-    ipaddr   = "172.16.4.16"
-    cpu      = 8
-    memory   = 8192
   }
 }
 gateway      = "172.16.1.1"
