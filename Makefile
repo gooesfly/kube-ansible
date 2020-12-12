@@ -31,7 +31,7 @@ install:
 	@echo -e "\033[32mDeploy kubernetes...\033[0m"
 	@[ -f group_vars/all.yml ] || ( echo -e "\033[31mPlease Create group vars...\033[0m" && exit 1 )
 	@[ -f ./inventory/hosts ] || ( echo -e "\033[31mPlease Create asset information...\033[0m" && exit 1 )
-	@ansible-playbook -i ./inventory/hosts install.yml \
+	@ansible-playbook -i ./inventory/hosts install.yml -c paramiko \
 		-e DOWNLOAD_WAY=$(DOWNLOAD_WAY) \
 		-e RUNTIME=$(RUNTIME) \
 		-e KUBE_VERSION=$(KUBE_VERSION) \
