@@ -39,6 +39,5 @@ group_vars/all.yml
 
 # terraform
 test/terraform/*/.terraform
-test/terraform/*/*.tfvars
 test/terraform/*/*.tfstate
 test/terraform/*/*.backup
