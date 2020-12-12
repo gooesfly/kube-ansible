@@ -1,10 +1,10 @@
 - name: Install epel-release applications
-  yum: 
+  package: 
     name: epel-release
     state: present
 
 - name: Install some applications
-  yum: 
+  package: 
     name: '{{ item }}'
     state: present
   with_items: "{{ package }}"
