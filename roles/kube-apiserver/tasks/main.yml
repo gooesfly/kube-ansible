@@ -214,5 +214,4 @@
   until: "'ok' in this.content"
   retries: 30
   delay: 5
-  connection: local
   when: apiserver_service.changed
