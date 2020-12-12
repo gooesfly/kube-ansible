@@ -1,10 +1,10 @@
 - name: Install epel-release applications
-  dnf: 
+  yum: 
     name: epel-release
     state: present
 
 - name: Install some applications
-  dnf: 
+  yum: 
     name: '{{ item }}'
     state: present
   with_items: "{{ package }}"
