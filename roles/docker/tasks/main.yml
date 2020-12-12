@@ -55,6 +55,7 @@
   unarchive:
     src: "/usr/local/src/docker-{{ DOCKER_VERSION }}.tgz"
     dest: /usr/local/bin
+    remote_src: yes
     extra_opts:
       - --strip-components=1
   notify: Start docker

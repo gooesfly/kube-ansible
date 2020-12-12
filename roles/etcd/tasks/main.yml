@@ -45,6 +45,7 @@
   unarchive:
     src: "/usr/local/src/etcd-v{{ ETCD_VERSION }}-linux-amd64.tar.gz"
     dest: /usr/local/bin
+    remote_src: yes
     exclude:
       - Documentation
       - 'README*'
