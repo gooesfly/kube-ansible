@@ -1,1 +1,1 @@
-download_url: https://github.com/containernetworking/plugins/releases/download/v{{ DOCKER_VERSION }}/cni-plugins-linux-amd64-v{{ DOCKER_VERSION }}.tgz
+download_url: https://github.com/containernetworking/plugins/releases/download/v{{ CNI_VERSION }}/cni-plugins-linux-amd64-v{{ CNI_VERSION }}.tgz
