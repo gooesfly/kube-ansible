@@ -14,7 +14,7 @@
 - name: Download binary
   get_url:
     url: "{{ download_url }}"
-    dest: "cni-plugins-linux-amd64-v{{ CNI_VERSION }}.tgz"
+    dest: "/usr/local/src/cni-plugins-linux-amd64-v{{ CNI_VERSION }}.tgz"
     mode: 0644
     owner: root
     group: root
@@ -28,7 +28,7 @@
 
 - name: Extract CNI
   unarchive:
-    src: "cni-plugins-linux-amd64-v{{ CNI_VERSION }}.tgz"
+    src: "/usr/local/src/cni-plugins-linux-amd64-v{{ CNI_VERSION }}.tgz"
     dest: /opt/cni/bin
     remote_src: yes
   when: kubernetes.network == "flannel"  or kubernetes.network == "cilium"
