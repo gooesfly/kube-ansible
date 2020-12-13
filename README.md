@@ -29,7 +29,7 @@ Refer to the `README.md` and `group_vars/template.yml` files for project configu
 
 ## Runtime Support
 
-* Docker >= 18.06.3
+* Docker >= 18.09.0
 * Containerd >= 1.3.0
 
 ## Size of master and master components
