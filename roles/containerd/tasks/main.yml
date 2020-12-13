@@ -1,5 +1,8 @@
 ---
 # tasks file for containerd
+- name: Set OS dependent variables
+  include_vars: '{{ DOWNLOAD_WAY }}.yml'
+
 - name: Download RunC
   get_url:
     url: '{{ runc_download_url }}'
