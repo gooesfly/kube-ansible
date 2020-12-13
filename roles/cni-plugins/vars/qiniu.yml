@@ -1,0 +1,1 @@
+download_url: http://artifacts.splunk.org.cn/containernetworking/plugins/releases/download/v{{ CNI_VERSION }}/cni-plugins-linux-amd64-v{{ CNI_VERSION }}.tgz
