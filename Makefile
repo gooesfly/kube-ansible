@@ -1,8 +1,6 @@
 SHELL := /bin/bash
 
-# Debug model
-DEBUG := false
-
+ANSIBLE_OPT := ""
 # binary file download way, official、nexus or local
 DOWNLOAD_WAY := "official"
 
@@ -44,7 +42,7 @@ install:
 		-e NEXUS_HTTP_USERNAME=$(NEXUS_HTTP_USERNAME) \
 		-e NEXUS_HTTP_PASSWORD=$(NEXUS_HTTP_PASSWORD) \
 		-e NEXUS_DOMAIN_NAME=$(NEXUS_DOMAIN_NAME) \
-		-e NEXUS_REPOSITORY=$(NEXUS_REPOSITORY)
+		-e NEXUS_REPOSITORY=$(NEXUS_REPOSITORY) $(ANSIBLE_OPT)
 	@echo "source /etc/bash_completion.d/kubectl"
 
 scale: download sync
