@@ -96,7 +96,7 @@ about Makefile parameter
 | RUNTIME | container runtime  | docker  | docker or containerd|
 | CONTAINERD_VERSION | containerd binary version | 1.3.0  | N/A|
 | CRICTL_VERSION | crictl binary version | 1.16.1  | N/A|
-| RUNC_VERSION | runc binary version | 1.0.0-rc8  | N/A|
+| RUNC_VERSION | runc binary version | 1.0.0-rc92  | N/A|
 | KUBE_VERSION | Kubernetes binary version  | 1.20.0 | N/A |
 | DOCKER_VERSION | Docker binary version  | 19.03.9 | N/A |
 | ETCD_VERSION | Etcd binary version  | 3.4.5  | N/A |

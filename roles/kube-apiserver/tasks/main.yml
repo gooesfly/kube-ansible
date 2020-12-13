@@ -1,16 +1,4 @@
 ---
-# tasks file for kube-apiserver
-# - name: Install the binary
-#   copy: 
-#     src: '{{ item }}'
-#     dest: /usr/local/bin/
-#     mode: 0755
-#     owner: root
-#     group: root
-#   with_items:
-#     - kube-apiserver
-#   register: apiserver_pkg
-
 - name: Set OS dependent variables
   include_vars: '{{ DOWNLOAD_WAY }}.yml'
 
@@ -57,15 +45,6 @@
     - { src: '/etc/ssl/{{ kubernetes.project }}/ca.crt', dest: '{{ kubernetes.ssl.location }}/ca.crt', mode: 644 }
     - { src: '/etc/ssl/{{ kubernetes.project }}/ca.key', dest: '{{ kubernetes.ssl.location }}/ca.key', mode: 600 }
 
-# - name: Check kube-apiserver certificate expired(30 days)
-#   shell: |
-#     [ -f apiserver.crt ] && 
-#     openssl x509 -in apiserver.crt -noout -text -checkend 2592000
-#   register: apiserver_certificate_expired
-#   ignore_errors: True
-#   args:
-#     chdir: '{{ kubernetes.ssl.location }}'
-#     executable: /bin/bash
 - name: Check kube-apiserver certificate expired(30 days)
   openssl_certificate:
     path: '{{ kubernetes.ssl.location }}/apiserver.crt'
@@ -85,15 +64,6 @@
   register: apiserver_certificate
   when: apiserver_certificate_expired.failed or openssl_conf.changed
 
-# - name: Check front-proxy-client certificate expired(30 days)
-#   shell: |
-#     [ -f front-proxy-client.crt ] && 
-#     openssl x509 -in front-proxy-client.crt -noout -text -checkend 2592000
-#   register: front_proxy_client_certificate_expired
-#   ignore_errors: True
-#   args:
-#     chdir: '{{ kubernetes.ssl.location }}'
-#     executable: /bin/bash
 - name: Check front-proxy-client certificate expired(30 days)
   openssl_certificate:
     path: '{{ kubernetes.ssl.location }}/front-proxy-client.crt'
@@ -113,15 +83,6 @@
   register: front_proxy_client_certificate
   when: front_proxy_client_certificate_expired.failed or openssl_conf.changed
 
-# - name: Check apiserver-kubelet-client certificate expired(30 days)
-#   shell: |
-#     [ -f apiserver-kubelet-client.crt ] && 
-#     openssl x509 -in apiserver-kubelet-client.crt -noout -text -checkend 2592000
-#   register: kubelet_client_certificate_expired
-#   ignore_errors: True
-#   args:
-#     chdir: '{{ kubernetes.ssl.location }}'
-#     executable: /bin/bash
 - name: Check apiserver-kubelet-client certificate expired(30 days)
   openssl_certificate:
     path: '{{ kubernetes.ssl.location }}/apiserver-kubelet-client.crt'
@@ -140,15 +101,6 @@
   register: kubelet_client_certificate
   when: kubelet_client_certificate_expired.failed or openssl_conf.changed
 
-# - name: Check apiserver-etcd-client certificate expired(30 days)
-#   shell: |
-#     [ -f apiserver-etcd-client.crt ] && 
-#     openssl x509 -in apiserver-etcd-client.crt -noout -text -checkend 2592000
-#   register: apiserver_etcd_client_certificate_expired
-#   ignore_errors: True
-#   args:
-#     chdir: '{{ kubernetes.ssl.location }}'
-#     executable: /bin/bash
 - name: Check apiserver-etcd-client certificate expired(30 days)
   openssl_certificate:
     path: '{{ kubernetes.ssl.location }}/apiserver-etcd-client.crt'
