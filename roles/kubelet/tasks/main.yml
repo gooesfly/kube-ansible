@@ -1,16 +1,4 @@
 ---
-# tasks file for kubelet
-# - name: Install the binary
-#   copy: 
-#     src: '{{ item }}'
-#     dest: /usr/local/bin/
-#     mode: 0755
-#     owner: root
-#     group: root
-#   with_items:
-#     - kubelet
-#   register: kubelet_bin
-
 - name: Set OS dependent variables
   include_vars: '{{ DOWNLOAD_WAY }}.yml'
 
@@ -64,7 +52,7 @@
     - { src: '/etc/ssl/{{ kubernetes.project }}/ca.crt', dest: '{{ kubernetes.ssl.location }}/ca.crt', mode: 644 }
 
 - name: Check kubelet certificate expired(30 days)
-  openssl_certificate:
+  community.crypto.openssl_certificate:
     path: '{{ kubernetes.ssl.location }}/kubelet.crt'
     provider: assertonly
     valid_in: "2592000"

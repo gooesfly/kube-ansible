@@ -1,16 +1,4 @@
 ---
-# tasks file for kube-controller-manager
-# - name: Try Install the binary of local file
-#   copy: 
-#     src: '{{ item }}'
-#     dest: /usr/local/bin/
-#     mode: 0755
-#     owner: root
-#     group: root
-#   with_items:
-#     - kube-controller-manager
-#   register: controllermanager_pkg
-
 - name: Set OS dependent variables
   include_vars: '{{ DOWNLOAD_WAY }}.yml'
 
@@ -57,17 +45,8 @@
     - { src: '/etc/ssl/{{ kubernetes.project }}/ca.crt', dest: '{{ kubernetes.ssl.location }}/ca.crt', mode: 644 }
     - { src: '/etc/ssl/{{ kubernetes.project }}/ca.key', dest: '{{ kubernetes.ssl.location }}/ca.key', mode: 600 }
 
-# - name: Check kube-controller-manager certificate expired(30 days)
-#   shell: |
-#     [ -f kube-controller-manager.crt ] && 
-#     openssl x509 -in kube-controller-manager.crt -noout -text -checkend 2592000
-#   register: kube_controller_manager_certificate_expired
-#   ignore_errors: True
-#   args:
-#     chdir: '{{ kubernetes.ssl.location }}'
-#     executable: /bin/bash
 - name: Check kube-controller-manager certificate expired(30 days)
-  openssl_certificate:
+  community.crypto.openssl_certificate:
     path: '{{ kubernetes.ssl.location }}/kube-controller-manager.crt'
     provider: assertonly
     valid_in: "2592000"

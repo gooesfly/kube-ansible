@@ -1,16 +1,4 @@
 ---
-# tasks file for kube-scheduler
-# - name: Install the binary
-#   copy: 
-#     src: '{{ item }}'
-#     dest: /usr/local/bin/
-#     mode: 0755
-#     owner: root
-#     group: root
-#   with_items:
-#     - kube-scheduler
-#   register: kube_scheduler_bin
-
 - name: Set OS dependent variables
   include_vars: '{{ DOWNLOAD_WAY }}.yml'
 
@@ -57,17 +45,8 @@
     - { src: '/etc/ssl/{{ kubernetes.project }}/ca.crt', dest: '{{ kubernetes.ssl.location }}/ca.crt', mode: 644 }
     - { src: '/etc/ssl/{{ kubernetes.project }}/ca.key', dest: '{{ kubernetes.ssl.location }}/ca.key', mode: 600 }
 
-# - name: Check kube-scheduler certificate expired(30 days)
-#   shell: |
-#     [ -f kube-scheduler.crt ] && 
-#     openssl x509 -in kube-scheduler.crt -noout -text -checkend 2592000
-#   register: kube_scheduler_certificate_expired
-#   ignore_errors: True
-#   args:
-#     chdir: '{{ kubernetes.ssl.location }}'
-#     executable: /bin/bash
 - name: Check kube-scheduler certificate expired(30 days)
-  openssl_certificate:
+  community.crypto.openssl_certificate:
     path: '{{ kubernetes.ssl.location }}/kube-scheduler.crt'
     provider: assertonly
     valid_in: "2592000"

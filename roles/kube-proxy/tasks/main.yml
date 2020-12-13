@@ -1,16 +1,4 @@
 ---
-# tasks file for kube-proxy
-# - name: Install the binary
-#   copy: 
-#     src: '{{ item }}'
-#     dest: /usr/local/bin/
-#     mode: 0755
-#     owner: root
-#     group: root
-#   with_items:
-#     - kube-proxy
-#   register: kube_proxy_bin
-
 - name: Set OS dependent variables
   include_vars: '{{ DOWNLOAD_WAY }}.yml'
 
@@ -57,17 +45,8 @@
     - { src: '/etc/ssl/{{ kubernetes.project }}/ca.crt', dest: '{{ kubernetes.ssl.location }}/ca.crt', mode: 644 }
     - { src: '/etc/ssl/{{ kubernetes.project }}/ca.key', dest: '{{ kubernetes.ssl.location }}/ca.key', mode: 600 }
 
-# - name: Check kube-proxy certificate expired(30 days)
-#   shell: |
-#     [ -f kube-proxy.crt ] && 
-#     openssl x509 -in kube-proxy.crt -noout -text -checkend 2592000
-#   register: kube_proxy_certificate_expired
-#   ignore_errors: True
-#   args:
-#     chdir: '{{ kubernetes.ssl.location }}'
-#     executable: /bin/bash
 - name: Check kube-proxy certificate expired(30 days)
-  openssl_certificate:
+  community.crypto.openssl_certificate:
     path: '{{ kubernetes.ssl.location }}/kube-proxy.crt'
     provider: assertonly
     valid_in: "2592000"
@@ -151,12 +130,6 @@
   register: kube_proxy_service
   when: kube_proxy_bin.changed or kube_proxy_certificate.changed or kube_proxy_kubeconfig.changed or kube_proxy_systemd.changed
 
-# - name: Waiting for the service
-#   wait_for:
-#     port: 10256
-#     delay: 30
-#     state: started
-
 - name: Health check
   uri: 
     url: 'http://{% if kubernetes.controllerManager.bind != "0.0.0.0" %}127.0.0.1{% else %}{{ ansible_default_ipv4.address }}{% endif %}:10256/healthz'
@@ -166,13 +139,3 @@
   retries: 30
   delay: 5
   when: kube_proxy_service.changed
-
-# - name: Clean kube-proxy ca and crb yml file
-#   file:
-#     path: '/etc/kubernetes/{{ item }}'
-#     state: absent
-#   run_once: true
-#   with_items:
-#     - kube-proxy-crb.yml
-#     - kube-proxy-sa.yml
-#   when: inventory_hostname in groups['master']

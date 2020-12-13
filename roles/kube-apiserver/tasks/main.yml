@@ -46,7 +46,7 @@
     - { src: '/etc/ssl/{{ kubernetes.project }}/ca.key', dest: '{{ kubernetes.ssl.location }}/ca.key', mode: 600 }
 
 - name: Check kube-apiserver certificate expired(30 days)
-  openssl_certificate:
+  community.crypto.openssl_certificate:
     path: '{{ kubernetes.ssl.location }}/apiserver.crt'
     provider: assertonly
     valid_in: "2592000"
@@ -65,7 +65,7 @@
   when: apiserver_certificate_expired.failed or openssl_conf.changed
 
 - name: Check front-proxy-client certificate expired(30 days)
-  openssl_certificate:
+  community.crypto.openssl_certificate:
     path: '{{ kubernetes.ssl.location }}/front-proxy-client.crt'
     provider: assertonly
     valid_in: "2592000"
@@ -84,7 +84,7 @@
   when: front_proxy_client_certificate_expired.failed or openssl_conf.changed
 
 - name: Check apiserver-kubelet-client certificate expired(30 days)
-  openssl_certificate:
+  community.crypto.openssl_certificate:
     path: '{{ kubernetes.ssl.location }}/apiserver-kubelet-client.crt'
     provider: assertonly
     valid_in: "2592000"
@@ -102,7 +102,7 @@
   when: kubelet_client_certificate_expired.failed or openssl_conf.changed
 
 - name: Check apiserver-etcd-client certificate expired(30 days)
-  openssl_certificate:
+  community.crypto.openssl_certificate:
     path: '{{ kubernetes.ssl.location }}/apiserver-etcd-client.crt'
     provider: assertonly
     valid_in: "2592000"
