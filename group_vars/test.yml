@@ -6,10 +6,7 @@ ansible_ssh_pass: 'root'
 # ansible_sudo_user: 'root'
 # ansible_sudo_pass: 'root'
 ansible_become: "{% if ansible_ssh_user != 'root' %}yes{% else %}no{% endif %}"
-
-# CentOS 7.*、Ubuntu 16.04 used /usr/bin/python2
-# CentOS 8.*、used /usr/bin/python3
-ansible_python_interpreter: "/usr/bin/python"
+ansible_python_interpreter: "/usr/bin/python3"
 
 # timezone settings, default is Asia/Shanghai
 timezone: 'Asia/Shanghai'
