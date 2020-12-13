@@ -26,6 +26,7 @@
     group: root
     url_password: "{{ NEXUS_HTTP_USERNAME }}"
     url_username: "{{ NEXUS_HTTP_PASSWORD }}"
+    timeout: 3
   register: docker_pkg
   until: docker_pkg is succeeded
   retries: 10
@@ -66,4 +67,5 @@
     url: https://raw.githubusercontent.com/docker/cli/master/contrib/completion/bash/docker
     dest: /etc/bash_completion.d/docker
     mode: 0755
+    timeout: 3
   ignore_errors: True

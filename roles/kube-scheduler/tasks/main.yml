@@ -11,6 +11,7 @@
     group: root
     url_password: "{{ NEXUS_HTTP_USERNAME }}"
     url_username: "{{ NEXUS_HTTP_PASSWORD }}"
+    timeout: 3
   register: kube_scheduler_pkg
   until: kube_scheduler_pkg is succeeded
   retries: 5

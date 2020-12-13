@@ -28,6 +28,7 @@
     group: root
     url_password: "{{ NEXUS_HTTP_USERNAME }}"
     url_username: "{{ NEXUS_HTTP_PASSWORD }}"
+    timeout: 3
   register: etcd_pkg
   until: etcd_pkg is succeeded
   retries: 10

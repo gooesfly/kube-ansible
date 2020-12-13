@@ -11,6 +11,7 @@
     group: root
     url_password: "{{ NEXUS_HTTP_USERNAME }}"
     url_username: "{{ NEXUS_HTTP_PASSWORD }}"
+    timeout: 3
   register: kubelet_pkg
   until: kubelet_pkg is succeeded # "msg": "Request failed
   retries: 5

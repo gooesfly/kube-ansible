@@ -4,6 +4,7 @@
   get_url: 
     url: https://github.com/istio/istio/releases/download/{{ istio.version }}/istio-{{ istio.version }}-linux-amd64.tar.gz
     dest: /usr/local/src/istio-{{ istio.version }}-linux-amd64.tar.gz
+    timeout: 3
   when: istio.enabled | bool
 
 - name: Install the istio binary

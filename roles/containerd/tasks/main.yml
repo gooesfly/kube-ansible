@@ -9,6 +9,7 @@
     group: root
     url_password: "{{ NEXUS_HTTP_USERNAME }}"
     url_username: "{{ NEXUS_HTTP_PASSWORD }}"
+    timeout: 3
   register: runc_pkg
   until: runc_pkg is succeeded
   retries: 10
@@ -23,6 +24,7 @@
     group: root
     url_password: "{{ NEXUS_HTTP_USERNAME }}"
     url_username: "{{ NEXUS_HTTP_PASSWORD }}"
+    timeout: 3
   register: containerd_pkg
   until: containerd_pkg is succeeded
   retries: 10
@@ -46,6 +48,7 @@
     group: root
     url_password: "{{ NEXUS_HTTP_USERNAME }}"
     url_username: "{{ NEXUS_HTTP_PASSWORD }}"
+    timeout: 3
   register: crictl_pkg
   until: crictl_pkg is succeeded
   retries: 10
