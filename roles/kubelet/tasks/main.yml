@@ -11,8 +11,8 @@
     group: root
     url_password: "{{ NEXUS_HTTP_USERNAME }}"
     url_username: "{{ NEXUS_HTTP_PASSWORD }}"
-  register: kubelet_bin
-  until: kubelet_bin is succeeded # "msg": "Request failed
+  register: kubelet_pkg
+  until: kubelet_pkg is succeeded # "msg": "Request failed
   retries: 5
 
 - name: Create data directory
@@ -127,7 +127,7 @@
     enabled: yes
     daemon_reload: yes
   register: kubelet_service
-  when: kubelet_bin.changed or kubelet_certificate.changed or kubelet_kubeconfig.changed or kubelet_systemd.changed
+  when: kubelet_pkg.changed or kubelet_certificate.changed or kubelet_kubeconfig.changed or kubelet_systemd.changed
 
 - name: Health check
   uri: 

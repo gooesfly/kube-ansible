@@ -11,8 +11,8 @@
     group: root
     url_password: "{{ NEXUS_HTTP_USERNAME }}"
     url_username: "{{ NEXUS_HTTP_PASSWORD }}"
-  register: kube_proxy_bin
-  until: kube_proxy_bin is succeeded
+  register: kube_proxy_pkg
+  until: kube_proxy_pkg is succeeded
   retries: 5
 
 - name: Create log directory
@@ -128,7 +128,7 @@
     enabled: yes
     daemon_reload: yes
   register: kube_proxy_service
-  when: kube_proxy_bin.changed or kube_proxy_certificate.changed or kube_proxy_kubeconfig.changed or kube_proxy_systemd.changed
+  when: kube_proxy_pkg.changed or kube_proxy_certificate.changed or kube_proxy_kubeconfig.changed or kube_proxy_systemd.changed
 
 - name: Health check
   uri: 

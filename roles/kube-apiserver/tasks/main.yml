@@ -11,8 +11,8 @@
     group: root
     url_password: "{{ NEXUS_HTTP_USERNAME }}"
     url_username: "{{ NEXUS_HTTP_PASSWORD }}"
-  register: apiserver_bin
-  until: apiserver_bin is succeeded
+  register: apiserver_pkg
+  until: apiserver_pkg is succeeded
   retries: 10
 
 - name: Create log directory
@@ -146,7 +146,7 @@
     enabled: yes
     daemon_reload: yes
   register: apiserver_service
-  when: apiserver_bin.changed or apiserver_certificate.changed or front_proxy_client_certificate.changed or kubelet_client_certificate.changed or apiserver_etcd_client_certificate.changed or audit_policy.changed or apiserver_systemd.changed
+  when: apiserver_pkg.changed or apiserver_certificate.changed or front_proxy_client_certificate.changed or kubelet_client_certificate.changed or apiserver_etcd_client_certificate.changed or audit_policy.changed or apiserver_systemd.changed
 
 - name: Waiting for the service
   wait_for:

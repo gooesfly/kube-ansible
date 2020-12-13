@@ -14,26 +14,6 @@
     system: True
     group: docker
 
-# - name: Install the binary of local files
-#   copy: 
-#     src: '{{ item }}'
-#     dest: /usr/local/bin/
-#     mode: 0755
-#     owner: root
-#     group: root
-#   with_items:
-#     - containerd
-#     - containerd-shim
-#     - ctr
-#     - docker
-#     - dockerd
-#     - docker-init
-#     - docker-proxy
-#     - runc
-#   register: docker_pkg
-#   ignore_errors: True
-#   notify: Start docker
-
 - name: Set OS dependent variables
   include_vars: '{{ DOWNLOAD_WAY }}.yml'
 
@@ -46,8 +26,8 @@
     group: root
     url_password: "{{ NEXUS_HTTP_USERNAME }}"
     url_username: "{{ NEXUS_HTTP_PASSWORD }}"
-  register: result
-  until: result is succeeded
+  register: docker_pkg
+  until: docker_pkg is succeeded
   retries: 10
   notify: Start docker
 

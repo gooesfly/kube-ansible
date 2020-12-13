@@ -11,8 +11,8 @@
     group: root
     url_password: "{{ NEXUS_HTTP_USERNAME }}"
     url_username: "{{ NEXUS_HTTP_PASSWORD }}"
-  register: controllermanager_bin
-  until: controllermanager_bin is succeeded
+  register: controllermanager_pkg
+  until: controllermanager_pkg is succeeded
   retries: 5
 
 - name: Create log directory
@@ -117,7 +117,7 @@
     enabled: yes
     daemon_reload: yes
   register: controllermanager_service
-  when: controllermanager_bin.changed or kube_controller_manager_certificate.changed or controllermanager_kubeconfig.changed or controllermanager_systemd.changed
+  when: controllermanager_pkg.changed or kube_controller_manager_certificate.changed or controllermanager_kubeconfig.changed or controllermanager_systemd.changed
 
 - name: Waiting for the service
   wait_for:

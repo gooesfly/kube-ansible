@@ -16,15 +16,6 @@
     system: True
     group: etcd
 
-# - name: Install the binary
-#   copy: 
-#     src: '{{ item }}'
-#     dest: /usr/local/bin/
-#     mode: 0755
-#   with_items:
-#     - etcd
-#     - etcdctl
-
 - name: Set OS dependent variables
   include_vars: '{{ DOWNLOAD_WAY }}.yml'
 
@@ -37,8 +28,8 @@
     group: root
     url_password: "{{ NEXUS_HTTP_USERNAME }}"
     url_username: "{{ NEXUS_HTTP_PASSWORD }}"
-  register: result
-  until: result is succeeded
+  register: etcd_pkg
+  until: etcd_pkg is succeeded
   retries: 10
 
 - name: Extract Etcd
@@ -78,9 +69,10 @@
   with_items:
     - { src: '/etc/ssl/{{ kubernetes.project }}/etcd/ca.crt', dest: '{{ kubernetes.ssl.location }}/etcd/ca.crt' }
     - { src: '/etc/ssl/{{ kubernetes.project }}/etcd/ca.key', dest: '{{ kubernetes.ssl.location }}/etcd/ca.key' }
+  register: etcd_tls
 
 - name: Check etcd server certificate expired(30 days)
-  openssl_certificate:
+  community.crypto.openssl_certificate:
     path: '{{ kubernetes.ssl.location }}/etcd/server.crt'
     provider: assertonly
     valid_in: "2592000"
@@ -100,7 +92,7 @@
   when: etcd_server_certificate_expired.failed
 
 - name: Check etcd peer certificate expired(30 days)
-  openssl_certificate:
+  community.crypto.openssl_certificate:
     path: '{{ kubernetes.ssl.location }}/etcd/peer.crt'
     provider: assertonly
     valid_in: "2592000"
@@ -119,7 +111,7 @@
   when: etcd_peer_certificate_expired.failed
 
 - name: Check etcd healthcheck certificate expired(30 days)
-  openssl_certificate:
+  community.crypto.openssl_certificate:
     path: '{{ kubernetes.ssl.location }}/etcd/healthcheck-client.crt'
     provider: assertonly
     valid_in: "2592000"
@@ -169,7 +161,7 @@
     enabled: yes
     daemon_reload: yes
   register: etcd_service
-  when: etcd_bin.changed or etcd_server_certificate.changed or etcd_peer_certificate.changed or etcd_systemd.changed
+  when: etcd_pkg.changed or etcd_server_certificate.changed or etcd_peer_certificate.changed or etcd_systemd.changed
 
 - name: Wait for etcd
   wait_for:

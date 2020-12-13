@@ -9,8 +9,8 @@
     group: root
     url_password: "{{ NEXUS_HTTP_USERNAME }}"
     url_username: "{{ NEXUS_HTTP_PASSWORD }}"
-  register: result
-  until: result is succeeded
+  register: runc_pkg
+  until: runc_pkg is succeeded
   retries: 10
   notify: Start Containerd
 
@@ -23,8 +23,8 @@
     group: root
     url_password: "{{ NEXUS_HTTP_USERNAME }}"
     url_username: "{{ NEXUS_HTTP_PASSWORD }}"
-  register: result
-  until: result is succeeded
+  register: containerd_pkg
+  until: containerd_pkg is succeeded
   retries: 10
   notify: Start Containerd
 
@@ -46,8 +46,8 @@
     group: root
     url_password: "{{ NEXUS_HTTP_USERNAME }}"
     url_username: "{{ NEXUS_HTTP_PASSWORD }}"
-  register: result
-  until: result is succeeded
+  register: crictl_pkg
+  until: crictl_pkg is succeeded
   retries: 10
   notify: Start Containerd
   

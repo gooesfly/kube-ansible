@@ -11,8 +11,8 @@
     group: root
     url_password: "{{ NEXUS_HTTP_USERNAME }}"
     url_username: "{{ NEXUS_HTTP_PASSWORD }}"
-  register: result
-  until: result is succeeded
+  register: kubectl_pkg
+  until: kubectl_pkg is succeeded
   retries: 5
 
 - name: Create ssl directory
