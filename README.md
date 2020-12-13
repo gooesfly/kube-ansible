@@ -12,6 +12,8 @@ Refer to the `README.md` and `group_vars/template.yml` files for project configu
 
 ## OS Support
 
+All Node install python3.
+
 * [x] CentOS 7.*
 * [x] CentOS 8.*
 * [x] Ubuntu 16.04.6
