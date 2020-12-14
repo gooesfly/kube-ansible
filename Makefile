@@ -9,6 +9,7 @@ KUBE_VERSION := "1.20.0"
 ETCD_VERSION := "3.4.13"
 CNI_VERSION := "0.8.5"
 
+# container runtime. containerd or docker
 RUNTIME := "docker"
 DOCKER_VERSION := "20.10.0"
 
@@ -94,9 +95,16 @@ runtime:
 
 .PHONY: test
 test:
-	@make apply -C ./test/terraform
-	@make auto
-	@make destroy -C ./test/terraform
+	@ssh-keygen -t rsa -P "" -f ~/.ssh/id_rsa'
+	@sshpass -p root ssh-copy-id -o StrictHostKeyChecking=no root@172.16.4.11
+	@sshpass -p root ssh-copy-id -o StrictHostKeyChecking=no root@172.16.4.12
+	@sshpass -p root ssh-copy-id -o StrictHostKeyChecking=no root@172.16.4.13
+	@sshpass -p root ssh-copy-id -o StrictHostKeyChecking=no root@172.16.4.14
+	@sshpass -p root ssh-copy-id -o StrictHostKeyChecking=no root@172.16.4.15
+	@sshpass -p root ssh-copy-id -o StrictHostKeyChecking=no root@172.16.4.16
+	@cp ./group_vars/test.yml ./group_vars/all.yml
+	@cp ./inventory/test.template ./inventory/hosts
+	@make install DOWNLOAD_WAY=official RUNTIME=containerd
 
 version: 
 	@command -v jq > /dev/null 2>&1 || ( echo -e "\033[32mPlease install jq\033[0m" &&  exit 1)
