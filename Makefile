@@ -43,17 +43,17 @@ install:
 		-e NEXUS_REPOSITORY=$(NEXUS_REPOSITORY) $(ANSIBLE_OPT)
 	@@echo -e "\033[32mDeploy kubernetes done, please check the pod status.\033[0m"
 
-scale: download sync
+scale: 
 	@echo -e "\033[32mScale kubernetes node...\033[0m"
-	@ansible-playbook scale.yml
+	@ansible-playbook -i ./inventory/hosts scale.yml
 
-upgrade: download sync
+upgrade: 
 	@echo -e "\033[32mUpgrade kubernetes...\033[0m"
-	@ansible-playbook upgrade.yml
+	@ansible-playbook -i ./inventory/hosts upgrade.yml
 
 uninstall:
 	@echo -e "\033[32mUninstall kubernetes...\033[0m"
-	@ansible-playbook uninstall.yml
+	@ansible-playbook -i ./inventory/hosts uninstall.yml
 
 # download:
 # 	@echo -e "\033[32mDownload the binaries package to ./scripts/binaries directory...\033[0m"
