@@ -92,7 +92,7 @@ runtime:
 
 .PHONY: test
 test:
-	@ssh-keygen -t rsa -P "" -f ~/.ssh/id_rsa
+	@[ -f ~/.ssh/id_rsa ] || ssh-keygen -t rsa -P "" -f ~/.ssh/id_rsa
 	@sshpass -p root ssh-copy-id -o StrictHostKeyChecking=no root@172.16.4.11
 	@sshpass -p root ssh-copy-id -o StrictHostKeyChecking=no root@172.16.4.12
 	@sshpass -p root ssh-copy-id -o StrictHostKeyChecking=no root@172.16.4.13
