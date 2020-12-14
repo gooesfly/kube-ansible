@@ -1,27 +1,27 @@
 SHELL := /bin/bash
 
-ANSIBLE_OPT := ""
+ANSIBLE_OPT := 
 # binary file download way, official、nexus or local
-DOWNLOAD_WAY := "official"
+DOWNLOAD_WAY := official
 
 # binary version
-KUBE_VERSION := "1.20.0"
-ETCD_VERSION := "3.4.13"
-CNI_VERSION := "0.8.5"
+KUBE_VERSION := 1.20.0
+ETCD_VERSION := 3.4.13
+CNI_VERSION := 0.8.5
 
 # container runtime. containerd or docker
-RUNTIME := "docker"
-DOCKER_VERSION := "20.10.0"
+RUNTIME := docker
+DOCKER_VERSION := 20.10.0
 
-CONTAINERD_VERSION := "1.3.0"
-CRICTL_VERSION := "1.16.1"
-RUNC_VERSION := "1.0.0-rc92"
+CONTAINERD_VERSION := 1.3.0
+CRICTL_VERSION := 1.16.1
+RUNC_VERSION := 1.0.0-rc92
 
 # nexus information
-NEXUS_DOMAIN_NAME := ""
-NEXUS_REPOSITORY := "kube-ansible"
-NEXUS_HTTP_USERNAME := ""
-NEXUS_HTTP_PASSWORD := ""
+NEXUS_DOMAIN_NAME := 
+NEXUS_REPOSITORY := kube-ansible
+NEXUS_HTTP_USERNAME := 
+NEXUS_HTTP_PASSWORD := 
 
 install:
 	@echo -e "\033[32mDeploy kubernetes...\033[0m"
@@ -41,7 +41,7 @@ install:
 		-e NEXUS_HTTP_PASSWORD=$(NEXUS_HTTP_PASSWORD) \
 		-e NEXUS_DOMAIN_NAME=$(NEXUS_DOMAIN_NAME) \
 		-e NEXUS_REPOSITORY=$(NEXUS_REPOSITORY) $(ANSIBLE_OPT)
-	@echo "source /etc/bash_completion.d/kubectl"
+	@@echo -e "\033[32mDeploy kubernetes done, please check the pod status.\033[0m"
 
 scale: download sync
 	@echo -e "\033[32mScale kubernetes node...\033[0m"
