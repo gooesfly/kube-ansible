@@ -23,9 +23,6 @@ NEXUS_REPOSITORY := "kube-ansible"
 NEXUS_HTTP_USERNAME := ""
 NEXUS_HTTP_PASSWORD := ""
 
-auto: runtime download sync
-	@make install
-
 install:
 	@echo -e "\033[32mDeploy kubernetes...\033[0m"
 	@[ -f group_vars/all.yml ] || ( echo -e "\033[31mPlease Create group vars...\033[0m" && exit 1 )
@@ -102,8 +99,8 @@ test:
 	@sshpass -p root ssh-copy-id -o StrictHostKeyChecking=no root@172.16.4.14
 	@sshpass -p root ssh-copy-id -o StrictHostKeyChecking=no root@172.16.4.15
 	@sshpass -p root ssh-copy-id -o StrictHostKeyChecking=no root@172.16.4.16
-	@cp ./group_vars/test.yml ./group_vars/all.yml
-	@cp ./inventory/test.template ./inventory/hosts
+	@cp -f ./group_vars/test.yml ./group_vars/all.yml
+	@cp -f ./inventory/test.template ./inventory/hosts
 	@make install DOWNLOAD_WAY=official RUNTIME=containerd
 
 version: 
