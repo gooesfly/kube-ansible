@@ -72,7 +72,7 @@ DNS.1 = localhost
 DNS.2 = kubernetes
 DNS.3 = kubernetes.default
 DNS.4 = kubernetes.default.svc
-DNS.5 = kubernetes.default.svc.cluster.local
+DNS.5 = kubernetes.default.svc.{{ kubernetes.settings.ClusterDomain | default(cluster.local) }}
 {% if  extDomain | length > 0 %}
 {% for Domain in extDomain | unique  %}
 DNS.{{ loop.index + 5 }} = {{ Domain }}
