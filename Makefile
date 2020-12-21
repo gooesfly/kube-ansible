@@ -102,7 +102,7 @@ test:
 	@sshpass -p root ssh-copy-id -o StrictHostKeyChecking=no root@172.16.4.16
 	@cp -f ./group_vars/test.yml ./group_vars/all.yml
 	@cp -f ./inventory/test.template ./inventory/hosts
-	@make install DOWNLOAD_WAY=official RUNTIME=containerd
+	@make install DOWNLOAD_WAY=official RUNTIME=$(RUNTIME)
 
 version: 
 	@command -v jq > /dev/null 2>&1 || ( echo -e "\033[32mPlease install jq\033[0m" &&  exit 1)
