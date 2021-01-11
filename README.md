@@ -60,12 +60,18 @@ All Node install python3.
 
 #### Clone code
 
+Gitee: https://gitee.com/buxiaomo/kube-ansible.git
+
+Gitlab: https://gitlab.com/buxiaomo/kube-ansible.git
+
+Github: https://github.com/buxiaomo/kube-ansible.git
+
 ```
 # ubuntu
 apt install git make -y
 # centos
 yum install git make vim -y
-git clone https://github.com/buxiaomo/kube-ansible.git /usr/local/src/kube-ansible # https://gitee.com/buxiaomo/kube-ansible.git
+git clone https://github.com/buxiaomo/kube-ansible.git /usr/local/src/kube-ansible # 
 cd /usr/local/src/kube-ansible
 ```
 
