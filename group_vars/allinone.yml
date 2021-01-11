@@ -230,12 +230,12 @@ kubernetes:
 
     # addon images
     image: 
-      metrics: k8s.gcr.io/metrics-server-amd64:v0.3.6
+      metrics: registry.cn-beijing.aliyuncs.com/kubernetes_mirror_2021/metrics-server-amd64:v0.3.6
       coredns: coredns/coredns:1.7.0
-      flannel: quay.io/coreos/flannel:v0.12.0
+      flannel: registry.cn-beijing.aliyuncs.com/kubernetes_mirror_2021/flannel:v0.12.0
       canal:
         node: calico/node:v3.13.2
-        flannel: quay.io/coreos/flannel:v0.11.0
+        flannel: registry.cn-beijing.aliyuncs.com/kubernetes_mirror_2021/flannel:v0.12.0
         cni: calico/cni:v3.13.2
         flexvol: calico/pod2daemon-flexvol:v3.13.2
       calico: 
