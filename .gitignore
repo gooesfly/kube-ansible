@@ -5,28 +5,7 @@
 scripts/binaries
 roles/apps/files/*.yaml
 
-# cni-plugins
-roles/cni-plugins/files/*
-
-# docker
-roles/docker/files/*
-
-# etcd
-roles/etcd/files/*
-
-# kubernetes
-roles/kube-apiserver/files/kube-apiserver
-roles/kubectl/files/kubectl
-roles/kubelet/files/kubelet
-roles/kube-controller-manager/files/kube-controller-manager
-roles/kube-scheduler/files/kube-scheduler
-roles/kube-proxy/files/kube-proxy
-
 # local package
-scripts/src/*.gz
-scripts/src/*.tgz
-scripts/tmp
-scripts/kube-check
 inventory/terraform
 
 inventory/hosts
