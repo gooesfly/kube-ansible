@@ -262,3 +262,7 @@ helm:
 istio:
   enabled: false
   version: 1.7.2
+
+fluxcd:
+  enabled: false
+  version: 0.5.7

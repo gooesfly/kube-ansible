@@ -128,6 +128,8 @@ kubernetes:
         - "native.cgroupdriver=systemd"
       registry-mirrors:
         - "https://i3jtbyvy.mirror.aliyuncs.com"
+      insecure-registries: 
+        - "hub.xiaomo.io"
       storage-driver: "overlay2"
       storage-opts: 
         - "overlay2.override_kernel_check=true"

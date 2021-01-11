@@ -67,7 +67,7 @@
       {%- set hostname_override = nodename %}
     {% endif %}
     openssl genrsa -out kubelet.key 2048
-    openssl req -new -key kubelet.key -subj "/CN=system:node:{{ hostname_override }}/O=system:nodes" -out kubelet.csr
+    openssl req -new -key kubelet.key -subj "/CN=system:node:{{ hostname_override | lower }}/O=system:nodes" -out kubelet.csr
     openssl x509 -req -in kubelet.csr -CA ca.crt -CAkey ca.key -CAcreateserial -extensions v3_req_client -extfile openssl.cnf -out kubelet.crt -days {{ kubernetes.ssl.days | default(3652) }}
   args:
     chdir: '{{ kubernetes.ssl.location }}'
@@ -111,7 +111,7 @@
 
     /usr/local/bin/kubectl config use-context {{ kubernetes.name | default("kubernetes") }} --kubeconfig=/etc/kubernetes/{{ item.KUBE_CONFIG }}
   with_items:
-    - { KUBE_USER: 'system:node:{{ ansible_hostname }}', KUBE_CERT: 'kubelet', KUBE_CONFIG: 'kubelet.kubeconfig' }
+    - { KUBE_USER: 'system:node:{{ ansible_hostname ｜ lower }}', KUBE_CERT: 'kubelet', KUBE_CONFIG: 'kubelet.kubeconfig' }
   register: kubelet_kubeconfig
   when: kubelet_certificate.changed
 
