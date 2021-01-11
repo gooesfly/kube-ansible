@@ -65,7 +65,7 @@ All Node install python3.
 apt install git make -y
 # centos
 yum install git make vim -y
-git clone https://github.com/buxiaomo/kube-ansible.git /usr/local/src/kube-ansible
+git clone https://github.com/buxiaomo/kube-ansible.git /usr/local/src/kube-ansible # https://gitee.com/buxiaomo/kube-ansible.git
 cd /usr/local/src/kube-ansible
 ```
 
