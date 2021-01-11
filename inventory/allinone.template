@@ -1,0 +1,8 @@
+[master]
+127.0.0.1
+
+[worker]
+
+[kubernetes:children]
+master
+worker
