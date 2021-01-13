@@ -5,16 +5,16 @@ ANSIBLE_OPT :=
 DOWNLOAD_WAY := official
 
 # binary version
-KUBE_VERSION := 1.20.0
+KUBE_VERSION := 1.20.1
 ETCD_VERSION := 3.4.13
 CNI_VERSION := 0.8.5
 
 # container runtime. containerd or docker
 RUNTIME := docker
-DOCKER_VERSION := 20.10.0
+DOCKER_VERSION := 20.10.2
 
-CONTAINERD_VERSION := 1.3.0
-CRICTL_VERSION := 1.16.1
+CONTAINERD_VERSION := 1.4.3
+CRICTL_VERSION := 1.20.0
 RUNC_VERSION := 1.0.0-rc92
 
 # nexus information
@@ -109,7 +109,12 @@ version:
 	@echo "etcd" > .etcd
 	@curl -s `curl -s https://api.github.com/repos/coreos/etcd/releases | jq -r .url` | jq -r '.[].name' | grep -Ev 'rc|beta|alpha' | sed 's/v//g' | head -n 15 | sort -r >> .etcd
 	@echo "docker" > .docker
-	@curl -s https://api.github.com/repos/docker/docker-ce/releases | jq -r '.[].name' | grep -Ev 'rc|beta|alpha' | sed 's/v//g' | head -n 15 | sort -r >> .docker
+	@curl -s https://api.github.com/repos/moby/moby/releases | jq -r '.[].name' | grep -Ev 'rc|beta|alpha' | sed 's/v//g' | head -n 15 | sort -r >> .docker
 	@echo "kubernetes" > .kubernetes
 	@curl -s https://api.github.com/repos/kubernetes/kubernetes/releases | jq -r '.[].name' | grep -Ev 'rc|beta|alpha' | sed 's/v//g' | sed 's/Kubernetes //g' | head -n 15 | sort -r >> .kubernetes
-	@paste -d '|' .etcd .docker .kubernetes | column -t -s '|'
+	@echo "containerd" > .containerd
+	@curl -s https://api.github.com/repos/containerd/containerd/releases | jq -r '.[].name' | grep -Ev 'rc|beta|alpha' | sed 's/containerd //g' | head -n 15 | sort -r >> .containerd
+	@echo "crictl" > .crictl
+	@curl -s https://api.github.com/repos/kubernetes-sigs/cri-tools/releases | jq -r '.[].name' | grep -Ev 'rc|beta|alpha' | sed 's/cri-tools v//g'| head -n 15 | sort -r >> .crictl
+	@paste -d '|' .etcd .docker .kubernetes .containerd .crictl | column -t -s '|'
+	@rm -rf .etcd .docker .kubernetes .containerd .crictl
