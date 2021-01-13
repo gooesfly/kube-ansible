@@ -39,7 +39,7 @@ ExecStart=/usr/local/bin/kube-apiserver \
   --etcd-certfile={{ kubernetes.ssl.location }}/apiserver-etcd-client.crt \
   --etcd-keyfile={{ kubernetes.ssl.location }}/apiserver-etcd-client.key \
   --etcd-servers={% for host in etcdnode %}https://{{ host }}:2379{% if not loop.last %},{% endif %}{% endfor %} \
-  --event-ttl=1h \
+  --event-ttl=4h \
   --experimental-encryption-provider-config=/etc/kubernetes/encryption-config.yaml \
   --enable-bootstrap-token-auth \
   --client-ca-file={{ kubernetes.ssl.location }}/ca.crt \
