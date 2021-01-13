@@ -1,1 +1,2 @@
 download_url: http://artifacts.splunk.org.cn/kubernetes-release/release/v{{ KUBE_VERSION }}/bin/linux/amd64/kubectl
+# checksum_url: http://artifacts.splunk.org.cn/kubernetes-release/release/v{{ KUBE_VERSION }}/bin/linux/amd64/kubectl.sha256
