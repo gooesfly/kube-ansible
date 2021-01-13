@@ -1,7 +1,7 @@
 SHELL := /bin/bash
 
 ANSIBLE_OPT := 
-# binary file download way, official、nexus or local
+# binary file download way, official、nexus、qiniu
 DOWNLOAD_WAY := official
 
 # binary version
