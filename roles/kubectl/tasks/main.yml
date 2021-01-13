@@ -6,6 +6,8 @@
   get_url:
     url: "{{ download_url }}"
     dest: /usr/local/bin/kubectl
+    # checksum: "sha256:{{ checksum_url }}"
+    force: true
     mode: 0755
     owner: root
     group: root
