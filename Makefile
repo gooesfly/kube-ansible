@@ -45,11 +45,37 @@ install:
 
 scale: 
 	@echo -e "\033[32mScale kubernetes node...\033[0m"
-	@ansible-playbook -i ./inventory/hosts scale.yml
+	@ansible-playbook -i ./inventory/hosts scale.yml \
+		-e DOWNLOAD_WAY=$(DOWNLOAD_WAY) \
+		-e RUNTIME=$(RUNTIME) \
+		-e KUBE_VERSION=$(KUBE_VERSION) \
+		-e ETCD_VERSION=$(ETCD_VERSION) \
+		-e CONTAINERD_VERSION=$(CONTAINERD_VERSION) \
+		-e RUNC_VERSION=$(RUNC_VERSION) \
+		-e CRICTL_VERSION=$(CRICTL_VERSION) \
+		-e DOCKER_VERSION=$(DOCKER_VERSION) \
+		-e CNI_VERSION=$(CNI_VERSION) \
+		-e NEXUS_HTTP_USERNAME=$(NEXUS_HTTP_USERNAME) \
+		-e NEXUS_HTTP_PASSWORD=$(NEXUS_HTTP_PASSWORD) \
+		-e NEXUS_DOMAIN_NAME=$(NEXUS_DOMAIN_NAME) \
+		-e NEXUS_REPOSITORY=$(NEXUS_REPOSITORY) $(ANSIBLE_OPT)
 
 upgrade: 
 	@echo -e "\033[32mUpgrade kubernetes...\033[0m"
-	@ansible-playbook -i ./inventory/hosts upgrade.yml
+	@ansible-playbook -i ./inventory/hosts upgrade.yml \
+		-e DOWNLOAD_WAY=$(DOWNLOAD_WAY) \
+		-e RUNTIME=$(RUNTIME) \
+		-e KUBE_VERSION=$(KUBE_VERSION) \
+		-e ETCD_VERSION=$(ETCD_VERSION) \
+		-e CONTAINERD_VERSION=$(CONTAINERD_VERSION) \
+		-e RUNC_VERSION=$(RUNC_VERSION) \
+		-e CRICTL_VERSION=$(CRICTL_VERSION) \
+		-e DOCKER_VERSION=$(DOCKER_VERSION) \
+		-e CNI_VERSION=$(CNI_VERSION) \
+		-e NEXUS_HTTP_USERNAME=$(NEXUS_HTTP_USERNAME) \
+		-e NEXUS_HTTP_PASSWORD=$(NEXUS_HTTP_PASSWORD) \
+		-e NEXUS_DOMAIN_NAME=$(NEXUS_DOMAIN_NAME) \
+		-e NEXUS_REPOSITORY=$(NEXUS_REPOSITORY) $(ANSIBLE_OPT)
 
 uninstall:
 	@echo -e "\033[32mUninstall kubernetes...\033[0m"
