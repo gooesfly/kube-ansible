@@ -109,7 +109,7 @@ version:
 	@echo "etcd" > .etcd
 	@curl -s `curl -s https://api.github.com/repos/coreos/etcd/releases | jq -r .url` | jq -r '.[].name' | grep -Ev 'rc|beta|alpha' | sed 's/v//g' | head -n 15 | sort -r >> .etcd
 	@echo "docker" > .docker
-	@curl -s https://api.github.com/repos/moby/moby/releases | jq -r '.[].name' | grep -Ev 'rc|beta|alpha' | sed 's/v//g' | head -n 15 | sort -r >> .docker
+	@curl -s https://api.github.com/repos/moby/moby/releases | jq -r '.[].name' | grep -Ev 'rc|beta|alpha|-ce' | sed 's/v//g' | head -n 15 | sort -r >> .docker
 	@echo "kubernetes" > .kubernetes
 	@curl -s https://api.github.com/repos/kubernetes/kubernetes/releases | jq -r '.[].name' | grep -Ev 'rc|beta|alpha' | sed 's/v//g' | sed 's/Kubernetes //g' | head -n 15 | sort -r >> .kubernetes
 	@echo "containerd" > .containerd
