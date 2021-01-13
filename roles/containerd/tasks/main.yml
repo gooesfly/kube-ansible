@@ -7,6 +7,7 @@
   get_url:
     url: '{{ runc_download_url }}'
     dest: /usr/local/bin/runc
+    force: true
     mode: 0755
     owner: root
     group: root
