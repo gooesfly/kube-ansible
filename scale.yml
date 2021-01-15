@@ -16,34 +16,6 @@
   tags:
     - ca
 
-# - name: Deployment etcd cluster
-#   hosts: "{% if groups['etcd'] is not defined %}master{% else %}etcd{% endif %}"
-#   become: yes
-#   vars:
-#     scale: true
-#   roles:
-#     - etcd
-#   tags:
-#     - etcd
-
-# - name: Deployment kube master
-#   hosts: master
-#   become: yes
-#   roles:
-#     - ipvsadm
-#     - haproxy
-#     - keepalived
-#     - docker
-#     - kubectl
-#     - kube-apiserver
-#     - kube-scheduler
-#     - kube-controller-manager
-#     - kubelet
-#     - kube-proxy
-#     - cni-plugins
-#   tags:
-#     - kube-master
-
 - name: Deployment kube worker
   hosts: worker
   become: yes
