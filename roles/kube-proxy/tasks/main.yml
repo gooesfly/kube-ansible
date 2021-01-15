@@ -17,17 +17,6 @@
   until: kube_proxy_pkg is succeeded
   retries: 5
 
-- name: Create log directory
-  file: 
-    name: '{{ kubernetes.proxy.log.logDir }}'
-    state: directory
-    mode: '0755'
-
-- name: Configuration logrotate
-  template: 
-    src: kube-proxy.logrotate.j2
-    dest: /etc/logrotate.d/kube-proxy
-
 - name: Create ssl directory
   file: 
     name: '{{ item }}'

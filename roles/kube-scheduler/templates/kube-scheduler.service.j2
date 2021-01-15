@@ -19,10 +19,6 @@ ExecStart=/usr/local/bin/kube-scheduler \
   --requestheader-extra-headers-prefix="X-Remote-Extra-" \
   --requestheader-group-headers=X-Remote-Group \
   --requestheader-username-headers=X-Remote-User \
-{% if kubernetes.scheduler.log is defined %}
-  --logtostderr=false \
-  --log-dir={{ kubernetes.scheduler.log.logDir }} \
-{% endif %}
   --v={{ kubernetes.scheduler.log.logLevel | default(2)}}
 
 Restart=always
