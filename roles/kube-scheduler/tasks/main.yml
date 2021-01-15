@@ -17,17 +17,6 @@
   until: kube_scheduler_pkg is succeeded
   retries: 5
 
-- name: Create log directory
-  file: 
-    name: '{{ kubernetes.scheduler.log.logDir }}'
-    state: directory
-    mode: '0755'
-
-- name: Configuration logrotate
-  template: 
-    src: kube-scheduler.logrotate.j2
-    dest: /etc/logrotate.d/kube-scheduler
-
 - name: Create ssl directory
   file: 
     name: '{{ item }}'

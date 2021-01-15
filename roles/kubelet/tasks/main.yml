@@ -27,17 +27,6 @@
     - /etc/kubernetes/manifests
     - /var/lib/kubelet
 
-- name: Create log directory
-  file: 
-    name: '{{ kubernetes.kubelet.log.logDir }}'
-    state: directory
-    mode: '0755'
-
-- name: Configuration logrotate
-  template: 
-    src: kubelet.logrotate.j2
-    dest: /etc/logrotate.d/kubelet
-
 - name: Install config file
   template: 
     src: kubelet.yaml.j2

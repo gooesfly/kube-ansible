@@ -61,10 +61,6 @@ ExecStart=/usr/local/bin/kube-apiserver \
   --proxy-client-cert-file={{ kubernetes.ssl.location }}/front-proxy-client.crt \
   --proxy-client-key-file={{ kubernetes.ssl.location }}/front-proxy-client.key \
   --profiling=false \
-{% if kubernetes.apiserver.log is defined %}
-  --logtostderr=false \
-  --log-dir={{ kubernetes.apiserver.log.logDir }} \
-{% endif %}
   --v={{ kubernetes.apiserver.log.logLevel | default(2) }}
 
 Restart=on-failure
