@@ -27,7 +27,7 @@
     url_password: "{{ NEXUS_HTTP_USERNAME }}"
     url_username: "{{ NEXUS_HTTP_PASSWORD }}"
     timeout: 3
-  register: docker_pkg
+  register: docker_pkg1
   until: docker_pkg is succeeded
   retries: 10
   notify: Start docker
@@ -39,7 +39,7 @@
     remote_src: yes
     extra_opts:
       - --strip-components=1
-  notify: Start docker
+  register: docker_pkg2
 
 - name: Create data directory
   file: 
@@ -54,13 +54,21 @@
   template: 
     src: daemon.json.j2
     dest: /etc/docker/daemon.json
-  notify: Start docker
+  register: docker_conf
 
 - name: Install systemd file
   template: 
     src: docker.service.j2
     dest: /etc/systemd/system/docker.service
-  notify: Start docker
+  register: docker_systemd
+
+- name: Start the service
+  systemd:
+    name: docker
+    state: restarted
+    enabled: yes
+    daemon_reload: yes
+  when: docker_pkg1.changed or docker_pkg2.changed or docker_conf.changed or docker_systemd.changed
 
 - name: Install docker completion
   get_url: 
