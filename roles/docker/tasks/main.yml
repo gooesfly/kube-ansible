@@ -30,7 +30,6 @@
   register: docker_pkg1
   until: docker_pkg is succeeded
   retries: 10
-  notify: Start docker
 
 - name: Extract docker
   unarchive:
