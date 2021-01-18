@@ -21,6 +21,7 @@
   get_url:
     url: "{{ download_url }}"
     dest: "/usr/local/src/docker-{{ DOCKER_VERSION }}.tgz"
+    force: true
     mode: 0644
     owner: root
     group: root
@@ -28,7 +29,7 @@
     url_username: "{{ NEXUS_HTTP_PASSWORD }}"
     timeout: 3
   register: docker_pkg1
-  until: docker_pkg is succeeded
+  until: docker_pkg1 is succeeded
   retries: 10
 
 - name: Extract docker
