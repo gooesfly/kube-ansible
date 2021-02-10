@@ -16,6 +16,7 @@
     - ca
 
 - name: Deployment etcd cluster
+  serial: 1
   hosts: "{% if groups['etcd'] is not defined %}master{% else %}etcd{% endif %}"
   become: yes
   roles:
@@ -32,6 +33,7 @@
     - ipvsadm
 
 - name: Deployment kube master
+  serial: 1
   hosts: master
   roles:
     - cni-plugins
@@ -46,6 +48,7 @@
     - kube-master
 
 - name: Deployment kube worker
+  serial: 1
   hosts: worker
   roles:
     - cni-plugins
