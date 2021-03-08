@@ -68,7 +68,7 @@
     src: '{{ kubernetes.docker.device }}'
     path: /var/lib/docker
     fstype: xfs
-    opts: noatime
+    opts: defaults,noatime
     state: present
 
 - name: Install systemd file
