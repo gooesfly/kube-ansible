@@ -71,7 +71,7 @@ Github: https://github.com/buxiaomo/kube-ansible.git
 apt install git make -y
 # centos
 yum install git make vim -y
-git clone https://github.com/buxiaomo/kube-ansible.git /usr/local/src/kube-ansible # 
+git clone https://github.com/buxiaomo/kube-ansible.git /usr/local/src/kube-ansible
 cd /usr/local/src/kube-ansible
 ```
 
@@ -211,7 +211,9 @@ component attributes of directory format:
 * [flannel](https://github.com/coreos/flannel#flannel)
 * [cilium](https://docs.cilium.io/en/stable/gettingstarted/#gs-guide)
 * [hubble](https://github.com/cilium/hubble)
-
+* [metrics-server](https://github.com/kubernetes-sigs/metrics-server)
+* [coredns on k8s](https://github.com/coredns/deployment/blob/master/kubernetes/CoreDNS-k8s_version.md)
+* [coredns on k8s](https://github.com/coredns/deployment/blob/master/kubernetes/CoreDNS-k8s_version.md)
 
 <!-- 
 kubectl config set-cluster kubernetes \
@@ -439,4 +441,12 @@ RestartSec=5
 
 [Install]
 WantedBy=multi-user.target
-EOF -->
+EOF 
+curl -vsk --cacert ./ca.crt --key ./admin.key --cert ./admin.crt https://172.16.5.11:10250/metrics
+
+
+curl -vsk --cacert /etc/pki/trust/anchors/DevOps_CA.crt \
+--cert /etc/pki/kube-scheduler.crt \
+--key /etc/pki/kube-scheduler.key \
+https://127.0.0.1:6443/apis/coordination.k8s.io/v1/namespaces/kube-system/leases/kube-scheduler?timeout=10s
+-->

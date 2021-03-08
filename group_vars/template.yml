@@ -122,7 +122,8 @@ kubernetes:
   # docker parameter configuration
   docker:
     datadir: /var/lib/docker
-    device: /dev/sdb
+    # auto create dockr primary partition
+    # device: /dev/sdb
     # Convert the json format to yaml
     daemon: 
       exec-opts:
