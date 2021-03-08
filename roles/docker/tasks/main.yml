@@ -56,6 +56,21 @@
     dest: /etc/docker/daemon.json
   register: docker_conf
 
+- name: Create a docker primary partition
+  community.general.filesystem: 
+    fstype: xfs
+    dev: '{{ kubernetes.docker.device }}'
+    state: present
+  when: kubernetes.docker.device is defined
+
+- name: Mount docker root dir
+  ansible.posix.mount:
+    src: '{{ kubernetes.docker.device }}'
+    path: /var/lib/docker
+    fstype: xfs
+    opts: noatime
+    state: present
+
 - name: Install systemd file
   template: 
     src: docker.service.j2

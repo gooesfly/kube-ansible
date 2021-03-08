@@ -16,3 +16,11 @@
       - --strip-components=1
       - linux-amd64/helm
   when: helm.enabled | bool
+
+- name: Install kubectl completion
+  copy: 
+    src: helm.sh
+    dest: /etc/bash_completion.d/helm
+    owner: root
+    group: root
+  when: helm.enabled | bool
