@@ -122,6 +122,7 @@ kubernetes:
   # docker parameter configuration
   docker:
     datadir: /var/lib/docker
+    device: /dev/sdb
     # Convert the json format to yaml
     daemon: 
       exec-opts:
