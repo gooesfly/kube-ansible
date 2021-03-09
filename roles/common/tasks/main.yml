@@ -20,6 +20,7 @@
   with_items:
     - pyopenssl>=0.15
     - pyyaml
+    - cryptography>=1.6
 
 - name: Set the Hostname
   hostname: 
