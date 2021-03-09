@@ -1,7 +1,7 @@
 ---
 # Ansible settings
 ansible_ssh_port: 22
-ansible_ssh_user: 'root'
+ansible_ssh_user: "root"
 # ansible_ssh_pass: 'root'
 # ansible_sudo_user: 'root'
 # ansible_sudo_pass: 'root'
@@ -9,7 +9,7 @@ ansible_become: "{% if ansible_ssh_user != 'root' %}yes{% else %}no{% endif %}"
 ansible_python_interpreter: "/usr/bin/python2"
 
 # timezone settings, default is Asia/Shanghai
-timezone: 'Asia/Shanghai'
+timezone: "Asia/Shanghai"
 
 # modprobe:
 #   filename: /etc/modules
@@ -80,7 +80,7 @@ kubernetes:
   name: kubernetes
 
   # cloud support
-  cloud: 
+  cloud:
     # choose: local aws azure gcp
     #   local: local data center (default)
     #          if ha.vip and ha.mask is defined and Number of master hosts > 1 will install haproxy and keepalived keep HA
@@ -116,7 +116,7 @@ kubernetes:
     ClusterDomain: cluster.local
 
   # etcd parameter configuration
-  etcd: 
+  etcd:
     datadir: /var/lib/etcd
 
   # docker parameter configuration
@@ -125,16 +125,16 @@ kubernetes:
     # auto create dockr primary partition
     # device: /dev/sdb
     # Convert the json format to yaml
-    daemon: 
+    daemon:
       exec-opts:
         - "native.cgroupdriver=systemd"
       registry-mirrors:
         - "https://i3jtbyvy.mirror.aliyuncs.com"
       storage-driver: "overlay2"
-      storage-opts: 
+      storage-opts:
         - "overlay2.override_kernel_check=true"
       log-driver: "json-file"
-      log-opts: 
+      log-opts:
         max-size: "100m"
         max-file: "5"
       max-concurrent-downloads: 20
@@ -157,7 +157,7 @@ kubernetes:
     #     - Environment="NO_PROXY=localhost,.docker.io,.docker.com,.daocloud.io"
 
   # kubelet parameter configuration
-  kubelet: 
+  kubelet:
     bind: 0.0.0.0
     pod_infra_container_image: registry.aliyuncs.com/google_containers/pause:3.2
     image_pull_progress_deadline: 2m
@@ -165,7 +165,7 @@ kubernetes:
       logLevel: 2
 
   # kube-apiserver parameter configuration
-  apiserver: 
+  apiserver:
     bind: 0.0.0.0
     encryption: Tsg7sO4Ki/W3s9bfwGfTi8ECcp+/3uDedQMq6rLQTIY= # head -c 32 /dev/urandom | base64
     enable_admission_plugins:
@@ -192,7 +192,7 @@ kubernetes:
       logLevel: 2
 
   # kube-scheduler parameter configuration
-  scheduler: 
+  scheduler:
     bind: 0.0.0.0
     log:
       logLevel: 2
@@ -217,7 +217,7 @@ kubernetes:
     metrics: true
 
     # addon images
-    image: 
+    image:
       metrics: k8s.gcr.io/metrics-server-amd64:v0.3.6
       coredns: coredns/coredns:1.8.0
       flannel: quay.io/coreos/flannel:v0.13.0
@@ -226,7 +226,7 @@ kubernetes:
         flannel: quay.io/coreos/flannel:v0.11.0
         cni: calico/cni:v3.13.2
         flexvol: calico/pod2daemon-flexvol:v3.13.2
-      calico: 
+      calico:
         node: calico/node:v3.13.2
         cni: calico/cni:v3.13.2
         typha: quay.io/calico/typha:v3.1.7
@@ -235,12 +235,12 @@ kubernetes:
       cilium:
         operator: docker.io/cilium/operator-generic:v1.8.1
 
-# apps:
-#   location: /etc/kubernetes/apps
-#   files:
-#     - https://raw.githubusercontent.com/buxiaomo/kubernetes-manifests/master/jenkins.yaml
-#     - https://raw.githubusercontent.com/buxiaomo/kubernetes-manifests/master/ingress/traefik-2.3.yaml
-#     - https://raw.githubusercontent.com/buxiaomo/kubernetes-manifests/master/nfs-client.yaml
+  # apps:
+  #   location: /etc/kubernetes/apps
+  #   files:
+  #     - https://raw.githubusercontent.com/buxiaomo/kubernetes-manifests/master/ingress/traefik-2.0.yaml
+  #     - https://raw.githubusercontent.com/buxiaomo/kubernetes-manifests/master/jenkins.yaml
+  #     - https://raw.githubusercontent.com/buxiaomo/kubernetes-manifests/master/nfs-client.yaml
 
 helm:
   enabled: false

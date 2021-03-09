@@ -17,4 +17,4 @@
       shell: '/usr/local/bin/kubectl apply -f {{ item }}'
       run_once: true
       with_items: '{{ apps.files }}'
-  when: apps is defined
+  when: kubernetes.apps is defined
