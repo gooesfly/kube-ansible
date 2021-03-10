@@ -2,19 +2,19 @@
 # tasks file for haproxy
 - block:
     - name: Install applications
-      package: 
-        name: '{{ item }}'
+      package:
+        name: "{{ item }}"
         state: present
       with_items:
         - haproxy
       register: haproxy_pkg
 
     - name: Create applications configure files
-      template: 
-        src: '{{ item.src }}'
-        dest: '{{ item.dest }}'
+      template:
+        src: "{{ item.src }}"
+        dest: "{{ item.dest }}"
       with_items:
-        - { src: 'haproxy.cfg.j2', dest: '/etc/haproxy/haproxy.cfg'}
+        - { src: "haproxy.cfg.j2", dest: "/etc/haproxy/haproxy.cfg" }
       register: haproxy_cfg
 
     - name: Start the service
@@ -29,7 +29,7 @@
         port: 8443
         delay: 15
         state: started
-        host: '{{ (ansible_ssh_host|default(ansible_host))|default(inventory_hostname) }}'
+        host: "{{ (ansible_ssh_host|default(ansible_host))|default(inventory_hostname) }}"
       connection: local
       when: haproxy_pkg.changed or haproxy_cfg.changed
   when: kubernetes.cloud.type == "local" and kubernetes.ha.vip is defined and groups['master'] | length > 1

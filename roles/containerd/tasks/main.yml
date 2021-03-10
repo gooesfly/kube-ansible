@@ -1,11 +1,11 @@
 ---
 # tasks file for containerd
 - name: Set OS dependent variables
-  include_vars: '{{ DOWNLOAD_WAY }}.yml'
+  include_vars: "{{ DOWNLOAD_WAY }}.yml"
 
 - name: Download RunC
   get_url:
-    url: '{{ runc_download_url }}'
+    url: "{{ runc_download_url }}"
     dest: /usr/local/bin/runc
     force: true
     mode: 0755
@@ -21,8 +21,8 @@
 
 - name: Download Containerd
   get_url:
-    url: '{{ containerd_download_url }}'
-    dest: '/usr/local/src/containerd-{{ CONTAINERD_VERSION }}.linux-amd64.tar.gz'
+    url: "{{ containerd_download_url }}"
+    dest: "/usr/local/src/containerd-{{ CONTAINERD_VERSION }}.linux-amd64.tar.gz"
     mode: 0644
     owner: root
     group: root
@@ -36,7 +36,7 @@
 
 - name: Extract Containerd
   unarchive:
-    src: '/usr/local/src/containerd-{{ CONTAINERD_VERSION }}.linux-amd64.tar.gz'
+    src: "/usr/local/src/containerd-{{ CONTAINERD_VERSION }}.linux-amd64.tar.gz"
     dest: /usr/local/bin
     remote_src: yes
     extra_opts:
@@ -45,8 +45,8 @@
 
 - name: Download Crictl
   get_url:
-    url: '{{ crictl_download_url }}'
-    dest: '/usr/local/src/crictl-v{{ CRICTL_VERSION }}-linux-amd64.tar.gz'
+    url: "{{ crictl_download_url }}"
+    dest: "/usr/local/src/crictl-v{{ CRICTL_VERSION }}-linux-amd64.tar.gz"
     mode: 0644
     owner: root
     group: root
@@ -57,40 +57,40 @@
   until: crictl_pkg is succeeded
   retries: 10
   notify: Start Containerd
-  
+
 - name: Extract Crictl
   unarchive:
-    src: '/usr/local/src/crictl-v{{ CRICTL_VERSION }}-linux-amd64.tar.gz'
+    src: "/usr/local/src/crictl-v{{ CRICTL_VERSION }}-linux-amd64.tar.gz"
     dest: /usr/local/bin
     remote_src: yes
 
 - name: Configuration Crictl
-  template: 
+  template:
     src: crictl.yaml.j2
     dest: /etc/crictl.yaml
 
 - name: Create Configuration directory
-  file: 
-    name: '{{ item }}'
+  file:
+    name: "{{ item }}"
     state: directory
-    mode: '0755'
+    mode: "0755"
   with_items:
     - /etc/containerd
 
 - name: Configuration Containerd
-  template: 
+  template:
     src: config.toml.j2
     dest: /etc/containerd/config.toml
   notify: Start Containerd
 
 - name: Install systemd file
-  template: 
+  template:
     src: containerd.service.j2
     dest: /etc/systemd/system/containerd.service
   notify: Start Containerd
 
 - name: Install crictl completion
-  copy: 
+  copy:
     src: crictl.sh
     dest: /etc/bash_completion.d/crictl
     owner: root

@@ -7,7 +7,7 @@
     {% else %}
       /usr/local/bin/kubectl taint node {{ hostvars[inventory_hostname].ansible_hostname | lower }} node-role.kubernetes.io/master="":NoSchedule --overwrite
     {% endif %}
-  when: 
+  when:
     - not kubernetes.settings.master_run_pod | default(false) | bool and inventory_hostname in groups['master']
 
 - name: Update node roles
@@ -20,15 +20,15 @@
 
 - name: Clean kubeconfig for kube-minion nodes
   file:
-    path: '{{ item }}'
+    path: "{{ item }}"
     state: absent
   with_items:
-    - ~/.kube
-    - /etc/kubernetes/admin.kubeconfig
-    - '{{ kubernetes.ssl.location }}/ca.key'
-    - '{{ kubernetes.ssl.location }}/ca.srl'
-    - '{{ kubernetes.ssl.location }}/admin.crt'
-    - '{{ kubernetes.ssl.location }}/admin.key'
-    - '{{ kubernetes.ssl.location }}/admin.csr'
-    - '{{ kubernetes.ssl.location }}/etcd'
+    - "~/.kube"
+    - "/etc/kubernetes/admin.kubeconfig"
+    - "{{ kubernetes.ssl.location }}/ca.key"
+    - "{{ kubernetes.ssl.location }}/ca.srl"
+    - "{{ kubernetes.ssl.location }}/admin.crt"
+    - "{{ kubernetes.ssl.location }}/admin.key"
+    - "{{ kubernetes.ssl.location }}/admin.csr"
+    - "{{ kubernetes.ssl.location }}/etcd"
   when: inventory_hostname in groups['worker']

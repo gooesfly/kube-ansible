@@ -1,6 +1,6 @@
 ---
 - name: Set OS dependent variables
-  include_vars: '{{ DOWNLOAD_WAY }}.yml'
+  include_vars: "{{ DOWNLOAD_WAY }}.yml"
 
 - name: Download binary
   get_url:
@@ -19,33 +19,37 @@
   retries: 5
 
 - name: Create data directory
-  file: 
-    name: '{{ item }}'
+  file:
+    name: "{{ item }}"
     state: directory
-    mode: '0755'
+    mode: "0755"
   with_items:
-    - '{{ kubernetes.ssl.location }}'
+    - "{{ kubernetes.ssl.location }}"
     - /etc/kubernetes/manifests
     - /var/lib/kubelet
 
 - name: Install config file
-  template: 
+  template:
     src: kubelet.yaml.j2
     dest: /etc/kubernetes/kubelet.yaml
 
 - name: Distribution certificate
-  copy: 
-    src: '{{ item.src }}'
-    dest: '{{ item.dest }}'
+  copy:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
     owner: root
     group: root
-    mode: '{{ item.mode }}'
+    mode: "{{ item.mode }}"
   with_items:
-    - { src: '/etc/ssl/{{ kubernetes.project }}/ca.crt', dest: '{{ kubernetes.ssl.location }}/ca.crt', mode: 644 }
+    - {
+        src: "/etc/ssl/{{ kubernetes.project }}/ca.crt",
+        dest: "{{ kubernetes.ssl.location }}/ca.crt",
+        mode: 644,
+      }
 
 - name: Check kubelet certificate expired(30 days)
   community.crypto.openssl_certificate:
-    path: '{{ kubernetes.ssl.location }}/kubelet.crt'
+    path: "{{ kubernetes.ssl.location }}/kubelet.crt"
     provider: assertonly
     valid_in: "2592000"
   ignore_errors: yes
@@ -61,7 +65,7 @@
     openssl req -new -key kubelet.key -subj "/CN=system:node:{{ hostname_override | lower }}/O=system:nodes" -out kubelet.csr
     openssl x509 -req -in kubelet.csr -CA ca.crt -CAkey ca.key -CAcreateserial -extensions v3_req_client -extfile openssl.cnf -out kubelet.crt -days {{ kubernetes.ssl.days | default(3652) }}
   args:
-    chdir: '{{ kubernetes.ssl.location }}'
+    chdir: "{{ kubernetes.ssl.location }}"
     executable: /bin/bash
   register: kubelet_certificate
   when: kubelet_certificate_expired.failed
@@ -102,12 +106,16 @@
 
     /usr/local/bin/kubectl config use-context {{ kubernetes.name | default("kubernetes") }} --kubeconfig=/etc/kubernetes/{{ item.KUBE_CONFIG }}
   with_items:
-    - { KUBE_USER: 'system:node:{{ ansible_hostname }}', KUBE_CERT: 'kubelet', KUBE_CONFIG: 'kubelet.kubeconfig' }
+    - {
+        KUBE_USER: "system:node:{{ ansible_hostname }}",
+        KUBE_CERT: "kubelet",
+        KUBE_CONFIG: "kubelet.kubeconfig",
+      }
   register: kubelet_kubeconfig
   when: kubelet_certificate.changed
 
 - name: Install systemd file
-  template: 
+  template:
     src: kubelet.service.j2
     dest: /etc/systemd/system/kubelet.service
   register: kubelet_systemd
@@ -122,7 +130,7 @@
   when: kubelet_pkg.changed or kubelet_certificate.changed or kubelet_kubeconfig.changed or kubelet_systemd.changed
 
 - name: Health check
-  uri: 
+  uri:
     url: 'http://{% if kubernetes.kubelet.bind != "0.0.0.0" %}127.0.0.1{% else %}{{ ansible_default_ipv4.address }}{% endif %}:10248/healthz'
     validate_certs: no
     return_content: yes

@@ -1,6 +1,6 @@
 ---
 - name: Set OS dependent variables
-  include_vars: '{{ DOWNLOAD_WAY }}.yml'
+  include_vars: "{{ DOWNLOAD_WAY }}.yml"
 
 - name: Download binary
   get_url:
@@ -18,27 +18,35 @@
   retries: 5
 
 - name: Create ssl directory
-  file: 
-    name: '{{ item }}'
+  file:
+    name: "{{ item }}"
     state: directory
-    mode: '0755'
+    mode: "0755"
   with_items:
-    - '{{ kubernetes.ssl.location }}'
+    - "{{ kubernetes.ssl.location }}"
 
 - name: Distribution certificate
-  copy: 
-    src: '{{ item.src }}'
-    dest: '{{ item.dest }}'
+  copy:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
     owner: root
     group: root
-    mode: '{{ item.mode }}'
+    mode: "{{ item.mode }}"
   with_items:
-    - { src: '/etc/ssl/{{ kubernetes.project }}/ca.crt', dest: '{{ kubernetes.ssl.location }}/ca.crt', mode: 644 }
-    - { src: '/etc/ssl/{{ kubernetes.project }}/ca.key', dest: '{{ kubernetes.ssl.location }}/ca.key', mode: 600 }
+    - {
+        src: "/etc/ssl/{{ kubernetes.project }}/ca.crt",
+        dest: "{{ kubernetes.ssl.location }}/ca.crt",
+        mode: 644,
+      }
+    - {
+        src: "/etc/ssl/{{ kubernetes.project }}/ca.key",
+        dest: "{{ kubernetes.ssl.location }}/ca.key",
+        mode: 600,
+      }
 
 - name: Check kube-scheduler certificate expired(30 days)
   community.crypto.openssl_certificate:
-    path: '{{ kubernetes.ssl.location }}/kube-scheduler.crt'
+    path: "{{ kubernetes.ssl.location }}/kube-scheduler.crt"
     provider: assertonly
     valid_in: "2592000"
   ignore_errors: yes
@@ -49,7 +57,7 @@
     openssl req -new -key kube-scheduler.key -subj "/CN=system:kube-scheduler/O=system:kube-scheduler" -out kube-scheduler.csr && \
     openssl x509 -req -in kube-scheduler.csr -CA ca.crt -CAkey ca.key -CAcreateserial -extensions v3_req_client -extfile openssl.cnf -out kube-scheduler.crt -days {{ kubernetes.ssl.days | default(3652) }}
   args:
-    chdir: '{{ kubernetes.ssl.location }}'
+    chdir: "{{ kubernetes.ssl.location }}"
     executable: /bin/bash
   register: kube_scheduler_certificate
   when: kube_scheduler_certificate_expired.failed
@@ -90,17 +98,21 @@
 
     /usr/local/bin/kubectl config use-context {{ item.KUBE_USER }}@{{ kubernetes.name | default("kubernetes") }} --kubeconfig=/etc/kubernetes/{{ item.KUBE_CONFIG }}
   with_items:
-    - { KUBE_USER: 'system:kube-scheduler', KUBE_CERT: "kube-scheduler", KUBE_CONFIG: 'kube-scheduler.kubeconfig'}
+    - {
+        KUBE_USER: "system:kube-scheduler",
+        KUBE_CERT: "kube-scheduler",
+        KUBE_CONFIG: "kube-scheduler.kubeconfig",
+      }
   register: kube_scheduler_kubeconfig
   when: kube_scheduler_certificate.changed
 
 - name: Change file permissions
   file:
     path: /etc/kubernetes/kube-scheduler.kubeconfig
-    mode: '0644'
+    mode: "0644"
 
 - name: Install systemd file
-  template: 
+  template:
     src: kube-scheduler.service.j2
     dest: /etc/systemd/system/kube-scheduler.service
   register: kube_scheduler_systemd
@@ -122,7 +134,7 @@
   when: kube_scheduler_service.changed
 
 - name: Health check
-  uri: 
+  uri:
     url: 'http://{% if kubernetes.scheduler.bind != "0.0.0.0" %}127.0.0.1{% else %}{{ ansible_default_ipv4.address }}{% endif %}:10251/healthz'
     validate_certs: no
     return_content: yes

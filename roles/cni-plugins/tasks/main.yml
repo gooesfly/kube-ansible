@@ -1,14 +1,14 @@
 ---
 # tasks file for cni
 - name: Create binary directory
-  file: 
+  file:
     name: /opt/cni/bin
     state: directory
-    mode: '0755'
+    mode: "0755"
   when: kubernetes.network == "flannel"  or kubernetes.network == "cilium"
 
 - name: Set OS dependent variables
-  include_vars: '{{ DOWNLOAD_WAY }}.yml'
+  include_vars: "{{ DOWNLOAD_WAY }}.yml"
   when: kubernetes.network == "flannel"  or kubernetes.network == "cilium"
 
 - name: Download binary

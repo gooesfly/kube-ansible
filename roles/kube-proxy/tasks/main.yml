@@ -1,6 +1,6 @@
 ---
 - name: Set OS dependent variables
-  include_vars: '{{ DOWNLOAD_WAY }}.yml'
+  include_vars: "{{ DOWNLOAD_WAY }}.yml"
 
 - name: Download binary
   get_url:
@@ -18,27 +18,35 @@
   retries: 5
 
 - name: Create ssl directory
-  file: 
-    name: '{{ item }}'
+  file:
+    name: "{{ item }}"
     state: directory
-    mode: '0755'
+    mode: "0755"
   with_items:
-    - '{{ kubernetes.ssl.location }}'
+    - "{{ kubernetes.ssl.location }}"
 
 - name: Distribution certificate
-  copy: 
-    src: '{{ item.src }}'
-    dest: '{{ item.dest }}'
+  copy:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
     owner: root
     group: root
-    mode: '{{ item.mode }}'
+    mode: "{{ item.mode }}"
   with_items:
-    - { src: '/etc/ssl/{{ kubernetes.project }}/ca.crt', dest: '{{ kubernetes.ssl.location }}/ca.crt', mode: 644 }
-    - { src: '/etc/ssl/{{ kubernetes.project }}/ca.key', dest: '{{ kubernetes.ssl.location }}/ca.key', mode: 600 }
+    - {
+        src: "/etc/ssl/{{ kubernetes.project }}/ca.crt",
+        dest: "{{ kubernetes.ssl.location }}/ca.crt",
+        mode: 644,
+      }
+    - {
+        src: "/etc/ssl/{{ kubernetes.project }}/ca.key",
+        dest: "{{ kubernetes.ssl.location }}/ca.key",
+        mode: 600,
+      }
 
 - name: Check kube-proxy certificate expired(30 days)
   community.crypto.openssl_certificate:
-    path: '{{ kubernetes.ssl.location }}/kube-proxy.crt'
+    path: "{{ kubernetes.ssl.location }}/kube-proxy.crt"
     provider: assertonly
     valid_in: "2592000"
   ignore_errors: yes
@@ -50,7 +58,7 @@
     openssl req -new -key kube-proxy.key -subj "/CN=system:kube-proxy/O=system:node-proxier" -out kube-proxy.csr && \
     openssl x509 -req -in kube-proxy.csr -CA ca.crt -CAkey ca.key -CAcreateserial -extensions v3_req_client -extfile openssl.cnf -out kube-proxy.crt -days {{ kubernetes.ssl.days | default(3652) }}
   args:
-    chdir: '{{ kubernetes.ssl.location }}'
+    chdir: "{{ kubernetes.ssl.location }}"
     executable: /bin/bash
   register: kube_proxy_certificate
   when: kube_proxy_certificate_expired.failed
@@ -91,23 +99,27 @@
 
     /usr/local/bin/kubectl config use-context {{ kubernetes.name | default("kubernetes") }} --kubeconfig=/etc/kubernetes/{{ item.KUBE_CONFIG }}
   with_items:
-    - { KUBE_USER: 'kube-proxy', KUBE_CERT: 'kube-proxy', KUBE_CONFIG: 'kube-proxy.kubeconfig' }
+    - {
+        KUBE_USER: "kube-proxy",
+        KUBE_CERT: "kube-proxy",
+        KUBE_CONFIG: "kube-proxy.kubeconfig",
+      }
   register: kube_proxy_kubeconfig
   when: kube_proxy_certificate.changed
 
 - name: Change file permissions
   file:
     path: /etc/kubernetes/kube-proxy.kubeconfig
-    mode: '0644'
+    mode: "0644"
 
 - name: Install config file
-  template: 
+  template:
     src: kube-proxy.yaml.j2
     dest: /etc/kubernetes/kube-proxy.yaml
   register: kube_proxy_conf
 
 - name: Install systemd file
-  template: 
+  template:
     src: kube-proxy.service.j2
     dest: /etc/systemd/system/kube-proxy.service
   register: kube_proxy_systemd
@@ -122,7 +134,7 @@
   when: kube_proxy_pkg.changed or kube_proxy_certificate.changed or kube_proxy_kubeconfig.changed or kube_proxy_systemd.changed
 
 - name: Health check
-  uri: 
+  uri:
     url: 'http://{% if kubernetes.controllerManager.bind != "0.0.0.0" %}127.0.0.1{% else %}{{ ansible_default_ipv4.address }}{% endif %}:10256/healthz'
     validate_certs: no
   register: this

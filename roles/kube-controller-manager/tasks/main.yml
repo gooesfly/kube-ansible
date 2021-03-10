@@ -1,6 +1,6 @@
 ---
 - name: Set OS dependent variables
-  include_vars: '{{ DOWNLOAD_WAY }}.yml'
+  include_vars: "{{ DOWNLOAD_WAY }}.yml"
 
 - name: Download binary
   get_url:
@@ -18,27 +18,35 @@
   retries: 5
 
 - name: Create ssl directory
-  file: 
-    name: '{{ item }}'
+  file:
+    name: "{{ item }}"
     state: directory
-    mode: '0755'
+    mode: "0755"
   with_items:
-    - '{{ kubernetes.ssl.location }}'
+    - "{{ kubernetes.ssl.location }}"
 
 - name: Distribution certificate
-  copy: 
-    src: '{{ item.src }}'
-    dest: '{{ item.dest }}'
+  copy:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
     owner: root
     group: root
-    mode: '{{ item.mode }}'
+    mode: "{{ item.mode }}"
   with_items:
-    - { src: '/etc/ssl/{{ kubernetes.project }}/ca.crt', dest: '{{ kubernetes.ssl.location }}/ca.crt', mode: 644 }
-    - { src: '/etc/ssl/{{ kubernetes.project }}/ca.key', dest: '{{ kubernetes.ssl.location }}/ca.key', mode: 600 }
+    - {
+        src: "/etc/ssl/{{ kubernetes.project }}/ca.crt",
+        dest: "{{ kubernetes.ssl.location }}/ca.crt",
+        mode: 644,
+      }
+    - {
+        src: "/etc/ssl/{{ kubernetes.project }}/ca.key",
+        dest: "{{ kubernetes.ssl.location }}/ca.key",
+        mode: 600,
+      }
 
 - name: Check kube-controller-manager certificate expired(30 days)
   community.crypto.openssl_certificate:
-    path: '{{ kubernetes.ssl.location }}/kube-controller-manager.crt'
+    path: "{{ kubernetes.ssl.location }}/kube-controller-manager.crt"
     provider: assertonly
     valid_in: "2592000"
   ignore_errors: yes
@@ -50,7 +58,7 @@
     openssl req -new -key kube-controller-manager.key -subj "/CN=system:kube-controller-manager/O=system:kube-controller-manager" -out kube-controller-manager.csr && \
     openssl x509 -req -in kube-controller-manager.csr -CA ca.crt -CAkey ca.key -CAcreateserial -extensions v3_req_client -extfile openssl.cnf -out kube-controller-manager.crt -days {{ kubernetes.ssl.days | default(3652) }}
   args:
-    chdir: '{{ kubernetes.ssl.location }}'
+    chdir: "{{ kubernetes.ssl.location }}"
     executable: /bin/bash
   register: kube_controller_manager_certificate
   when: kube_controller_manager_certificate_expired.failed
@@ -89,14 +97,18 @@
       --user={{ item.KUBE_USER }} \
       --kubeconfig=/etc/kubernetes/{{ item.KUBE_CONFIG }}
 
-    /usr/local/bin/kubectl config use-context {{ item.KUBE_USER }}@{{ kubernetes.name | default("kubernetes") }} --kubeconfig=/etc/kubernetes/{{ item.KUBE_CONFIG }} 
+    /usr/local/bin/kubectl config use-context {{ item.KUBE_USER }}@{{ kubernetes.name | default("kubernetes") }} --kubeconfig=/etc/kubernetes/{{ item.KUBE_CONFIG }}
   with_items:
-    - { KUBE_USER: 'system:kube-controller-manager', KUBE_CERT: "kube-controller-manager", KUBE_CONFIG: 'kube-controller-manager.kubeconfig' }
+    - {
+        KUBE_USER: "system:kube-controller-manager",
+        KUBE_CERT: "kube-controller-manager",
+        KUBE_CONFIG: "kube-controller-manager.kubeconfig",
+      }
   register: controllermanager_kubeconfig
   when: kube_controller_manager_certificate.changed
 
 - name: Install systemd file
-  template: 
+  template:
     src: kube-controller-manager.service.j2
     dest: /etc/systemd/system/kube-controller-manager.service
   register: controllermanager_systemd
@@ -118,7 +130,7 @@
   when: controllermanager_service.changed
 
 - name: Health check
-  uri: 
+  uri:
     url: 'http://{% if kubernetes.controllerManager.bind != "0.0.0.0" %}127.0.0.1{% else %}{{ ansible_default_ipv4.address }}{% endif %}:10252/healthz'
     validate_certs: no
     return_content: yes
