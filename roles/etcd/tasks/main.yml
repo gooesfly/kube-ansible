@@ -9,7 +9,7 @@
 - name: Add the user 'etcd'
   user:
     name: etcd
-    home: '{{ kubernetes.etcd.datadir }}'
+    home: "{{ kubernetes.etcd.datadir }}"
     comment: etcd service account
     create_home: False
     shell: /sbin/nologin
@@ -17,7 +17,7 @@
     group: etcd
 
 - name: Set OS dependent variables
-  include_vars: '{{ DOWNLOAD_WAY }}.yml'
+  include_vars: "{{ DOWNLOAD_WAY }}.yml"
 
 - name: Download binary
   get_url:
@@ -40,41 +40,47 @@
     remote_src: yes
     exclude:
       - Documentation
-      - 'README*'
+      - "README*"
     extra_opts:
       - --strip-components=1
   register: etcd_bin
 
 - name: Create data directory
-  file: 
-    name: '{{ kubernetes.etcd.datadir }}'
+  file:
+    name: "{{ kubernetes.etcd.datadir }}"
     state: directory
     mode: 0700
     owner: etcd
     group: etcd
 
 - name: Create certificate directory
-  file: 
-    name: '{{ kubernetes.ssl.location }}/etcd'
+  file:
+    name: "{{ kubernetes.ssl.location }}/etcd"
     state: directory
     owner: etcd
     group: etcd
 
 - name: Distribution certificate
-  copy: 
-    src: '{{ item.src }}'
-    dest: '{{ item.dest }}'
+  copy:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
     mode: 0644
     owner: root
     group: root
   with_items:
-    - { src: '/etc/ssl/{{ kubernetes.project }}/etcd/ca.crt', dest: '{{ kubernetes.ssl.location }}/etcd/ca.crt' }
-    - { src: '/etc/ssl/{{ kubernetes.project }}/etcd/ca.key', dest: '{{ kubernetes.ssl.location }}/etcd/ca.key' }
+    - {
+        src: "/etc/ssl/{{ kubernetes.project }}/etcd/ca.crt",
+        dest: "{{ kubernetes.ssl.location }}/etcd/ca.crt",
+      }
+    - {
+        src: "/etc/ssl/{{ kubernetes.project }}/etcd/ca.key",
+        dest: "{{ kubernetes.ssl.location }}/etcd/ca.key",
+      }
   register: etcd_tls
 
 - name: Check etcd server certificate expired(30 days)
   community.crypto.openssl_certificate:
-    path: '{{ kubernetes.ssl.location }}/etcd/server.crt'
+    path: "{{ kubernetes.ssl.location }}/etcd/server.crt"
     provider: assertonly
     valid_in: "2592000"
   ignore_errors: yes
@@ -87,14 +93,14 @@
     openssl x509 -in etcd/server.csr -req -CA etcd/ca.crt -CAkey etcd/ca.key -CAcreateserial -extensions v3_req_etcd -extfile openssl.cnf -out etcd/server.crt -days {{ kubernetes.ssl.days | default(3652) }}
     chown etcd:etcd etcd/server.key etcd/server.csr etcd/server.crt
   args:
-    chdir: '{{ kubernetes.ssl.location }}'
+    chdir: "{{ kubernetes.ssl.location }}"
     executable: /bin/bash
   register: etcd_server_certificate
   when: etcd_server_certificate_expired.failed
 
 - name: Check etcd peer certificate expired(30 days)
   community.crypto.openssl_certificate:
-    path: '{{ kubernetes.ssl.location }}/etcd/peer.crt'
+    path: "{{ kubernetes.ssl.location }}/etcd/peer.crt"
     provider: assertonly
     valid_in: "2592000"
   ignore_errors: yes
@@ -106,14 +112,14 @@
     openssl req -new -key etcd/peer.key -subj "/CN=etcd-peer" -out etcd/peer.csr && \
     openssl x509 -in etcd/peer.csr -req -CA etcd/ca.crt -CAkey etcd/ca.key -CAcreateserial -extensions v3_req_etcd -extfile openssl.cnf -out etcd/peer.crt -days {{ kubernetes.ssl.days | default(3652) }}
   args:
-    chdir: '{{ kubernetes.ssl.location }}'
+    chdir: "{{ kubernetes.ssl.location }}"
     executable: /bin/bash
   register: etcd_peer_certificate
   when: etcd_peer_certificate_expired.failed
 
 - name: Check etcd healthcheck certificate expired(30 days)
   community.crypto.openssl_certificate:
-    path: '{{ kubernetes.ssl.location }}/etcd/healthcheck-client.crt'
+    path: "{{ kubernetes.ssl.location }}/etcd/healthcheck-client.crt"
     provider: assertonly
     valid_in: "2592000"
   ignore_errors: yes
@@ -125,26 +131,32 @@
     openssl req -new -key etcd/healthcheck-client.key -subj "/CN=etcd-client" -out etcd/healthcheck-client.csr && \
     openssl x509 -in etcd/healthcheck-client.csr -req -CA etcd/ca.crt -CAkey etcd/ca.key -CAcreateserial -extensions v3_req_etcd -extfile openssl.cnf -out etcd/healthcheck-client.crt -days {{ kubernetes.ssl.days | default(3652) }}
   args:
-    chdir: '{{ kubernetes.ssl.location }}'
+    chdir: "{{ kubernetes.ssl.location }}"
     executable: /bin/bash
   when: etcd_healthcheck_certificate_expired.failed
 
 - name: Change file ownership, group and permissions
   file:
-    path: '{{ item.src }}'
+    path: "{{ item.src }}"
     owner: etcd
     group: etcd
-    mode: '{{ item.mode }}'
+    mode: "{{ item.mode }}"
   with_items:
-    - { src: '{{ kubernetes.ssl.location }}/etcd/healthcheck-client.crt', mode: 644 }
-    - { src: '{{ kubernetes.ssl.location }}/etcd/healthcheck-client.key', mode: 600 }
-    - { src: '{{ kubernetes.ssl.location }}/etcd/peer.crt', mode: 644 }
-    - { src: '{{ kubernetes.ssl.location }}/etcd/peer.key', mode: 600 }
-    - { src: '{{ kubernetes.ssl.location }}/etcd/server.crt', mode: 644 }
-    - { src: '{{ kubernetes.ssl.location }}/etcd/server.key', mode: 600 }
+    - {
+        src: "{{ kubernetes.ssl.location }}/etcd/healthcheck-client.crt",
+        mode: 644,
+      }
+    - {
+        src: "{{ kubernetes.ssl.location }}/etcd/healthcheck-client.key",
+        mode: 600,
+      }
+    - { src: "{{ kubernetes.ssl.location }}/etcd/peer.crt", mode: 644 }
+    - { src: "{{ kubernetes.ssl.location }}/etcd/peer.key", mode: 600 }
+    - { src: "{{ kubernetes.ssl.location }}/etcd/server.crt", mode: 644 }
+    - { src: "{{ kubernetes.ssl.location }}/etcd/server.key", mode: 600 }
 
 - name: Install systemd file
-  template: 
+  template:
     src: etcd.service.j2
     dest: /etc/systemd/system/etcd.service
   register: etcd_systemd
@@ -169,18 +181,18 @@
     port: 2379
     delay: 15
     state: started
-    host: '{{ (ansible_ssh_host|default(ansible_host))|default(inventory_hostname) }}'
+    host: "{{ (ansible_ssh_host|default(ansible_host))|default(inventory_hostname) }}"
   connection: local
   when: etcd_service.changed
 
 - name: Install health check command
-  template: 
+  template:
     src: etcd-check.j2
     dest: /usr/local/bin/etcd-check
     mode: 755
 
 - name: Install Backup command
-  template: 
+  template:
     src: etcd-backup.j2
     dest: /usr/local/bin/etcd-backup
     mode: 755

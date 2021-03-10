@@ -15,7 +15,7 @@
     group: docker
 
 - name: Set OS dependent variables
-  include_vars: '{{ DOWNLOAD_WAY }}.yml'
+  include_vars: "{{ DOWNLOAD_WAY }}.yml"
 
 - name: Download binary
   get_url:
@@ -42,30 +42,30 @@
   register: docker_pkg2
 
 - name: Create data directory
-  file: 
-    name: '{{ item }}'
+  file:
+    name: "{{ item }}"
     state: directory
-    mode: '0755'
+    mode: "0755"
   with_items:
     - /etc/docker
-    - '{{ kubernetes.docker.datadir }}'
+    - "{{ kubernetes.docker.datadir }}"
 
 - name: Configuration daemon
-  template: 
+  template:
     src: daemon.json.j2
     dest: /etc/docker/daemon.json
   register: docker_conf
 
 - name: Create a docker primary partition
-  community.general.filesystem: 
+  community.general.filesystem:
     fstype: xfs
-    dev: '{{ kubernetes.docker.device }}'
+    dev: "{{ kubernetes.docker.device }}"
     state: present
   when: kubernetes.docker.device is defined
 
 - name: Mount docker root dir
   ansible.posix.mount:
-    src: '{{ kubernetes.docker.device }}'
+    src: "{{ kubernetes.docker.device }}"
     path: /var/lib/docker
     fstype: xfs
     opts: defaults,noatime,atime
@@ -73,7 +73,7 @@
   when: kubernetes.docker.device is defined
 
 - name: Install systemd file
-  template: 
+  template:
     src: docker.service.j2
     dest: /etc/systemd/system/docker.service
   register: docker_systemd
@@ -87,7 +87,7 @@
   when: docker_pkg1.changed or docker_pkg2.changed or docker_conf.changed or docker_systemd.changed
 
 - name: Install docker completion
-  get_url: 
+  get_url:
     url: https://raw.githubusercontent.com/docker/cli/master/contrib/completion/bash/docker
     dest: /etc/bash_completion.d/docker
     mode: 0755

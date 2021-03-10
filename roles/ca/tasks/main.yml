@@ -1,16 +1,16 @@
 ---
 # tasks file for ca
 - name: Create certificate directory
-  file: 
-    name: '/etc/ssl/{{ kubernetes.project }}/etcd'
+  file:
+    name: "/etc/ssl/{{ kubernetes.project }}/etcd"
     state: directory
-    mode: '0755'
+    mode: "0755"
   delegate_to: localhost
   run_once: true
 
 - name: Check kubernetes certificate expired(30 days)
   community.crypto.openssl_certificate:
-    path: '/etc/ssl/{{ kubernetes.project }}/ca.crt'
+    path: "/etc/ssl/{{ kubernetes.project }}/ca.crt"
     provider: assertonly
     valid_in: "2592000"
   ignore_errors: yes
@@ -23,7 +23,7 @@
     openssl genrsa -out ca.key 2048 && \
     openssl req -x509 -new -nodes -key ca.key -subj "/CN=kubernetes-ca" -out ca.crt -days {{ kubernetes.ssl.days | default(3652) }}
   args:
-    chdir: '/etc/ssl/{{ kubernetes.project }}'
+    chdir: "/etc/ssl/{{ kubernetes.project }}"
     executable: /bin/bash
   delegate_to: localhost
   run_once: true
@@ -31,7 +31,7 @@
 
 - name: Check etcd certificate expired(30 days)
   community.crypto.openssl_certificate:
-    path: '/etc/ssl/{{ kubernetes.project }}/etcd/ca.crt'
+    path: "/etc/ssl/{{ kubernetes.project }}/etcd/ca.crt"
     provider: assertonly
     valid_in: "2592000"
   ignore_errors: yes
@@ -44,20 +44,20 @@
     openssl genrsa -out etcd/ca.key 2048 && \
     openssl req -x509 -new -nodes -key etcd/ca.key -subj "/CN=etcd-ca" -out etcd/ca.crt -days {{ kubernetes.ssl.days | default(3652) }}
   args:
-    chdir: '/etc/ssl/{{ kubernetes.project }}'
+    chdir: "/etc/ssl/{{ kubernetes.project }}"
     executable: /bin/bash
   delegate_to: localhost
   run_once: true
   when: etcd_certificate_expired.failed
 
 - name: Create certificate directory for kube nodes
-  file: 
-    name: '{{ kubernetes.ssl.location }}/etcd'
+  file:
+    name: "{{ kubernetes.ssl.location }}/etcd"
     state: directory
-    mode: '0755'
+    mode: "0755"
 
 - name: Create openssl template
-  template: 
-    src: 'openssl.cnf.j2'
-    dest: '{{ kubernetes.ssl.location }}/openssl.cnf'
+  template:
+    src: "openssl.cnf.j2"
+    dest: "{{ kubernetes.ssl.location }}/openssl.cnf"
   register: openssl_conf

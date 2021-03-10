@@ -1,6 +1,6 @@
 ---
 - name: Set OS dependent variables
-  include_vars: '{{ DOWNLOAD_WAY }}.yml'
+  include_vars: "{{ DOWNLOAD_WAY }}.yml"
 
 - name: Download binary
   get_url:
@@ -19,27 +19,35 @@
   retries: 5
 
 - name: Create ssl directory
-  file: 
-    name: '{{ item }}'
+  file:
+    name: "{{ item }}"
     state: directory
-    mode: '0755'
+    mode: "0755"
   with_items:
-    - '{{ kubernetes.ssl.location }}'
+    - "{{ kubernetes.ssl.location }}"
 
 - name: Distribution certificate
-  copy: 
-    src: '{{ item.src }}'
-    dest: '{{ item.dest }}'
+  copy:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
     owner: root
     group: root
-    mode: '{{ item.mode }}'
+    mode: "{{ item.mode }}"
   with_items:
-    - { src: '/etc/ssl/{{ kubernetes.project }}/ca.crt', dest: '{{ kubernetes.ssl.location }}/ca.crt', mode: 644 }
-    - { src: '/etc/ssl/{{ kubernetes.project }}/ca.key', dest: '{{ kubernetes.ssl.location }}/ca.key', mode: 600 }
+    - {
+        src: "/etc/ssl/{{ kubernetes.project }}/ca.crt",
+        dest: "{{ kubernetes.ssl.location }}/ca.crt",
+        mode: 644,
+      }
+    - {
+        src: "/etc/ssl/{{ kubernetes.project }}/ca.key",
+        dest: "{{ kubernetes.ssl.location }}/ca.key",
+        mode: 600,
+      }
 
 - name: Check admin certificate expired(30 days)
   community.crypto.openssl_certificate:
-    path: '{{ kubernetes.ssl.location }}/admin.crt'
+    path: "{{ kubernetes.ssl.location }}/admin.crt"
     provider: assertonly
     valid_in: "2592000"
   ignore_errors: yes
@@ -51,7 +59,7 @@
     openssl req -new -key admin.key -subj "/CN=admin/O=system:masters" -out admin.csr && \
     openssl x509 -req -in admin.csr -CA ca.crt -CAkey ca.key -CAcreateserial -extensions v3_req_client -extfile openssl.cnf -out admin.crt -days {{ kubernetes.ssl.days | default(3652) }}
   args:
-    chdir: '{{ kubernetes.ssl.location }}'
+    chdir: "{{ kubernetes.ssl.location }}"
     executable: /bin/bash
   register: admin_certificate
   when: admin_certificate_expired.failed
@@ -92,38 +100,42 @@
 
     /usr/local/bin/kubectl config use-context {{ item.KUBE_USER }}@{{ kubernetes.name | default("kubernetes") }} --kubeconfig=/etc/kubernetes/{{ item.KUBE_CONFIG }}
   with_items:
-    - { KUBE_USER: 'admin', KUBE_CERT: 'admin', KUBE_CONFIG: 'admin.kubeconfig'}
+    - {
+        KUBE_USER: "admin",
+        KUBE_CERT: "admin",
+        KUBE_CONFIG: "admin.kubeconfig",
+      }
   register: admin_kubeconfig
   when: admin_certificate.changed
 
 - name: Change file permissions
   file:
     path: /etc/kubernetes/admin.kubeconfig
-    mode: '0644'
+    mode: "0644"
   when: admin_kubeconfig.changed
 
 - name: Delete user kube directory
-  file: 
+  file:
     name: ~/.kube
     state: absent
   when: admin_kubeconfig.changed
 
 - name: Create user kube directory
-  file: 
+  file:
     name: ~/.kube
     state: directory
-    mode: '0755'
+    mode: "0755"
   when: admin_kubeconfig.changed
 
 - name: Create User kubeconfig
-  copy: 
+  copy:
     src: /etc/kubernetes/admin.kubeconfig
     dest: ~/.kube/config
     remote_src: yes
   when: admin_kubeconfig.changed
 
 - name: Install kubectl completion
-  copy: 
+  copy:
     src: kubectl.sh
     dest: /etc/bash_completion.d/kubectl
     owner: root

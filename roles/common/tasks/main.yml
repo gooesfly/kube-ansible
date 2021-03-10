@@ -1,9 +1,9 @@
 ---
 # tasks file for common
 - name: Set OS dependent variables
-  include_vars: '{{ item }}'
+  include_vars: "{{ item }}"
   with_first_found:
-   - '{{ ansible_os_family }}.yml'
+    - "{{ ansible_os_family }}.yml"
 
 - name: Set system time zone
   timezone:
@@ -14,8 +14,8 @@
   include: "{{ ansible_os_family }}.yml"
 
 - name: Install python applications
-  pip: 
-    name: '{{ item }}'
+  pip:
+    name: "{{ item }}"
     extra_args: "-i https://mirrors.aliyun.com/pypi/simple"
   with_items:
     - pyopenssl>=0.15
@@ -23,13 +23,13 @@
     - cryptography>=1.6
 
 - name: Set the Hostname
-  hostname: 
-    name: '{{ hostname }}'
+  hostname:
+    name: "{{ hostname }}"
   when: hostname is defined
 
 - name: Close firewalld
-  systemd: 
-    name: '{{ svc_name }}'
+  systemd:
+    name: "{{ svc_name }}"
     enabled: no
     state: stopped
   ignore_errors: True
@@ -43,47 +43,47 @@
 
 - name: Load kernel modules
   modprobe:
-    name: '{{ item }}'
+    name: "{{ item }}"
     state: present
-  with_items: '{{ modprobe.params }}'
+  with_items: "{{ modprobe.params }}"
   when: modprobe.params is defined
 
 - name: Write kernel modules to file
   lineinfile:
-    path: '{{ modprobe.filename }}'
-    line: '{{ item }}'
+    path: "{{ modprobe.filename }}"
+    line: "{{ item }}"
     create: yes
-  with_items: '{{ modprobe.params }}'
+  with_items: "{{ modprobe.params }}"
   when: modprobe.params is defined
 
 - name: Manage entries in sysctl.conf
   sysctl:
-    name: '{{ item.0 }}'
-    value: '{{ item.1 }}'
-    sysctl_file: '{{ sysctl.filename }}'
+    name: "{{ item.0 }}"
+    value: "{{ item.1 }}"
+    sysctl_file: "{{ sysctl.filename }}"
     reload: yes
     ignoreerrors: yes
-  loop: '{{ sysctl.params | dictsort }}'
+  loop: "{{ sysctl.params | dictsort }}"
   when: sysctl.params is defined
 
 - name: Remove swapfile from /etc/fstab
   lineinfile:
-    dest: /etc/fstab     
+    dest: /etc/fstab
     regexp: "(^\\s*[^#].+swap)"
     line: '#\1'
     backrefs: yes
- 
+
 - name: Disable swap
   command: swapoff -a
   when: ansible_swaptotal_mb > 0
 
 - name: Settings limits
-  copy: 
+  copy:
     src: limits.conf
     dest: /etc/security/limits.d/99-kubernetes.conf
 
 - name: Settings journald
-  copy: 
+  copy:
     src: journald.conf.j2
     dest: /etc/systemd/journald.conf
   notify: restart journald
