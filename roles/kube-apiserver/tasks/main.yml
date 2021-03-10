@@ -1,6 +1,6 @@
 ---
 - name: Set OS dependent variables
-  include_vars: '{{ DOWNLOAD_WAY }}.yml'
+  include_vars: "{{ DOWNLOAD_WAY }}.yml"
 
 - name: Download binary
   get_url:
@@ -18,27 +18,43 @@
   retries: 10
 
 - name: Create ssl directory
-  file: 
-    name: '{{ kubernetes.ssl.location }}'
+  file:
+    name: "{{ kubernetes.ssl.location }}"
     state: directory
-    mode: '0755'
+    mode: "0755"
 
 - name: Distribution certificate
-  copy: 
-    src: '{{ item.src }}'
-    dest: '{{ item.dest }}'
+  copy:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
     owner: root
     group: root
-    mode: '{{ item.mode }}'
+    mode: "{{ item.mode }}"
   with_items:
-    - { src: '/etc/ssl/{{ kubernetes.project }}/etcd/ca.crt', dest: '{{ kubernetes.ssl.location }}/etcd/ca.crt', mode: 644 }
-    - { src: '/etc/ssl/{{ kubernetes.project }}/etcd/ca.key', dest: '{{ kubernetes.ssl.location }}/etcd/ca.key', mode: 600 }
-    - { src: '/etc/ssl/{{ kubernetes.project }}/ca.crt', dest: '{{ kubernetes.ssl.location }}/ca.crt', mode: 644 }
-    - { src: '/etc/ssl/{{ kubernetes.project }}/ca.key', dest: '{{ kubernetes.ssl.location }}/ca.key', mode: 600 }
+    - {
+        src: "/etc/ssl/{{ kubernetes.project }}/etcd/ca.crt",
+        dest: "{{ kubernetes.ssl.location }}/etcd/ca.crt",
+        mode: 644,
+      }
+    - {
+        src: "/etc/ssl/{{ kubernetes.project }}/etcd/ca.key",
+        dest: "{{ kubernetes.ssl.location }}/etcd/ca.key",
+        mode: 600,
+      }
+    - {
+        src: "/etc/ssl/{{ kubernetes.project }}/ca.crt",
+        dest: "{{ kubernetes.ssl.location }}/ca.crt",
+        mode: 644,
+      }
+    - {
+        src: "/etc/ssl/{{ kubernetes.project }}/ca.key",
+        dest: "{{ kubernetes.ssl.location }}/ca.key",
+        mode: 600,
+      }
 
 - name: Check kube-apiserver certificate expired(30 days)
   community.crypto.openssl_certificate:
-    path: '{{ kubernetes.ssl.location }}/apiserver.crt'
+    path: "{{ kubernetes.ssl.location }}/apiserver.crt"
     provider: assertonly
     valid_in: "2592000"
   ignore_errors: yes
@@ -50,14 +66,14 @@
     openssl req -new -key apiserver.key -subj "/CN=kube-apiserver/O=Kubernetes" -config openssl.cnf -out apiserver.csr && \
     openssl x509 -req -in apiserver.csr -CA ca.crt -CAkey ca.key -CAcreateserial -extensions v3_req_apiserver -extfile openssl.cnf -out apiserver.crt -days {{ kubernetes.ssl.days | default(3652) }}
   args:
-    chdir: '{{ kubernetes.ssl.location }}'
+    chdir: "{{ kubernetes.ssl.location }}"
     executable: /bin/bash
   register: apiserver_certificate
   when: apiserver_certificate_expired.failed or openssl_conf.changed
 
 - name: Check front-proxy-client certificate expired(30 days)
   community.crypto.openssl_certificate:
-    path: '{{ kubernetes.ssl.location }}/front-proxy-client.crt'
+    path: "{{ kubernetes.ssl.location }}/front-proxy-client.crt"
     provider: assertonly
     valid_in: "2592000"
   ignore_errors: yes
@@ -69,14 +85,14 @@
     openssl req -new -key front-proxy-client.key -subj "/CN=front-proxy-client" -out front-proxy-client.csr && \
     openssl x509 -req -in front-proxy-client.csr -CA ca.crt -CAkey ca.key -CAcreateserial -extensions v3_req_client -extfile openssl.cnf -out front-proxy-client.crt -days {{ kubernetes.ssl.days | default(3652) }}
   args:
-    chdir: '{{ kubernetes.ssl.location }}'
+    chdir: "{{ kubernetes.ssl.location }}"
     executable: /bin/bash
   register: front_proxy_client_certificate
   when: front_proxy_client_certificate_expired.failed or openssl_conf.changed
 
 - name: Check apiserver-kubelet-client certificate expired(30 days)
   community.crypto.openssl_certificate:
-    path: '{{ kubernetes.ssl.location }}/apiserver-kubelet-client.crt'
+    path: "{{ kubernetes.ssl.location }}/apiserver-kubelet-client.crt"
     provider: assertonly
     valid_in: "2592000"
   ignore_errors: yes
@@ -87,14 +103,14 @@
     openssl req -new -key apiserver-kubelet-client.key -subj "/CN=apiserver-kubelet-client/O=system:masters" -out apiserver-kubelet-client.csr && \
     openssl x509 -req -in apiserver-kubelet-client.csr -CA ca.crt -CAkey ca.key -CAcreateserial -extensions v3_req_client -extfile openssl.cnf -out apiserver-kubelet-client.crt -days {{ kubernetes.ssl.days | default(3652) }}
   args:
-    chdir: '{{ kubernetes.ssl.location }}'
+    chdir: "{{ kubernetes.ssl.location }}"
     executable: /bin/bash
   register: kubelet_client_certificate
   when: kubelet_client_certificate_expired.failed or openssl_conf.changed
 
 - name: Check apiserver-etcd-client certificate expired(30 days)
   community.crypto.openssl_certificate:
-    path: '{{ kubernetes.ssl.location }}/apiserver-etcd-client.crt'
+    path: "{{ kubernetes.ssl.location }}/apiserver-etcd-client.crt"
     provider: assertonly
     valid_in: "2592000"
   ignore_errors: yes
@@ -106,26 +122,26 @@
     openssl req -new -key apiserver-etcd-client.key -subj "/CN=apiserver-etcd-client/O=system:masters" -out apiserver-etcd-client.csr && \
     openssl x509 -in apiserver-etcd-client.csr -req -CA etcd/ca.crt -CAkey etcd/ca.key -CAcreateserial -extensions v3_req_etcd -extfile openssl.cnf -out apiserver-etcd-client.crt -days {{ kubernetes.ssl.days | default(3652) }}
   args:
-    chdir: '{{ kubernetes.ssl.location }}'
+    chdir: "{{ kubernetes.ssl.location }}"
     executable: /bin/bash
   register: apiserver_etcd_client_certificate
   when: apiserver_etcd_client_certificate_expired.failed or openssl_conf.changed
 
 - name: Install encryption config
-  template: 
+  template:
     src: encryption-config.yaml.j2
     dest: /etc/kubernetes/encryption-config.yaml
-    mode: '0644'
+    mode: "0644"
 
 - name: Install audit policy
-  template: 
+  template:
     src: audit-policy-minimal.yaml.j2
     dest: /etc/kubernetes/audit-policy-minimal.yaml
-    mode: '0644'
+    mode: "0644"
   register: audit_policy
 
 - name: Install systemd file
-  template: 
+  template:
     src: kube-apiserver.service.j2
     dest: /etc/systemd/system/kube-apiserver.service
   register: apiserver_systemd
@@ -147,10 +163,10 @@
   when: apiserver_service.changed
 
 - name: Health check
-  uri: 
+  uri:
     url: 'https://{% if kubernetes.apiserver.bind != "0.0.0.0" %}127.0.0.1{% else %}{{ ansible_default_ipv4.address }}{% endif %}:6443/healthz'
-    client_cert: '{{ kubernetes.ssl.location }}/admin.crt'
-    client_key: '{{ kubernetes.ssl.location }}/admin.key'
+    client_cert: "{{ kubernetes.ssl.location }}/admin.crt"
+    client_key: "{{ kubernetes.ssl.location }}/admin.key"
     validate_certs: no
     return_content: yes
   register: this
