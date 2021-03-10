@@ -2,38 +2,17 @@
 # tasks file for calico
 - block:
     - name: Create calico data directory
-      file: 
-        name: '{{ kubernetes.addon.location }}/calico'
+      file:
+        name: "{{ kubernetes.addon.location }}/calico"
         state: directory
-        mode: '0755'
-
-    # - name: Stat calico yaml file
-    #   stat: 
-    #     path: '{{ kubernetes.addon.location }}/calico/calico.yaml'
-    #   register: calico_yaml_file
-    #   run_once: true
-
-    # - name: Clean old deployment
-    #   shell: '/usr/local/bin/kubectl delete -f {{ kubernetes.addon.location }}/calico/calico.yaml'
-    #   run_once: true
-    #   when: calico_yaml_file.stat.exists
-
-    # - name: Waiting deployment delete
-    #   shell: /usr/local/bin/kubectl get po -n kube-system
-    #   register: waiting_for_delete_deployment_done
-    #   until: waiting_for_delete_deployment_done.rc == 0 and waiting_for_delete_deployment_done.stdout.find("calico") == -1
-    #   retries: 30
-    #   delay: 5
-    #   changed_when: false
-    #   when: calico_yaml_file.stat.exists
-    #   run_once: true
+        mode: "0755"
 
     - name: Deployment calico --- part.1
-      template: 
+      template:
         src: calico.yaml.j2
-        dest: '{{ kubernetes.addon.location }}/calico/calico.yaml'
+        dest: "{{ kubernetes.addon.location }}/calico/calico.yaml"
 
     - name: Deployment calico --- part.2
-      shell: '/usr/local/bin/kubectl apply -f {{ kubernetes.addon.location }}/calico/calico.yaml'
+      shell: "/usr/local/bin/kubectl apply -f {{ kubernetes.addon.location }}/calico/calico.yaml"
       run_once: true
   when: kubernetes.network == "calico"
