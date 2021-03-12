@@ -69,7 +69,7 @@
     path: /var/lib/docker
     fstype: xfs
     opts: defaults,noatime,atime
-    state: present
+    state: mounted
   when: kubernetes.docker.device is defined
 
 - name: Install systemd file
