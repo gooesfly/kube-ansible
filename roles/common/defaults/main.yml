@@ -42,3 +42,5 @@ sysctl:
     net.netfilter.nf_conntrack_tcp_timeout_close_wait: 3600
     net.core.netdev_max_backlog: 10000
     kernel.pid_max: 65535
+    net.ipv4.tcp_congestion_control: bbr
+    net.core.default_qdisc: fq
