@@ -30,6 +30,11 @@ ExecStart=/usr/local/bin/kubelet \
   --runtime-request-timeout=15m \
   --container-runtime-endpoint=unix:///run/containerd/containerd.sock \
 {% endif %}
+{% if kubernetes.kubelet.args is defined %}
+{% for arg in kubernetes.kubelet.args %}
+  {{ arg }} \
+{% endfor %}
+{% endif %}
   --v={{ kubernetes.kubelet.log.logLevel | default(2)}}
 
 Restart=on-failure
