@@ -68,7 +68,7 @@
     src: "{{ kubernetes.docker.device }}"
     path: /var/lib/docker
     fstype: xfs
-    opts: defaults,noatime,atime
+    opts: defaults,pquota
     state: mounted
   when: kubernetes.docker.device is defined
 
