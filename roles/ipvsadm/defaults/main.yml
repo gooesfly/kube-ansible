@@ -1,6 +1,7 @@
 ---
 # defaults file for ipvs
 ipvs:
+  # /etc/modules-load.d/kubernetes.conf
   filename: /etc/modules
   params:
     - ip_vs
