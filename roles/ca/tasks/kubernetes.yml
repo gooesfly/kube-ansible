@@ -1,0 +1,111 @@
+- name: Create kubernetes certificate directory
+  file:
+    name: /etc/ssl/kubernetes
+    state: directory
+    mode: 0755
+  delegate_to: localhost
+  run_once: true
+
+- name: Generate an kubernetes CA private key
+  community.crypto.openssl_privatekey:
+    path: /etc/ssl/kubernetes/ca.key
+    size: 2048
+    mode: 0600
+  delegate_to: localhost
+  run_once: true
+
+- name: Generate an kubernetes SA private key
+  community.crypto.openssl_privatekey:
+    path: /etc/ssl/kubernetes/sa.key
+    size: 2048
+    mode: 0600
+  delegate_to: localhost
+  run_once: true
+
+- name: Generate an kubernetes CA CSR
+  community.crypto.openssl_csr:
+    path: /etc/ssl/kubernetes/ca.csr
+    privatekey_path: /etc/ssl/kubernetes/ca.key
+    common_name: kubernetes-ca
+    basic_constraints: "CA:TRUE"
+    basic_constraints_critical: true
+    key_usage_critical: true
+    key_usage:
+      - digitalSignature
+      - keyEncipherment
+      - keyCertSign
+  delegate_to: localhost
+  run_once: true
+
+- name: Sign kubernetes CA CSR
+  community.crypto.x509_certificate:
+    path: /etc/ssl/kubernetes/ca.crt
+    csr_path: /etc/ssl/kubernetes/ca.csr
+    privatekey_path: /etc/ssl/kubernetes/ca.key
+    mode: 0644
+    provider: selfsigned
+  run_once: true
+  delegate_to: localhost
+
+# - name: Generate an front proxy private key
+#   community.crypto.openssl_privatekey:
+#     path: /etc/ssl/kubernetes/front-proxy-ca.key
+#     size: 2048
+#     mode: 0600
+#   delegate_to: localhost
+#   run_once: true
+
+# - name: Generate an front proxy CA CSR
+#   community.crypto.openssl_csr:
+#     path: /etc/ssl/kubernetes/front-proxy-ca.csr
+#     privatekey_path: /etc/ssl/kubernetes/front-proxy-ca.key
+#     common_name: kubernetes-ca
+#     basic_constraints: "CA:TRUE"
+#     basic_constraints_critical: true
+#     key_usage_critical: true
+#     key_usage:
+#       - digitalSignature
+#       - keyEncipherment
+#       - keyCertSign
+#   delegate_to: localhost
+#   run_once: true
+
+# - name: Sign front proxy CA CSR
+#   community.crypto.x509_certificate:
+#     path: /etc/ssl/kubernetes/front-proxy-ca.crt
+#     csr_path: /etc/ssl/kubernetes/front-proxy-ca.csr
+#     privatekey_path: /etc/ssl/kubernetes/front-proxy-ca.key
+#     mode: 0644
+#     provider: selfsigned
+#   run_once: true
+#   delegate_to: localhost
+
+# openssl genrsa -out sa.key 2048 && \
+# openssl ecparam -name secp521r1 -genkey -noout -out sa.key && \
+# openssl ec -in sa.key -outform PEM -pubout -out sa.pub && \
+# openssl req -new -sha256 -key sa.key -subj "/CN=system:kube-controller-manager" -out sa.csr && \
+# openssl x509 -req -in sa.csr -CA ca.crt -CAkey ca.key -CAcreateserial -days {{ days }} -extensions v3_req_client -extfile openssl.cnf -out sa.crt
+# - name: Generate an sa private key
+#   community.crypto.openssl_privatekey:
+#     path: /etc/ssl/kubernetes/sa.key
+#     size: 2048
+#     mode: 0600
+#     curve: secp521r1
+#   delegate_to: localhost
+#   run_once: true
+
+# - name: Generate an sa private csr
+#   community.crypto.openssl_csr:
+#     path: /etc/ssl/kubernetes/sa.csr
+#     privatekey_path: /etc/ssl/kubernetes/sa.key
+#     common_name: "system:kube-controller-manager"
+#     organization_name: "system:kube-controller-manager"
+#     basic_constraints_critical: yes
+#     basic_constraints:
+#       - "CA:FALSE"
+#     key_usage_critical: yes
+#     key_usage:
+#       - digitalSignature
+#       - keyEncipherment
+#     extended_key_usage:
+#       - clientAuth

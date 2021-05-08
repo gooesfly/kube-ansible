@@ -1,0 +1,133 @@
+apiVersion: kubeadm.k8s.io/v1beta2
+kind: InitConfiguration
+bootstrapTokens:
+- token: "9a08jv.c0izixklcxtmnze7"
+  description: "kubeadm bootstrap token"
+  ttl: "24h"
+- token: "783bde.3f89s0fje9f38fhf"
+  description: "another bootstrap token"
+  usages:
+  - authentication
+  - signing
+  groups:
+  - system:bootstrappers:kubeadm:default-node-token
+nodeRegistration:
+  taints:
+  - key: "kubeadmNode"
+    value: "master"
+    effect: "NoSchedule"
+  kubeletExtraArgs:
+    cgroup-driver: "systemd"
+certificateKey: "e6a2eb8581237ab72a4f494f30285ec12a9694d750b9785706a83bfcbbbd2204"
+
+---
+apiVersion: kubeadm.k8s.io/v1beta2
+kind: ClusterConfiguration
+clusterName: kubernetes
+certificatesDir: /etc/kubernetes/pki
+imageRepository: registry.aliyuncs.com/google_containers
+kubernetesVersion: v1.19.7
+controlPlaneEndpoint: 172.16.7.10:6443
+networking:
+  dnsDomain: cluster.local
+  serviceSubnet: 10.96.0.0/12
+  podSubnet: 10.244.0.0/16
+dns:
+  type: CoreDNS
+etcd:
+  local:
+    dataDir: /var/lib/etcd
+    serverCertSANs:
+      - 172.16.7.11
+      - 172.16.7.12
+      - 172.16.7.13
+    peerCertSANs:
+      - 172.16.7.11
+      - 172.16.7.12
+      - 172.16.7.13
+    extraArgs:
+      auto-compaction-retention: "1h"
+      max-request-bytes: "33554432"
+      quota-backend-bytes: "8589934592"
+      enable-v2: "false"
+apiServer:
+  timeoutForControlPlane: 4m0s
+  extraArgs:
+    event-ttl: "4h"
+    allow-privileged: "true"
+    anonymous-auth: "true"
+    insecure-port: "0"
+    authorization-mode: "Node,RBAC"
+    enable-admission-plugins: "AlwaysPullImages,ServiceAccount,NamespaceLifecycle,NodeRestriction,LimitRanger,PersistentVolumeClaimResize,DefaultStorageClass,DefaultTolerationSeconds,MutatingAdmissionWebhook,ValidatingAdmissionWebhook,ResourceQuota,Priority"
+    runtime-config: "api/all=true"
+    storage-backend: etcd3
+    etcd-servers: https://172.16.7.11:2379,https://172.16.7.12:2379,https://172.16.7.13:2379
+    tls-cipher-suites: TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305,TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305,TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384,TLS_RSA_WITH_AES_256_GCM_SHA384,TLS_RSA_WITH_AES_128_GCM_SHA256
+  certSANs:
+    - localhost
+    - 10.96.0.1
+    - 127.0.0.1
+    - 172.16.7.10
+    - 172.16.7.11
+    - 172.16.7.12
+    - 172.16.7.13
+    - kubernetes
+    - kubernetes.default
+    - kubernetes.default.svc
+    - kubernetes.default.svc.cluster.local
+  extraVolumes:
+    - hostPath: /etc/localtime
+      mountPath: /etc/localtime
+      name: localtime
+      readOnly: true
+scheduler: 
+  extraArgs:
+    bind-address: "0.0.0.0"
+controllerManager: 
+  extraArgs:
+    bind-address: "0.0.0.0"
+    experimental-cluster-signing-duration: 876000h
+
+---
+apiVersion: kubelet.config.k8s.io/v1beta1
+kind: KubeletConfiguration
+cgroupDriver: systemd
+clusterDNS:
+- 10.96.0.10
+authentication:
+  anonymous:
+    enabled: false
+staticPodPath: /etc/kubernetes/manifests
+nodeStatusUpdateFrequency: 5s
+evictionSoft:
+  "imagefs.available": "15%"
+  "memory.available": "512Mi"
+  "nodefs.available": "15%"
+  "nodefs.inodesFree": "10%"
+evictionSoftGracePeriod:
+  "imagefs.available": "3m"
+  "memory.available": "1m"
+  "nodefs.available": "3m"
+  "nodefs.inodesFree": "1m"
+evictionHard:
+  "imagefs.available": "10%"
+  "memory.available": "256Mi"
+  "nodefs.available": "10%"
+  "nodefs.inodesFree": "5%"
+evictionMaxPodGracePeriod: 30
+imageGCLowThresholdPercent: 70
+imageGCHighThresholdPercent: 80
+kubeReserved:
+  "cpu": "500m"
+  "memory": "512Mi"
+  "ephemeral-storage": "1Gi"
+
+---
+apiVersion: kubeproxy.config.k8s.io/v1alpha1
+kind: KubeProxyConfiguration
+bindAddress: 0.0.0.0
+mode: "ipvs"
+ipvs:
+  minSyncPeriod: 5s
+  syncPeriod: 5s
+  scheduler: "wrr"

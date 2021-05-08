@@ -6,16 +6,13 @@
     state: directory
     mode: "0755"
   with_items:
-    - "{{ kubernetes.addon.location }}/coredns"
+    - "{{ addon.location }}/coredns"
 
 - name: Deployment coredns --- part.1
   template:
     src: coredns.yaml.j2
-    dest: "{{ kubernetes.addon.location }}/coredns/coredns.yaml"
+    dest: "{{ addon.location }}/coredns/coredns.yaml"
 
 - name: Deployment coredns --- part.2
-  shell: "/usr/local/bin/kubectl apply -f {{ kubernetes.addon.location }}/coredns/coredns.yaml"
+  shell: "/usr/local/bin/kubectl apply -f {{ addon.location }}/coredns/coredns.yaml"
   run_once: true
-# - name: Waiting resources
-#   shell: /usr/local/bin/kubectl -n kube-system rollout status deployment/coredns
-#   run_once: true

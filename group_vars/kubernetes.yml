@@ -1,0 +1,155 @@
+# docker parameter configuration
+docker:
+  datadir: /var/lib/docker
+  # auto create dockr primary partition
+  # device: /dev/sdb
+  # Convert the json format to yaml
+  daemon:
+    exec-opts:
+      - "native.cgroupdriver=systemd"
+    registry-mirrors:
+      - "https://i3jtbyvy.mirror.aliyuncs.com"
+    storage-driver: "overlay2"
+    storage-opts:
+      - "overlay2.override_kernel_check=true"
+    log-driver: "json-file"
+    log-opts:
+      max-size: "100m"
+      max-file: "5"
+    max-concurrent-downloads: 20
+    max-concurrent-uploads: 10
+    userland-proxy: false
+    experimental: false
+    icc: false
+    debug: false
+    default-ulimits:
+      nofile:
+        Name: nofile
+        Hard: 655360
+        Soft: 655360
+
+etcd:
+  dataDir: /var/lib/etcd
+  backupDir: /tmp
+  extraArgs:
+    - "--auto-compaction-retention=1h"
+    - "--max-request-bytes=33554432"
+    - "--quota-backend-bytes=8589934592"
+    - "--enable-v2=false"
+    - "--snapshot-count=10000"
+
+ha:
+  # none not use lb for apiserver
+  # slb is software load balancing, will install harpoxy and keepalived on master node
+  # clb is cloud load balancing, will use cloud load balancing
+  type: slb
+  vip: 172.16.16.10
+  mask: 16
+
+networking:
+  dnsDomain: cluster.local
+  serviceSubnet: 10.96.0.0/12
+  podSubnet: 10.244.0.0/16
+  SvcIP: 10.96.0.1
+  DNSIP: 10.96.0.2
+
+apiServer:
+  bindAddress: "0.0.0.0"
+  encryption: Tsg7sO4Ki/W3s9bfwGfTi8ECcp+/3uDedQMq6rLQTIY= # head -c 32 /dev/urandom | base64
+  timeoutForControlPlane: 4m0s
+  certSANs:
+    - "*.kubernetes.local"
+  admissionControlConfigFile:
+    - name: EventRateLimit
+      path: EventRateLimit.yaml
+      configuration:
+        apiVersion: eventratelimit.admission.k8s.io/v1alpha1
+        kind: Configuration
+        limits:
+        - type: Namespace
+          qps: 50
+          burst: 100
+          cacheSize: 2000
+  extraArgs:
+    - "--insecure-port=0"
+    - "--allow-privileged=true"
+    - "--anonymous-auth=false"
+    - "--kubelet-preferred-address-types=InternalIP,ExternalIP,Hostname"
+    - "--service-node-port-range=30000-32767"
+    - "--runtime-config=api/all=true"
+    - "--authorization-mode=Node,RBAC"
+    - "--profiling=false"
+    - "--enable-admission-plugins=AlwaysPullImages,ServiceAccount,NamespaceLifecycle,NodeRestriction,LimitRanger,PersistentVolumeClaimResize,DefaultStorageClass,DefaultTolerationSeconds,MutatingAdmissionWebhook,ValidatingAdmissionWebhook,ResourceQuota,Priority"
+    - "--tls-cipher-suites=TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305,TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305,TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384,TLS_RSA_WITH_AES_256_GCM_SHA384,TLS_RSA_WITH_AES_128_GCM_SHA256"
+  log:
+    level: 2
+
+controllerManager:
+  bindAddress: "0.0.0.0"
+  extraArgs:
+    - "--experimental-cluster-signing-duration=8760h"
+    - "--terminated-pod-gc-threshold=12500"
+    - "--node-monitor-period=5s"
+    - "--node-monitor-grace-period=40s"
+    - "--pod-eviction-timeout=5m0s"
+    - "--profiling=false"
+  log:
+    level: 2
+
+scheduler:
+  bindAddress: "0.0.0.0"
+  log:
+    level: 2
+
+kubelet:
+  bindAddress: "0.0.0.0"
+  extraArgs:
+    - "--pod-infra-container-image=registry.aliyuncs.com/google_containers/pause:3.2"
+    - "--tls-cipher-suites=TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305,TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305,TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384,TLS_RSA_WITH_AES_256_GCM_SHA384,TLS_RSA_WITH_AES_128_GCM_SHA256"
+    - "--allowed-unsafe-sysctls=net.*"
+  log:
+    level: 2
+
+proxy:
+  bindAddress: "0.0.0.0"
+  extraArgs:
+    - "--mode=ipvs"
+  log:
+    level: 2
+
+addon:
+  # add-on manifests directory
+  location: /etc/kubernetes/addon
+  # choose: none flannel calico canals
+  #   none: not deployment any network plugin
+  #   flannel: will deployment flannel plugin (default)
+  #   calico: will deployment calico plugin
+  #   canal: will deployment canal plugin
+  #   cilium: will deployment cilium plugin
+  network: flannel
+  metrics: true
+  # addon images
+  image:
+    metrics: k8s.gcr.io/metrics-server-amd64:v0.3.6
+    coredns: coredns/coredns:1.8.0
+    flannel: quay.io/coreos/flannel:v0.13.0
+    canal:
+      node: calico/node:v3.13.2
+      flannel: quay.io/coreos/flannel:v0.11.0
+      cni: calico/cni:v3.13.2
+      flexvol: calico/pod2daemon-flexvol:v3.13.2
+    calico:
+      node: calico/node:v3.13.2
+      cni: calico/cni:v3.13.2
+      typha: quay.io/calico/typha:v3.1.7
+      flexvol: calico/pod2daemon-flexvol:v3.13.2
+      controllers: calico/kube-controllers:v3.13.2
+    cilium:
+      operator: docker.io/cilium/operator-generic:v1.8.1
+
+apps:
+  location: /etc/kubernetes/apps
+  files:
+    - https://raw.githubusercontent.com/buxiaomo/kubernetes-manifests/master/ingress/traefik-2.0.yaml
+    # - https://raw.githubusercontent.com/buxiaomo/kubernetes-manifests/master/jenkins.yaml
+    # - https://raw.githubusercontent.com/buxiaomo/kubernetes-manifests/master/nfs-client.yaml

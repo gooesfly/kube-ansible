@@ -3,16 +3,16 @@
 - block:
     - name: Create cilium data directory
       file:
-        name: "{{ kubernetes.addon.location }}/cilium"
+        name: "{{ addon.location }}/cilium"
         state: directory
         mode: "0755"
 
     - name: Deployment cilium --- part.1
       template:
         src: cilium.yaml.j2
-        dest: "{{ kubernetes.addon.location }}/cilium/cilium.yaml"
+        dest: "{{ addon.location }}/cilium/cilium.yaml"
 
     - name: Deployment cilium --- part.2
-      shell: "/usr/local/bin/kubectl apply -f {{ kubernetes.addon.location }}/cilium/cilium.yaml"
+      shell: "/usr/local/bin/kubectl apply -f {{ addon.location }}/cilium/cilium.yaml"
       run_once: true
-  when: kubernetes.network == "cilium"
+  when: addon.network == "cilium"

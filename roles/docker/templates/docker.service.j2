@@ -5,8 +5,8 @@ After=network-online.target firewalld.service
 Wants=network-online.target
 
 [Service]
-{% if kubernetes.docker.systemd.service is defined %}
-{% for opt in kubernetes.docker.systemd.service %}
+{% if docker.systemd.service is defined %}
+{% for opt in docker.systemd.service %}
 {{ opt }}
 {% endfor %}
 {% endif %}

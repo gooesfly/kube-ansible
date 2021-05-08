@@ -3,16 +3,16 @@
 - block:
     - name: Create flannel data directory
       file:
-        name: "{{ kubernetes.addon.location }}/flannel"
+        name: "{{ addon.location }}/flannel"
         state: directory
         mode: "0755"
 
     - name: Deployment flannel --- part.1
       template:
         src: flannel.yaml.j2
-        dest: "{{ kubernetes.addon.location }}/flannel/flannel.yaml"
+        dest: "{{ addon.location }}/flannel/flannel.yaml"
 
     - name: Deployment flannel --- part.2
-      shell: "/usr/local/bin/kubectl apply -f {{ kubernetes.addon.location }}/flannel/flannel.yaml"
+      shell: "/usr/local/bin/kubectl apply -f {{ addon.location }}/flannel/flannel.yaml"
       run_once: true
-  when: kubernetes.network == "flannel"
+  when: addon.network == "flannel"

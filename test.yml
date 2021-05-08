@@ -1,0 +1,33 @@
+- name: test my new module
+  hosts: all
+  tasks:
+  - name: Insert/Update "Match User" configuration block in /etc/ssh/sshd_config
+    blockinfile:
+      path: "/etc/kubernetes/{{ item.path }}"
+      block: |
+        {{ item.configuration | to_nice_yaml(indent=2) }}
+    with_items: "{{ apiServer.admissionControlConfigFile }}"
+    when:
+      - apiServer.admissionControlConfigFile is defined
+      - apiServer.admissionControlConfigFile | length >= 1
+
+  # - name: Generate an Kubernetes CA private key
+  #   community.crypto.openssl_privatekey:
+  #     path: /etc/ssl/kubernetes/ca.key
+  #     size: 2048
+  #   run_once: true
+
+  # - name: Generate an Kubernetes CA CSR
+  #   community.crypto.openssl_csr:
+  #     path: /etc/ssl/kubernetes/ca.csr
+  #     privatekey_path: /etc/ssl/kubernetes/ca.key
+  #     common_name: "kubernetes-ca"
+  #   run_once: true
+
+  # - name: Sign Kubernetes CA CSR
+  #   community.crypto.x509_certificate:
+  #     path: /etc/ssl/kubernetes/ca.crt
+  #     csr_path: /etc/ssl/kubernetes/ca.csr
+  #     privatekey_path: /etc/ssl/kubernetes/ca.key
+  #     provider: selfsigned
+  #   run_once: true

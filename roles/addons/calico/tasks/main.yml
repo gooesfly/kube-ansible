@@ -3,16 +3,16 @@
 - block:
     - name: Create calico data directory
       file:
-        name: "{{ kubernetes.addon.location }}/calico"
+        name: "{{ addon.location }}/calico"
         state: directory
         mode: "0755"
 
     - name: Deployment calico --- part.1
       template:
         src: calico.yaml.j2
-        dest: "{{ kubernetes.addon.location }}/calico/calico.yaml"
+        dest: "{{ addon.location }}/calico/calico.yaml"
 
     - name: Deployment calico --- part.2
-      shell: "/usr/local/bin/kubectl apply -f {{ kubernetes.addon.location }}/calico/calico.yaml"
+      shell: "/usr/local/bin/kubectl apply -f {{ addon.location }}/calico/calico.yaml"
       run_once: true
-  when: kubernetes.network == "calico"
+  when: addon.network == "calico"

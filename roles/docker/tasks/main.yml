@@ -48,7 +48,7 @@
     mode: "0755"
   with_items:
     - /etc/docker
-    - "{{ kubernetes.docker.datadir }}"
+    - "{{ docker.datadir }}"
 
 - name: Configuration daemon
   template:
@@ -59,18 +59,18 @@
 - name: Create a docker primary partition
   community.general.filesystem:
     fstype: xfs
-    dev: "{{ kubernetes.docker.device }}"
+    dev: "{{ docker.device }}"
     state: present
-  when: kubernetes.docker.device is defined
+  when: docker.device is defined
 
 - name: Mount docker root dir
   ansible.posix.mount:
-    src: "{{ kubernetes.docker.device }}"
+    src: "{{ docker.device }}"
     path: /var/lib/docker
     fstype: xfs
     opts: defaults,pquota
     state: mounted
-  when: kubernetes.docker.device is defined
+  when: docker.device is defined
 
 - name: Install systemd file
   template:

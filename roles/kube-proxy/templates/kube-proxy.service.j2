@@ -15,7 +15,7 @@ After=network.target
 ExecStart=/usr/local/bin/kube-proxy \
   --hostname-override={{ hostname_override }} \
   --config=/etc/kubernetes/kube-proxy.yaml \
-  --v={{ kubernetes.proxy.log.logLevel | default(2) }}
+  --v={{ proxy.log.level | default(2) }}
 
 Restart=always
 RestartSec=10s

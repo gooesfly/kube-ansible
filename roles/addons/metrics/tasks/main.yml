@@ -7,14 +7,14 @@
         state: directory
         mode: "0755"
       with_items:
-        - "{{ kubernetes.addon.location }}/metrics"
+        - "{{ addon.location }}/metrics"
 
     - name: Deployment metrics --- part.1
       template:
         src: metrics.yaml.j2
-        dest: "{{ kubernetes.addon.location }}/metrics/metrics.yaml"
+        dest: "{{ addon.location }}/metrics/metrics.yaml"
 
     - name: Deployment metrics --- part.2
-      shell: "/usr/local/bin/kubectl apply -f {{ kubernetes.addon.location }}/metrics/metrics.yaml"
+      shell: "/usr/local/bin/kubectl apply -f {{ addon.location }}/metrics/metrics.yaml"
       run_once: true
-  when: kubernetes.addon.metrics
+  when: addon.metrics

@@ -17,13 +17,10 @@
   until: controllermanager_pkg is succeeded
   retries: 5
 
-- name: Create ssl directory
+- name: Create certificate directory
   file:
-    name: "{{ item }}"
+    name: /etc/kubernetes/pki
     state: directory
-    mode: "0755"
-  with_items:
-    - "{{ kubernetes.ssl.location }}"
 
 - name: Distribution certificate
   copy:
@@ -34,34 +31,64 @@
     mode: "{{ item.mode }}"
   with_items:
     - {
-        src: "/etc/ssl/{{ kubernetes.project }}/ca.crt",
-        dest: "{{ kubernetes.ssl.location }}/ca.crt",
+        src: "/etc/ssl/kubernetes/ca.crt",
+        dest: "/etc/kubernetes/pki/ca.crt",
         mode: 644,
       }
     - {
-        src: "/etc/ssl/{{ kubernetes.project }}/ca.key",
-        dest: "{{ kubernetes.ssl.location }}/ca.key",
+        src: "/etc/ssl/kubernetes/ca.key",
+        dest: "/etc/kubernetes/pki/ca.key",
         mode: 600,
       }
 
-- name: Check kube-controller-manager certificate expired(30 days)
-  community.crypto.openssl_certificate:
-    path: "{{ kubernetes.ssl.location }}/kube-controller-manager.crt"
-    provider: assertonly
-    valid_in: "2592000"
-  ignore_errors: yes
-  register: kube_controller_manager_certificate_expired
+# - name: Check kube-controller-manager certificate expired(30 days)
+#   community.crypto.openssl_certificate:
+#     path: "/etc/kubernetes/pki/kube-controller-manager.crt"
+#     provider: assertonly
+#     valid_in: "2592000"
+#   ignore_errors: yes
+#   register: kube_controller_manager_certificate_expired
+# - name: Create kube-controller-manager
+#   shell: |
+#     openssl genrsa -out kube-controller-manager.key 2048 && \
+#     openssl req -new -key kube-controller-manager.key -subj "/CN=system:kube-controller-manager/O=system:kube-controller-manager" -out kube-controller-manager.csr && \
+#     openssl x509 -req -in kube-controller-manager.csr -CA ca.crt -CAkey ca.key -CAcreateserial -extensions v3_req_client -extfile openssl.cnf -out kube-controller-manager.crt -days {{ kubernetes.ssl.days | default(3652) }}
+#   args:
+#     chdir: "/etc/kubernetes/pki"
+#     executable: /bin/bash
+#   register: kube_controller_manager_certificate
+#   when: kube_controller_manager_certificate_expired.failed
 
-- name: Create kube-controller-manager
-  shell: |
-    openssl genrsa -out kube-controller-manager.key 2048 && \
-    openssl req -new -key kube-controller-manager.key -subj "/CN=system:kube-controller-manager/O=system:kube-controller-manager" -out kube-controller-manager.csr && \
-    openssl x509 -req -in kube-controller-manager.csr -CA ca.crt -CAkey ca.key -CAcreateserial -extensions v3_req_client -extfile openssl.cnf -out kube-controller-manager.crt -days {{ kubernetes.ssl.days | default(3652) }}
-  args:
-    chdir: "{{ kubernetes.ssl.location }}"
-    executable: /bin/bash
-  register: kube_controller_manager_certificate
-  when: kube_controller_manager_certificate_expired.failed
+- name: Generate kube-controller-manager private key
+  community.crypto.openssl_privatekey:
+    path: /etc/kubernetes/pki/kube-controller-manager.key
+    size: 2048
+    mode: 0600
+
+- name: Generate kube-controller-manager csr
+  community.crypto.openssl_csr:
+    path: /etc/kubernetes/pki/kube-controller-manager.csr
+    privatekey_path: /etc/kubernetes/pki/kube-controller-manager.key
+    common_name: "system:kube-controller-manager"
+    organization_name: "system:kube-controller-manager"
+    basic_constraints_critical: yes
+    basic_constraints:
+      - "CA:FALSE"
+    key_usage_critical: yes
+    key_usage:
+      - digitalSignature
+      - keyEncipherment
+    extended_key_usage:
+      - clientAuth
+
+- name: Generate kube-controller-manager certificate
+  community.crypto.x509_certificate:
+    path: /etc/kubernetes/pki/kube-controller-manager.crt
+    csr_path: /etc/kubernetes/pki/kube-controller-manager.csr
+    ownca_path: /etc/kubernetes/pki/ca.crt
+    ownca_privatekey_path: /etc/kubernetes/pki/ca.key
+    provider: ownca
+    mode: 0644
 
 - name: Create kubeconfig
   shell: |
@@ -69,43 +96,41 @@
     {% if inventory_hostname in groups['master'] %}
       {% set KUBE_APISERVER_ADDR, KUBE_APISERVER_PORT = ansible_default_ipv4.address, 6443 %}
     {% else %}
-      {% if kubernetes.ha.vip is defined %}
-        {% if kubernetes.cloud.type == "local" %}
-          {% set KUBE_APISERVER_ADDR, KUBE_APISERVER_PORT = kubernetes.ha.vip, 8443 %}
-        {% else %}
-           {% set KUBE_APISERVER_ADDR, KUBE_APISERVER_PORT = kubernetes.ha.vip, 6443 %}
-        {% endif %}
-      {% else %}
+      {% if ha.type == "none" %}
         {% set KUBE_APISERVER_ADDR, KUBE_APISERVER_PORT = hostvars[groups['master'][0]].inventory_hostname, 6443 %}
+      {% else %}
+        {% if ha.type == "slb" %}
+          {% set KUBE_APISERVER_ADDR, KUBE_APISERVER_PORT = ha.vip, 8443 %}
+        {% else %}
+          {% set KUBE_APISERVER_ADDR, KUBE_APISERVER_PORT = ha.vip, 6443 %}
+        {% endif %}
       {% endif %}
     {% endif %}
 
-    /usr/local/bin/kubectl config set-cluster {{ kubernetes.name | default("kubernetes") }} \
+    /usr/local/bin/kubectl config set-cluster kubernetes \
       --embed-certs=true \
-      --certificate-authority={{ kubernetes.ssl.location }}/ca.crt \
+      --certificate-authority=/etc/kubernetes/pki/ca.crt \
       --server=https://{{ KUBE_APISERVER_ADDR }}:{{ KUBE_APISERVER_PORT }} \
-      --kubeconfig=/etc/kubernetes/{{ item.KUBE_CONFIG }}
+      --kubeconfig=/etc/kubernetes/kube-controller-manager.kubeconfig
 
-    /usr/local/bin/kubectl config set-credentials {{ item.KUBE_USER }} \
+    /usr/local/bin/kubectl config set-credentials system:kube-controller-manager \
       --embed-certs=true \
-      --client-certificate={{ kubernetes.ssl.location }}/{{ item.KUBE_CERT }}.crt \
-      --client-key={{ kubernetes.ssl.location }}/{{ item.KUBE_CERT }}.key \
-      --kubeconfig=/etc/kubernetes/{{ item.KUBE_CONFIG }}
+      --client-certificate=/etc/kubernetes/pki/{{ item.KUBE_CERT }}.crt \
+      --client-key=/etc/kubernetes/pki/{{ item.KUBE_CERT }}.key \
+      --kubeconfig=/etc/kubernetes/kube-controller-manager.kubeconfig
 
-    /usr/local/bin/kubectl config set-context {{ item.KUBE_USER }}@{{ kubernetes.name | default("kubernetes") }} \
-      --cluster={{ kubernetes.name | default("kubernetes") }} \
-      --user={{ item.KUBE_USER }} \
-      --kubeconfig=/etc/kubernetes/{{ item.KUBE_CONFIG }}
+    /usr/local/bin/kubectl config set-context system:kube-controller-manager@kubernetes \
+      --cluster=kubernetes \
+      --user=system:kube-controller-manager \
+      --kubeconfig=/etc/kubernetes/kube-controller-manager.kubeconfig
 
-    /usr/local/bin/kubectl config use-context {{ item.KUBE_USER }}@{{ kubernetes.name | default("kubernetes") }} --kubeconfig=/etc/kubernetes/{{ item.KUBE_CONFIG }}
+    /usr/local/bin/kubectl config use-context system:kube-controller-manager@kubernetes --kubeconfig=/etc/kubernetes/kube-controller-manager.kubeconfig
   with_items:
     - {
         KUBE_USER: "system:kube-controller-manager",
         KUBE_CERT: "kube-controller-manager",
         KUBE_CONFIG: "kube-controller-manager.kubeconfig",
       }
-  register: controllermanager_kubeconfig
-  when: kube_controller_manager_certificate.changed
 
 - name: Install systemd file
   template:
@@ -120,7 +145,7 @@
     enabled: yes
     daemon_reload: yes
   register: controllermanager_service
-  when: controllermanager_pkg.changed or kube_controller_manager_certificate.changed or controllermanager_kubeconfig.changed or controllermanager_systemd.changed
+  when: controllermanager_pkg.changed or controllermanager_systemd.changed
 
 - name: Waiting for the service
   wait_for:
@@ -131,7 +156,7 @@
 
 - name: Health check
   uri:
-    url: 'http://{% if kubernetes.controllerManager.bind != "0.0.0.0" %}127.0.0.1{% else %}{{ ansible_default_ipv4.address }}{% endif %}:10252/healthz'
+    url: 'http://{% if controllerManager.bindAddress != "0.0.0.0" %}127.0.0.1{% else %}{{ ansible_default_ipv4.address }}{% endif %}:10252/healthz'
     validate_certs: no
     return_content: yes
   register: this
