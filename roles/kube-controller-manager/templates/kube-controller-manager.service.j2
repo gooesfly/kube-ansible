@@ -9,65 +9,28 @@ ExecStart=/usr/local/bin/kube-controller-manager \
   --authentication-kubeconfig=/etc/kubernetes/kube-controller-manager.kubeconfig \
   --authorization-kubeconfig=/etc/kubernetes/kube-controller-manager.kubeconfig \
   --kubeconfig=/etc/kubernetes/kube-controller-manager.kubeconfig \
-  --bind-address={{ kubernetes.controllerManager.bind | default('127.0.0.1') }} \
-  --tls-cert-file={{ kubernetes.ssl.location }}/kube-controller-manager.crt \
-  --tls-private-key-file={{ kubernetes.ssl.location }}/kube-controller-manager.key \
-  --client-ca-file={{ kubernetes.ssl.location }}/ca.crt \
-  --cluster-signing-cert-file={{ kubernetes.ssl.location }}/ca.crt \
-  --cluster-signing-key-file={{ kubernetes.ssl.location }}/ca.key \
+  --bind-address={{ controllerManager.bindAddress | default('127.0.0.1') }} \
+  --tls-cert-file=/etc/kubernetes/pki/kube-controller-manager.crt \
+  --tls-private-key-file=/etc/kubernetes/pki/kube-controller-manager.key \
+  --client-ca-file=/etc/kubernetes/pki/ca.crt \
+  --cluster-signing-cert-file=/etc/kubernetes/pki/ca.crt \
+  --cluster-signing-key-file=/etc/kubernetes/pki/ca.key \
   --leader-elect=true \
-  --cluster-cidr={{ kubernetes.settings.PodCIDR }} \
-  --service-cluster-ip-range={{ kubernetes.settings.SvcCIDR }} \
-  --requestheader-client-ca-file={{ kubernetes.ssl.location }}/ca.crt \
-  --service-account-private-key-file={{ kubernetes.ssl.location }}/ca.key \
-  --root-ca-file={{ kubernetes.ssl.location }}/ca.crt \
+  --cluster-cidr={{ networking.podSubnet }} \
+  --service-cluster-ip-range={{ networking.serviceSubnet }} \
+  --requestheader-client-ca-file=/etc/kubernetes/pki/ca.crt \
+  --service-account-private-key-file=/etc/kubernetes/pki/ca.key \
+  --root-ca-file=/etc/kubernetes/pki/ca.crt \
   --use-service-account-credentials=true \
   --controllers=*,bootstrapsigner,tokencleaner \
   --experimental-cluster-signing-duration=8760h \
   --feature-gates=RotateKubeletServerCertificate=true \
-  --profiling=false \
-{% if kubernetes.controllerManager.terminatedPodGcThreshold is defined %}
-  --terminated-pod-gc-threshold={{ kubernetes.controllerManager.terminatedPodGcThreshold }} \
+{% if controllerManager.extraArgs is defined %}
+{% for extraArg in controllerManager.extraArgs %}
+  {{ extraArg }} \
+{% endfor %}
 {% endif %}
-  --node-monitor-period=
-{%- if kubernetes.controllerManager.nodeMonitorPeriod is defined -%}
-    {{ kubernetes.controllerManager.nodeMonitorPeriod }}
-{%- else -%}
-    {%- if kubernetes.controllerManager.nodeStatusUpdate == 'Fast' -%}
-        2s
-    {%- else -%}
-        5s
-    {%- endif -%}
-{%- endif %} \
-  --node-monitor-grace-period=
-{%- if kubernetes.controllerManager.nodeMonitorGracePeriod is defined -%}
-    {{ kubernetes.controllerManager.nodeMonitorGracePeriod }}
-{%- else -%}
-    {%- if kubernetes.controllerManager.nodeStatusUpdate == 'Fast' -%}
-             20s
-    {%- elif kubernetes.controllerManager.nodeStatusUpdate == 'Medium' -%}
-             2m
-    {%- elif kubernetes.controllerManager.nodeStatusUpdate == 'Low' -%}
-             5m
-    {%- else -%}
-             40s
-    {%- endif -%}
-{%- endif %} \
-  --pod-eviction-timeout= 
-{%- if kubernetes.controllerManager.podEvictionTimeout is defined -%}
-    {{ kubernetes.controllerManager.podEvictionTimeout }}
-{%- else -%}
-    {%- if kubernetes.controllerManager.nodeStatusUpdate == 'Fast' -%}
-             30s
-    {%- elif kubernetes.controllerManager.nodeStatusUpdate == 'Medium' -%}
-             1m
-    {%- elif kubernetes.controllerManager.nodeStatusUpdate == 'Low' -%}
-             1m
-    {%- else -%}
-             5m
-    {%- endif -%}
-{%- endif %} \
-  --v={{ kubernetes.controllerManager.log.logLevel | default(2) }}
+  --v={{ controllerManager.log.level | default(2) }}
 
 
 Restart=always

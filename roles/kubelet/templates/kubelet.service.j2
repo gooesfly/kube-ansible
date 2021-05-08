@@ -13,29 +13,26 @@ Requires=docker.service
 ExecStart=/usr/local/bin/kubelet \
   --kubeconfig=/etc/kubernetes/kubelet.kubeconfig \
   --config=/etc/kubernetes/kubelet.yaml \
+  --network-plugin=cni \
 {% if nodename is defined %}
   --hostname-override={{ nodename | lower }} \
 {% endif %}
-  --pod-infra-container-image={{ kubernetes.kubelet.pod_infra_container_image }} \
-  --image-pull-progress-deadline={{ kubernetes.kubelet.image_pull_progress_deadline }} \
-  --network-plugin=cni \
   --cni-conf-dir=/etc/cni/net.d \
   --cni-bin-dir=/opt/cni/bin \
-  --cert-dir=/etc/kubernetes/pki \
+  --cert-dir=/var/lib/kubelet/pki \
   --register-node=true \
   --feature-gates=RotateKubeletServerCertificate=true \
-  --tls-cipher-suites=TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305,TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305,TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384,TLS_RSA_WITH_AES_256_GCM_SHA384,TLS_RSA_WITH_AES_128_GCM_SHA256 \
 {% if RUNTIME == "containerd" %}
   --container-runtime=remote \
   --runtime-request-timeout=15m \
   --container-runtime-endpoint=unix:///run/containerd/containerd.sock \
 {% endif %}
-{% if kubernetes.kubelet.args is defined %}
-{% for arg in kubernetes.kubelet.args %}
-  {{ arg }} \
+{% if kubelet.extraArgs is defined %}
+{% for extraArg in kubelet.extraArgs %}
+  {{ extraArg }} \
 {% endfor %}
 {% endif %}
-  --v={{ kubernetes.kubelet.log.logLevel | default(2)}}
+  --v={{ kubelet.log.level | default(2)}}
 
 Restart=on-failure
 RestartSec=5

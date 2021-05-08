@@ -9,7 +9,7 @@
 - name: Add the user 'etcd'
   user:
     name: etcd
-    home: "{{ kubernetes.etcd.datadir }}"
+    home: "{{ etcd.dataDir }}"
     comment: etcd service account
     create_home: False
     shell: /sbin/nologin
@@ -47,7 +47,7 @@
 
 - name: Create data directory
   file:
-    name: "{{ kubernetes.etcd.datadir }}"
+    name: "{{ etcd.dataDir }}"
     state: directory
     mode: 0700
     owner: etcd
@@ -55,105 +55,194 @@
 
 - name: Create certificate directory
   file:
-    name: "{{ kubernetes.ssl.location }}/etcd"
+    name: "/etc/kubernetes/pki/etcd"
     state: directory
     owner: etcd
     group: etcd
 
-- name: Distribution certificate
+- name: Distribution CA certificate
   copy:
     src: "{{ item.src }}"
     dest: "{{ item.dest }}"
-    mode: 0644
     owner: root
     group: root
   with_items:
     - {
-        src: "/etc/ssl/{{ kubernetes.project }}/etcd/ca.crt",
-        dest: "{{ kubernetes.ssl.location }}/etcd/ca.crt",
+        src: "/etc/ssl/kubernetes/etcd/ca.crt",
+        dest: "/etc/kubernetes/pki/etcd/ca.crt"
       }
     - {
-        src: "/etc/ssl/{{ kubernetes.project }}/etcd/ca.key",
-        dest: "{{ kubernetes.ssl.location }}/etcd/ca.key",
+        src: "/etc/ssl/kubernetes/etcd/ca.key",
+        dest: "/etc/kubernetes/pki/etcd/ca.key"
       }
-  register: etcd_tls
 
-- name: Check etcd server certificate expired(30 days)
-  community.crypto.openssl_certificate:
-    path: "{{ kubernetes.ssl.location }}/etcd/server.crt"
-    provider: assertonly
-    valid_in: "2592000"
-  ignore_errors: yes
-  register: etcd_server_certificate_expired
-
-- name: Create etcd server certificate
-  shell: |
-    openssl genrsa -out etcd/server.key 2048 && \
-    openssl req -new -key etcd/server.key -subj "/CN=etcd-server" -out etcd/server.csr && \
-    openssl x509 -in etcd/server.csr -req -CA etcd/ca.crt -CAkey etcd/ca.key -CAcreateserial -extensions v3_req_etcd -extfile openssl.cnf -out etcd/server.crt -days {{ kubernetes.ssl.days | default(3652) }}
-    chown etcd:etcd etcd/server.key etcd/server.csr etcd/server.crt
-  args:
-    chdir: "{{ kubernetes.ssl.location }}"
-    executable: /bin/bash
-  register: etcd_server_certificate
-  when: etcd_server_certificate_expired.failed
-
-- name: Check etcd peer certificate expired(30 days)
-  community.crypto.openssl_certificate:
-    path: "{{ kubernetes.ssl.location }}/etcd/peer.crt"
-    provider: assertonly
-    valid_in: "2592000"
-  ignore_errors: yes
-  register: etcd_peer_certificate_expired
-
-- name: Create etcd peer certificate
-  shell: |
-    openssl genrsa -out etcd/peer.key 2048 && \
-    openssl req -new -key etcd/peer.key -subj "/CN=etcd-peer" -out etcd/peer.csr && \
-    openssl x509 -in etcd/peer.csr -req -CA etcd/ca.crt -CAkey etcd/ca.key -CAcreateserial -extensions v3_req_etcd -extfile openssl.cnf -out etcd/peer.crt -days {{ kubernetes.ssl.days | default(3652) }}
-  args:
-    chdir: "{{ kubernetes.ssl.location }}"
-    executable: /bin/bash
-  register: etcd_peer_certificate
-  when: etcd_peer_certificate_expired.failed
-
-- name: Check etcd healthcheck certificate expired(30 days)
-  community.crypto.openssl_certificate:
-    path: "{{ kubernetes.ssl.location }}/etcd/healthcheck-client.crt"
-    provider: assertonly
-    valid_in: "2592000"
-  ignore_errors: yes
-  register: etcd_healthcheck_certificate_expired
-
-- name: Create etcd healthcheck client
-  shell: |
-    openssl genrsa -out etcd/healthcheck-client.key 2048 && \
-    openssl req -new -key etcd/healthcheck-client.key -subj "/CN=etcd-client" -out etcd/healthcheck-client.csr && \
-    openssl x509 -in etcd/healthcheck-client.csr -req -CA etcd/ca.crt -CAkey etcd/ca.key -CAcreateserial -extensions v3_req_etcd -extfile openssl.cnf -out etcd/healthcheck-client.crt -days {{ kubernetes.ssl.days | default(3652) }}
-  args:
-    chdir: "{{ kubernetes.ssl.location }}"
-    executable: /bin/bash
-  when: etcd_healthcheck_certificate_expired.failed
-
-- name: Change file ownership, group and permissions
-  file:
-    path: "{{ item.src }}"
+# - name: Create etcd server certificate
+#   shell: |
+#     openssl genrsa -out etcd/server.key 2048 && \
+#     openssl req -new -key etcd/server.key -subj "/CN=etcd-server" -out etcd/server.csr && \
+#     openssl x509 -in etcd/server.csr -req -CA etcd/ca.crt -CAkey etcd/ca.key -CAcreateserial -extensions v3_req_etcd -extfile openssl.cnf -out etcd/server.crt -days {{ kubernetes.ssl.days | default(3652) }}
+#     chown etcd:etcd etcd/server.key etcd/server.csr etcd/server.crt
+#   args:
+#     chdir: "/etc/kubernetes/pki"
+#     executable: /bin/bash
+#   register: etcd_server_certificate
+#   when: etcd_server_certificate_expired.failed
+- name: Generate etcd server private key
+  community.crypto.openssl_privatekey:
+    path: /etc/kubernetes/pki/etcd/server.key
+    size: 2048
+    mode: 0600
     owner: etcd
-    group: etcd
-    mode: "{{ item.mode }}"
-  with_items:
-    - {
-        src: "{{ kubernetes.ssl.location }}/etcd/healthcheck-client.crt",
-        mode: 644,
-      }
-    - {
-        src: "{{ kubernetes.ssl.location }}/etcd/healthcheck-client.key",
-        mode: 600,
-      }
-    - { src: "{{ kubernetes.ssl.location }}/etcd/peer.crt", mode: 644 }
-    - { src: "{{ kubernetes.ssl.location }}/etcd/peer.key", mode: 600 }
-    - { src: "{{ kubernetes.ssl.location }}/etcd/server.crt", mode: 644 }
-    - { src: "{{ kubernetes.ssl.location }}/etcd/server.key", mode: 600 }
+    group: root
+
+- name: Generate etcd server csr
+  community.crypto.openssl_csr:
+    path: /etc/kubernetes/pki/etcd/server.csr
+    privatekey_path: /etc/kubernetes/pki/etcd/server.key
+    common_name: "etcd-server"
+    basic_constraints_critical: yes
+    basic_constraints:
+      - "CA:FALSE"
+    key_usage_critical: yes
+    key_usage:
+      - digitalSignature
+      - keyEncipherment
+    extended_key_usage:
+      - serverAuth
+      - clientAuth
+    subject_alt_name: "{{ item.value | map('regex_replace', '^', 'IP:') | list }}"
+    owner: etcd
+    group: root
+  with_dict: 
+    ips: "{% if groups['etcd'] is not defined %}{{ groups['master'] }}{% else %}{{ groups['etcd'] }}{% endif %}"
+
+- name: Generate etcd server certificate
+  community.crypto.x509_certificate:
+    path: /etc/kubernetes/pki/etcd/server.crt
+    csr_path: /etc/kubernetes/pki/etcd/server.csr
+    ownca_path: /etc/kubernetes/pki/etcd/ca.crt
+    ownca_privatekey_path: /etc/kubernetes/pki/etcd/ca.key
+    provider: ownca
+    mode: 0644
+    owner: etcd
+    group: root
+
+# - name: Check etcd peer certificate expired(30 days)
+#   community.crypto.openssl_certificate:
+#     path: "/etc/kubernetes/pki/etcd/peer.crt"
+#     provider: assertonly
+#     valid_in: "2592000"
+#   ignore_errors: yes
+#   register: etcd_peer_certificate_expired
+
+# - name: Create etcd peer certificate
+#   shell: |
+#     openssl genrsa -out etcd/peer.key 2048 && \
+#     openssl req -new -key etcd/peer.key -subj "/CN=etcd-peer" -out etcd/peer.csr && \
+#     openssl x509 -in etcd/peer.csr -req -CA etcd/ca.crt -CAkey etcd/ca.key -CAcreateserial -extensions v3_req_etcd -extfile openssl.cnf -out etcd/peer.crt -days {{ kubernetes.ssl.days | default(3652) }}
+#   args:
+#     chdir: "/etc/kubernetes/pki"
+#     executable: /bin/bash
+#   register: etcd_peer_certificate
+#   when: etcd_peer_certificate_expired.failed
+
+- name: Generate etcd peer private key
+  community.crypto.openssl_privatekey:
+    path: /etc/kubernetes/pki/etcd/peer.key
+    size: 2048
+    mode: 0600
+    owner: etcd
+    group: root
+
+- name: Generate etcd peer csr
+  community.crypto.openssl_csr:
+    path: /etc/kubernetes/pki/etcd/peer.csr
+    privatekey_path: /etc/kubernetes/pki/etcd/peer.key
+    common_name: "etcd-peer"
+    basic_constraints_critical: yes
+    basic_constraints:
+      - "CA:FALSE"
+    key_usage_critical: yes
+    key_usage:
+      - digitalSignature
+      - keyEncipherment
+    extended_key_usage:
+      - serverAuth
+      - clientAuth
+    subject_alt_name: "{{ item.value | map('regex_replace', '^', 'IP:') | list }}"
+    owner: etcd
+    group: root
+  with_dict: 
+    ips: "{% if groups['etcd'] is not defined %}{{ groups['master'] }}{% else %}{{ groups['etcd'] }}{% endif %}"
+
+- name: Generate etcd peers certificate
+  community.crypto.x509_certificate:
+    path: /etc/kubernetes/pki/etcd/peer.crt
+    csr_path: /etc/kubernetes/pki/etcd/peer.csr
+    ownca_path: /etc/kubernetes/pki/etcd/ca.crt
+    ownca_privatekey_path: /etc/kubernetes/pki/etcd/ca.key
+    provider: ownca
+    mode: 0644
+    owner: etcd
+    group: root
+
+
+# - name: Check etcd healthcheck certificate expired(30 days)
+#   community.crypto.openssl_certificate:
+#     path: "/etc/kubernetes/pki/etcd/healthcheck-client.crt"
+#     provider: assertonly
+#     valid_in: "2592000"
+#   ignore_errors: yes
+#   register: etcd_healthcheck_certificate_expired
+
+# - name: Create etcd healthcheck client
+#   shell: |
+#     openssl genrsa -out etcd/healthcheck-client.key 2048 && \
+#     openssl req -new -key etcd/healthcheck-client.key -subj "/CN=etcd-client" -out etcd/healthcheck-client.csr && \
+#     openssl x509 -in etcd/healthcheck-client.csr -req -CA etcd/ca.crt -CAkey etcd/ca.key -CAcreateserial -extensions v3_req_etcd -extfile openssl.cnf -out etcd/healthcheck-client.crt -days {{ kubernetes.ssl.days | default(3652) }}
+#   args:
+#     chdir: "/etc/kubernetes/pki"
+#     executable: /bin/bash
+#   when: etcd_healthcheck_certificate_expired.failed
+- name: Generate etcd healthcheck private key
+  community.crypto.openssl_privatekey:
+    path: /etc/kubernetes/pki/etcd/healthcheck-client.key
+    size: 2048
+    mode: 0600
+    owner: etcd
+    group: root
+
+- name: Generate etcd healthcheck csr
+  community.crypto.openssl_csr:
+    path: /etc/kubernetes/pki/etcd/healthcheck-client.csr
+    privatekey_path: /etc/kubernetes/pki/etcd/healthcheck-client.key
+    common_name: "etcd-client"
+    basic_constraints_critical: yes
+    basic_constraints:
+      - "CA:FALSE"
+    key_usage_critical: yes
+    key_usage:
+      - digitalSignature
+      - keyEncipherment
+    extended_key_usage:
+      - serverAuth
+      - clientAuth
+    subject_alt_name: "{{ item.value | map('regex_replace', '^', 'IP:') | list }}"
+    owner: etcd
+    group: root
+  with_dict: 
+    ips: "{% if groups['etcd'] is not defined %}{{ groups['master'] }}{% else %}{{ groups['etcd'] }}{% endif %}"
+
+- name: Generate etcd healthcheck certificate
+  community.crypto.x509_certificate:
+    path: /etc/kubernetes/pki/etcd/healthcheck-client.crt
+    csr_path: /etc/kubernetes/pki/etcd/healthcheck-client.csr
+    ownca_path: /etc/kubernetes/pki/etcd/ca.crt
+    ownca_privatekey_path: /etc/kubernetes/pki/etcd/ca.key
+    provider: ownca
+    mode: 0644
+    owner: etcd
+    group: root
 
 - name: Install systemd file
   template:
@@ -164,7 +253,7 @@
 - name: Backup data
   shell: |
     NAME=$(date +%s)
-    ETCDCTL_API=3 /usr/local/bin/etcdctl --command-timeout=3s --endpoints {{ ansible_default_ipv4.address }}:2379 --cacert {{ kubernetes.ssl.location }}/etcd/ca.crt --cert {{ kubernetes.ssl.location }}/etcd/server.crt --key {{ kubernetes.ssl.location }}/etcd/server.key snapshot save /tmp/kubernetes-etcd.${NAME}.db
+    ETCDCTL_API=3 /usr/local/bin/etcdctl --command-timeout=3s --endpoints {{ ansible_default_ipv4.address }}:2379 --cacert /etc/kubernetes/pki/etcd/ca.crt --cert /etc/kubernetes/pki/etcd/server.crt --key /etc/kubernetes/pki/etcd/server.key snapshot save /tmp/kubernetes-etcd.${NAME}.db
   ignore_errors: True
 
 - name: Start the service
@@ -174,7 +263,7 @@
     enabled: yes
     daemon_reload: yes
   register: etcd_service
-  when: etcd_pkg.changed or etcd_server_certificate.changed or etcd_peer_certificate.changed or etcd_systemd.changed
+  when: etcd_pkg.changed or etcd_systemd.changed
 
 - name: Wait for etcd
   wait_for:
@@ -199,7 +288,7 @@
 
 - name: Health check
   shell: |
-    ETCDCTL_API=3 /usr/local/bin/etcdctl --endpoints {{ ansible_default_ipv4.address }}:2379 --cacert {{ kubernetes.ssl.location }}/etcd/ca.crt --cert {{ kubernetes.ssl.location }}/etcd/server.crt --key {{ kubernetes.ssl.location }}/etcd/server.key endpoint health
+    ETCDCTL_API=3 /usr/local/bin/etcdctl --endpoints {{ ansible_default_ipv4.address }}:2379 --cacert /etc/kubernetes/pki/etcd/ca.crt --cert /etc/kubernetes/pki/etcd/server.crt --key /etc/kubernetes/pki/etcd/server.key endpoint health
   when: etcd_service.changed
 
 - name: Create backup kubernetes etcd data in cron

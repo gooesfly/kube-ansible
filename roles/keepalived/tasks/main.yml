@@ -14,8 +14,14 @@
         src: "{{ item.src }}"
         dest: "{{ item.dest }}"
       with_items:
-        - { src: "keepalived.conf.j2", dest: "/etc/keepalived/keepalived.conf" }
-        - { src: "check_haproxy.sh.j2", dest: "/etc/keepalived/check_haproxy.sh" }
+        - { 
+            src: "keepalived.conf.j2", 
+            dest: "/etc/keepalived/keepalived.conf",
+          }
+        - {
+            src: "check_haproxy.sh.j2",
+            dest: "/etc/keepalived/check_haproxy.sh",
+          }
       register: keepalived_cfg
 
     - name: Start the service
@@ -24,4 +30,4 @@
         enabled: yes
         state: restarted
       when: keepalived_pkg.changed or keepalived_cfg.changed
-  when: kubernetes.cloud.type == "local" and kubernetes.ha.vip is defined and groups['master'] | length > 1
+  when: ha.type == "slb" and ha.vip is defined

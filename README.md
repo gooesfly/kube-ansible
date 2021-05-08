@@ -16,8 +16,9 @@ All Node install python3.
 
 * [x] CentOS 7.*
 * [x] CentOS 8.*
-* [x] Ubuntu 16.04.6
-* [ ] Ubuntu 18.04.6
+* [x] Ubuntu 16.04.*
+* [ ] Ubuntu 18.04.*
+* [x] Ubuntu 18.04.*
 
 ## Kubernetes Support
 
@@ -76,6 +77,8 @@ cd /usr/local/src/kube-ansible
 ```
 
 #### Install ansible
+
+if use python2, all node please run command `curl -s https://bootstrap.pypa.io/pip/2.7/get-pip.py | python2` to update pip
 
 ```
 make runtime
@@ -213,9 +216,20 @@ component attributes of directory format:
 * [hubble](https://github.com/cilium/hubble)
 * [metrics-server](https://github.com/kubernetes-sigs/metrics-server)
 * [coredns on k8s](https://github.com/coredns/deployment/blob/master/kubernetes/CoreDNS-k8s_version.md)
-* [coredns on k8s](https://github.com/coredns/deployment/blob/master/kubernetes/CoreDNS-k8s_version.md)
+* [certificates] (https://kubernetes.io/zh/docs/setup/best-practices/certificates/)
+* https://github.com/pythops/k8s_the_hard_way/blob/master/roles/pki/tasks/admin.yaml
+
+
+
+
 
 <!-- 
+openssl genrsa -out  sa.key 2048
+openssl ecparam -name secp521r1 -genkey -noout -out sa.key
+openssl ec -in sa.key -outform PEM -pubout -out sa.pub
+openssl req -new -sha256 -key sa.key -subj "/CN=system:kube-controller-manager" -out sa.csr
+openssl x509 -req -in sa.csr -CA ca.crt -CAkey ca.key -CAcreateserial -days 10000 -extensions v3_req_client -extfile openssl.cnf -out sa.crt
+
 kubectl config set-cluster kubernetes \
 --certificate-authority=/etc/kubernetes/pki/ca.crt \
 --embed-certs=false \

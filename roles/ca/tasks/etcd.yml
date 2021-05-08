@@ -1,0 +1,63 @@
+- name: Create etcd certificate directory
+  file:
+    name: "/etc/ssl/kubernetes/etcd"
+    state: directory
+    mode: 0755
+  delegate_to: localhost
+  run_once: true
+
+# - name: Check etcd certificate expired(30 days)
+#   community.crypto.openssl_certificate:
+#     path: /etc/ssl/kubernetes/etcd/ca.crt
+#     provider: assertonly
+#     valid_in: "2592000"
+#   ignore_errors: yes
+#   register: etcd_certificate_expired
+#   delegate_to: localhost
+#   run_once: true
+
+# - name: Generate etcd ca
+#   shell: |
+#     openssl genrsa -out etcd/ca.key 2048 && \
+#     openssl req -x509 -new -nodes -key etcd/ca.key -subj "/CN=etcd-ca" -out etcd/ca.crt -days {{ kubernetes.ssl.days | default(3652) }}
+#   args:
+#     chdir: "/etc/ssl/{{ kubernetes.project }}"
+#     executable: /bin/bash
+#   delegate_to: localhost
+#   run_once: true
+#   when: etcd_certificate_expired.failed
+
+- name: Generate an etcd CA private key
+  community.crypto.openssl_privatekey:
+    path: /etc/ssl/kubernetes/etcd/ca.key
+    size: 2048
+    mode: 0600
+  delegate_to: localhost
+  run_once: true
+  # when: etcd_certificate_expired.failed
+
+- name: Generate an etcd CA csr
+  community.crypto.openssl_csr:
+    path: /etc/ssl/kubernetes/etcd/ca.csr
+    privatekey_path: /etc/ssl/kubernetes/etcd/ca.key
+    basic_constraints: "CA:TRUE"
+    basic_constraints_critical: true
+    key_usage_critical: true
+    key_usage:
+      - digitalSignature
+      - keyEncipherment
+      - keyCertSign
+  delegate_to: localhost
+  run_once: true
+  # when: etcd_certificate_expired.failed
+
+- name: Sign etcd CA csr
+  community.crypto.x509_certificate:
+    path: /etc/ssl/kubernetes/etcd/ca.crt
+    csr_path: /etc/ssl/kubernetes/etcd/ca.csr
+    privatekey_path: /etc/ssl/kubernetes/etcd/ca.key
+    provider: selfsigned
+    mode: 0644
+  run_once: true
+  delegate_to: localhost
+  # when: etcd_certificate_expired.failed

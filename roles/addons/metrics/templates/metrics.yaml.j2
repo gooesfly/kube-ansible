@@ -86,7 +86,7 @@ spec:
         emptyDir: {}
       containers:
       - name: metrics-server
-        image: {{ kubernetes.addon.image.metrics | default("k8s.gcr.io/metrics-server-amd64:v0.3.6") }}
+        image: {{ addon.image.metrics | default("k8s.gcr.io/metrics-server-amd64:v0.3.6") }}
         imagePullPolicy: IfNotPresent
         args:
           - --cert-dir=/tmp

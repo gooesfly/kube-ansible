@@ -25,10 +25,10 @@
   with_items:
     - "~/.kube"
     - "/etc/kubernetes/admin.kubeconfig"
-    - "{{ kubernetes.ssl.location }}/ca.key"
-    - "{{ kubernetes.ssl.location }}/ca.srl"
-    - "{{ kubernetes.ssl.location }}/admin.crt"
-    - "{{ kubernetes.ssl.location }}/admin.key"
-    - "{{ kubernetes.ssl.location }}/admin.csr"
-    - "{{ kubernetes.ssl.location }}/etcd"
+    - "/etc/kubernetes/pki/ca.key"
+    - "/etc/kubernetes/pki/ca.srl"
+    - "/etc/kubernetes/pki/admin.crt"
+    - "/etc/kubernetes/pki/admin.key"
+    - "/etc/kubernetes/pki/admin.csr"
+    - "/etc/kubernetes/pki/etcd"
   when: inventory_hostname in groups['worker']

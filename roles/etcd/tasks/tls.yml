@@ -1,0 +1,40 @@
+# server tls
+
+
+
+# peers tls
+- name: Generate an etcd server private key
+  community.crypto.openssl_privatekey:
+    path: /etc/kubernetes/pki/etcd/peer.key
+    size: 2048
+    mode: 0600
+
+- name: Generate an etcd server csr
+  community.crypto.openssl_csr:
+    path: /etc/kubernetes/pki/etcd/server.csr
+    privatekey_path: /etc/kubernetes/pki/etcd/server.key
+    common_name: "etcd-server"
+    basic_constraints_critical: yes
+    basic_constraints:
+      - "CA:FALSE"
+    key_usage_critical: yes
+    key_usage:
+      - digitalSignature
+      - keyEncipherment
+    extended_key_usage:
+      - serverAuth
+      - clientAuth
+    subject_alt_name: 
+      - DNS:localhost
+      - DNS:{{ ansible_hostname | lower }}
+      - IP:127.0.0.1
+      - IP:{{ ansible_default_ipv4.address }}
+
+- name: Sign etcd server csr
+  community.crypto.x509_certificate:
+    path: /etc/kubernetes/pki/etcd/server.crt
+    csr_path: /etc/kubernetes/pki/etcd/server.csr
+    ownca_path: /etc/kubernetes/pki/etcd/ca.crt
+    ownca_privatekey_path: /etc/kubernetes/pki/etcd/ca.key
+    provider: ownca
+    mode: 0644

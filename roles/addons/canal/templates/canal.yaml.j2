@@ -60,7 +60,7 @@ data:
   # Flannel network configuration. Mounted into the flannel container.
   net-conf.json: |
     {
-      "Network": "{{ kubernetes.settings.PodCIDR }}",
+      "Network": "{{ networking.podSubnet }}",
       "Backend": {
         "Type": "vxlan"
       }
@@ -481,7 +481,7 @@ spec:
         # This container installs the CNI binaries
         # and CNI network config file on each node.
         - name: install-cni
-          image: {{ kubernetes.addon.image.canal.cni | default("calico/cni:v3.13.2") }}
+          image: {{ addon.image.canal.cni | default("calico/cni:v3.13.2") }}
           command: ["/install-cni.sh"]
           env:
             # Name of the CNI config file to create.
@@ -517,7 +517,7 @@ spec:
         # Adds a Flex Volume Driver that creates a per-pod Unix Domain Socket to allow Dikastes
         # to communicate with Felix over the Policy Sync API.
         - name: flexvol-driver
-          image: {{ kubernetes.addon.image.canal.flexvol | default("calico/pod2daemon-flexvol:v3.13.2") }}
+          image: {{ addon.image.canal.flexvol | default("calico/pod2daemon-flexvol:v3.13.2") }}
           volumeMounts:
           - name: flexvol-driver-host
             mountPath: /host/driver
@@ -528,7 +528,7 @@ spec:
         # container programs network policy and routes on each
         # host.
         - name: calico-node
-          image: {{ kubernetes.addon.image.canal.node | default("calico/node:v3.13.2") }}
+          image: {{ addon.image.canal.node | default("calico/node:v3.13.2") }}
           env:
             # Use Kubernetes API as the backing datastore.
             - name: DATASTORE_TYPE
@@ -612,7 +612,7 @@ spec:
         # This container runs flannel using the kube-subnet-mgr backend
         # for allocating subnets.
         - name: kube-flannel
-          image: {{ kubernetes.addon.image.canal.flannel | default("quay.io/coreos/flannel:v0.11.0") }}
+          image: {{ addon.image.canal.flannel | default("quay.io/coreos/flannel:v0.11.0") }}
           command: [ "/opt/bin/flanneld", "--ip-masq", "--kube-subnet-mgr" ]
           securityContext:
             privileged: true

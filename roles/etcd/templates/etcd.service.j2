@@ -23,7 +23,7 @@ LimitNOFILE=40000
 TimeoutStartSec=0
 ExecStart=/usr/local/bin/etcd \
   --name=etcd-{{ ansible_play_hosts.index(inventory_hostname) }} \
-  --data-dir={{ kubernetes.etcd.datadir }} \
+  --data-dir={{ etcd.dataDir }} \
   --listen-client-urls=https://127.0.0.1:2379,https://{{ ansible_default_ipv4.address }}:2379 \
   --advertise-client-urls=https://{{ ansible_default_ipv4.address }}:2379 \
   --listen-peer-urls=https://{{ ansible_default_ipv4.address }}:2380 \
@@ -36,17 +36,18 @@ ExecStart=/usr/local/bin/etcd \
   --initial-cluster-state=new \
 {% endif %}
   --client-cert-auth=true \
-  --trusted-ca-file={{ kubernetes.ssl.location }}/etcd/ca.crt \
-  --cert-file={{ kubernetes.ssl.location }}/etcd/server.crt \
-  --key-file={{ kubernetes.ssl.location }}/etcd/server.key \
+  --trusted-ca-file=/etc/kubernetes/pki/etcd/ca.crt \
+  --cert-file=/etc/kubernetes/pki/etcd/server.crt \
+  --key-file=/etc/kubernetes/pki/etcd/server.key \
   --peer-client-cert-auth=true \
-  --peer-trusted-ca-file={{ kubernetes.ssl.location }}/etcd/ca.crt \
-  --peer-cert-file={{ kubernetes.ssl.location }}/etcd/peer.crt \
-  --peer-key-file={{ kubernetes.ssl.location }}/etcd/peer.key \
-  --snapshot-count=10000 \
-  --auto-compaction-retention=1 \
-  --max-request-bytes=10485760 \
-  --quota-backend-bytes=8589934592 \
+  --peer-trusted-ca-file=/etc/kubernetes/pki/etcd/ca.crt \
+  --peer-cert-file=/etc/kubernetes/pki/etcd/peer.crt \
+  --peer-key-file=/etc/kubernetes/pki/etcd/peer.key \
+{% if etcd.extraArgs is defined %}
+{% for extraArg in etcd.extraArgs %}
+  {{ extraArg }} \
+{% endfor %}
+{% endif %}
   --listen-metrics-urls=http://127.0.0.1:2381
 
 [Install]

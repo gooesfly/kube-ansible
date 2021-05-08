@@ -132,7 +132,7 @@ spec:
         beta.kubernetes.io/os: linux
       containers:
       - name: coredns
-        image: {{ kubernetes.addon.image.coredns | default("coredns/coredns:1.6.7") }}
+        image: {{ addon.image.coredns | default("coredns/coredns:1.6.7") }}
         imagePullPolicy: IfNotPresent
         resources:
           limits:
@@ -207,7 +207,7 @@ metadata:
 spec:
   selector:
     k8s-app: kube-dns
-  clusterIP: {{ kubernetes.settings.DNSIP }}
+  clusterIP: {{ networking.DNSIP }}
   ports:
   - name: dns
     port: 53
