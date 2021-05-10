@@ -95,11 +95,12 @@
       - keyEncipherment
     extended_key_usage:
       - clientAuth
-    subject_alt_name: "{{ item.value | list }}"
-  with_dict: 
-    ips: 
-      - "DNS:{{ ansible_hostname | lower }}"
-      - "IP:{{ ansible_default_ipv4.address }}"
+  #   subject_alt_name: "{{ item.value | list }}"
+  # with_dict: 
+  #   ips: 
+  #     - "DNS:{{ ansible_hostname | lower }}"
+  #     - "IP:{{ ansible_default_ipv4.address }}"
+  #     - "IP:127.0.0.1"
 
 - name: Generate kubelet certificate
   community.crypto.x509_certificate:
@@ -133,7 +134,7 @@
       --server=https://{{ KUBE_APISERVER_ADDR }}:{{ KUBE_APISERVER_PORT }} \
       --kubeconfig=/etc/kubernetes/kubelet.kubeconfig
 
-    /usr/local/bin/kubectl config set-credentials system:node:{{ ansible_hostname }} \
+    /usr/local/bin/kubectl config set-credentials system:node:{{ ansible_hostname | lower }} \
       --embed-certs=true \
       --client-certificate=/etc/kubernetes/pki/kubelet.crt \
       --client-key=/etc/kubernetes/pki/kubelet.key \
@@ -141,7 +142,7 @@
 
     /usr/local/bin/kubectl config set-context kubernetes \
       --cluster=kubernetes \
-      --user=system:node:{{ ansible_hostname }} \
+      --user=system:node:{{ ansible_hostname | lower }} \
       --kubeconfig=/etc/kubernetes/kubelet.kubeconfig
 
     /usr/local/bin/kubectl config use-context kubernetes --kubeconfig=/etc/kubernetes/kubelet.kubeconfig

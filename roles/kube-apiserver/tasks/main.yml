@@ -96,8 +96,8 @@
       - "DNS:kubernetes"
       - "DNS:kubernetes.default"
       - "DNS:kubernetes.default.svc"
-      - "DNS:kubernetes.default.svc.cluster"
-      - "DNS:kubernetes.default.svc.cluster.local"
+      - "DNS:kubernetes.default.svc.{{ networking.dnsDomain | default(cluster.local) | split('.') | first }}"
+      - "DNS:kubernetes.default.svc.{{ networking.dnsDomain | default(cluster.local) }}"
       - "IP:127.0.0.1"
       - "IP:{{ networking.SvcIP }}"
       - "IP:{{ ha.vip }}"
@@ -303,6 +303,12 @@
   when:
     - apiServer.admissionControlConfigFile is defined
     - apiServer.admissionControlConfigFile | length >= 1
+
+- name: Configuration cloud provider
+  template:
+    src: cloud.conf.j2
+    dest: /etc/kubernetes/cloud.conf
+  when: cloudProvider is defined
 
 - name: Install systemd file
   template:

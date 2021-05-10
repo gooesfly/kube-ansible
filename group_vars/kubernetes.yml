@@ -53,6 +53,31 @@ networking:
   SvcIP: 10.96.0.1
   DNSIP: 10.96.0.2
 
+# # Azure Cloud Provider
+# cloudProvider:
+#   cloud: "AzurePublicCloud"
+#   tenantId: "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+#   subscriptionId: "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+#   aadClientId: "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+#   aadClientSecret: "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+#   resourceGroup: "<Resource Group of the K8s cluster>"
+#   location: "<Region of the K8s cluster>"
+#   subnetName: "<Subnet Name where the cluster is running>"
+#   securityGroupName: "<network security group assigned to the subnet>"
+#   routeTableName: "<route table assiged to the subnet>"
+#   vnetName: "<virtual network of the cluster>"
+#   vnetResourceGroup: "<Resource Group of the K8s cluster>"
+#   cloudProviderBackoff: true
+#   cloudProviderBackoffRetries: 6
+#   cloudProviderBackoffExponent: 1.5
+#   cloudProviderBackoffDuration: 5
+#   cloudProviderBackoffJitter: 1
+#   cloudProviderRatelimit: true
+#   cloudProviderRateLimitQPS: 3
+#   cloudProviderRateLimitBucket: 10
+#   useManagedIdentityExtension: false
+#   useInstanceMetadata: true
+
 apiServer:
   bindAddress: "0.0.0.0"
   encryption: Tsg7sO4Ki/W3s9bfwGfTi8ECcp+/3uDedQMq6rLQTIY= # head -c 32 /dev/urandom | base64
