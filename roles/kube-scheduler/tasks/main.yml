@@ -156,9 +156,11 @@
 
 - name: Health check
   uri:
-    url: 'http://{% if scheduler.bindAddress != "0.0.0.0" %}127.0.0.1{% else %}{{ ansible_default_ipv4.address }}{% endif %}:10251/healthz'
+    url: 'https://127.0.0.1:10259/healthz'
     validate_certs: no
     return_content: yes
+    client_cert: "/etc/kubernetes/pki/kube-scheduler.crt"
+    client_key: "/etc/kubernetes/pki/kube-scheduler.key"
   register: this
   until: "'ok' in this.content"
   retries: 30

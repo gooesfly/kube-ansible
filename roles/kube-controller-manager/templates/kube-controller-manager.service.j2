@@ -18,6 +18,7 @@ ExecStart=/usr/local/bin/kube-controller-manager \
   --kubeconfig=/etc/kubernetes/kube-controller-manager.kubeconfig \
   --leader-elect=true \
   --port=0 \
+  --secure-port=10257 \
   --requestheader-client-ca-file=/etc/kubernetes/pki/ca.crt \
   --root-ca-file=/etc/kubernetes/pki/ca.crt \
   --service-account-private-key-file=/etc/kubernetes/pki/ca.key \
