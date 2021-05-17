@@ -96,8 +96,7 @@ apiServer:
           burst: 100
           cacheSize: 2000
   extraArgs:
-    - "--insecure-port=0"
-    - "--allow-privileged=true"
+    - "--event-ttl=4h"
     - "--anonymous-auth=false"
     - "--kubelet-preferred-address-types=InternalIP,ExternalIP,Hostname"
     - "--service-node-port-range=30000-32767"
@@ -123,6 +122,8 @@ controllerManager:
 
 scheduler:
   bindAddress: "0.0.0.0"
+  extraArgs:
+    - "--profiling=false"
   log:
     level: 2
 

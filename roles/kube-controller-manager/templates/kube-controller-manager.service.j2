@@ -8,23 +8,23 @@ ExecStart=/usr/local/bin/kube-controller-manager \
   --allocate-node-cidrs=true \
   --authentication-kubeconfig=/etc/kubernetes/kube-controller-manager.kubeconfig \
   --authorization-kubeconfig=/etc/kubernetes/kube-controller-manager.kubeconfig \
-  --kubeconfig=/etc/kubernetes/kube-controller-manager.kubeconfig \
   --bind-address={{ controllerManager.bindAddress | default('127.0.0.1') }} \
-  --tls-cert-file=/etc/kubernetes/pki/kube-controller-manager.crt \
-  --tls-private-key-file=/etc/kubernetes/pki/kube-controller-manager.key \
   --client-ca-file=/etc/kubernetes/pki/ca.crt \
+  --cluster-cidr={{ networking.podSubnet }} \
+  --cluster-name=kubernetes \
   --cluster-signing-cert-file=/etc/kubernetes/pki/ca.crt \
   --cluster-signing-key-file=/etc/kubernetes/pki/ca.key \
-  --leader-elect=true \
-  --cluster-cidr={{ networking.podSubnet }} \
-  --service-cluster-ip-range={{ networking.serviceSubnet }} \
-  --requestheader-client-ca-file=/etc/kubernetes/pki/ca.crt \
-  --service-account-private-key-file=/etc/kubernetes/pki/ca.key \
-  --root-ca-file=/etc/kubernetes/pki/ca.crt \
-  --use-service-account-credentials=true \
   --controllers=*,bootstrapsigner,tokencleaner \
-  --experimental-cluster-signing-duration=8760h \
-  --feature-gates=RotateKubeletServerCertificate=true \
+  --kubeconfig=/etc/kubernetes/kube-controller-manager.kubeconfig \
+  --leader-elect=true \
+  --port=0 \
+  --requestheader-client-ca-file=/etc/kubernetes/pki/ca.crt \
+  --root-ca-file=/etc/kubernetes/pki/ca.crt \
+  --service-account-private-key-file=/etc/kubernetes/pki/ca.key \
+  --service-cluster-ip-range={{ networking.serviceSubnet }} \
+  --use-service-account-credentials=true \
+  --tls-cert-file=/etc/kubernetes/pki/kube-controller-manager.crt \
+  --tls-private-key-file=/etc/kubernetes/pki/kube-controller-manager.key \
 {% if controllerManager.extraArgs is defined %}
 {% for extraArg in controllerManager.extraArgs %}
   {{ extraArg }} \
