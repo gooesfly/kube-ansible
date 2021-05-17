@@ -110,11 +110,16 @@
     extended_key_usage:
       - serverAuth
       - clientAuth
-    subject_alt_name: "{{ item.value | map('regex_replace', '^', 'IP:') | list }}"
     owner: etcd
     group: root
-  with_dict: 
-    ips: "{% if groups['etcd'] is not defined %}{{ groups['master'] }}{% else %}{{ groups['etcd'] }}{% endif %}"
+    subject_alt_name: 
+      - "DNS:localhost"
+      - "DNS:{{ ansible_hostname | lower }}"
+      - "IP:127.0.0.1"
+      - "IP:{{ ansible_default_ipv4.address }}"
+  #   subject_alt_name: "{{ item.value | map('regex_replace', '^', 'IP:') | list }}"
+  # with_dict: 
+  #   ips: "{% if groups['etcd'] is not defined %}{{ groups['master'] }}{% else %}{{ groups['etcd'] }}{% endif %}"
 
 - name: Generate etcd server certificate
   community.crypto.x509_certificate:
