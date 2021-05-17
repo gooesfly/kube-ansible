@@ -15,12 +15,11 @@
 
 - name: Install python applications
   pip:
-    name: "{{ item }}"
+    name: 
+      - pyopenssl>=0.15
+      - pyyaml
+      - cryptography>=1.6
     extra_args: "-i https://mirrors.aliyun.com/pypi/simple"
-  with_items:
-    - pyopenssl>=0.15
-    - pyyaml
-    - cryptography>=1.6
 
 - name: Set the Hostname
   hostname:
