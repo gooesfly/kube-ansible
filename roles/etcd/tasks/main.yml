@@ -97,6 +97,8 @@
 
 - name: Generate etcd server csr
   community.crypto.openssl_csr:
+    owner: etcd
+    group: root
     path: /etc/kubernetes/pki/etcd/server.csr
     privatekey_path: /etc/kubernetes/pki/etcd/server.key
     common_name: "etcd-server"
@@ -110,8 +112,6 @@
     extended_key_usage:
       - serverAuth
       - clientAuth
-    owner: etcd
-    group: root
     subject_alt_name: 
       - "DNS:localhost"
       - "DNS:{{ ansible_hostname | lower }}"
@@ -161,6 +161,8 @@
 
 - name: Generate etcd peer csr
   community.crypto.openssl_csr:
+    owner: etcd
+    group: root
     path: /etc/kubernetes/pki/etcd/peer.csr
     privatekey_path: /etc/kubernetes/pki/etcd/peer.key
     common_name: "etcd-peer"
@@ -174,11 +176,14 @@
     extended_key_usage:
       - serverAuth
       - clientAuth
-    subject_alt_name: "{{ item.value | map('regex_replace', '^', 'IP:') | list }}"
-    owner: etcd
-    group: root
-  with_dict: 
-    ips: "{% if groups['etcd'] is not defined %}{{ groups['master'] }}{% else %}{{ groups['etcd'] }}{% endif %}"
+    subject_alt_name: 
+      - "DNS:localhost"
+      - "DNS:{{ ansible_hostname | lower }}"
+      - "IP:127.0.0.1"
+      - "IP:{{ ansible_default_ipv4.address }}"
+  #   subject_alt_name: "{{ item.value | map('regex_replace', '^', 'IP:') | list }}"
+  # with_dict: 
+  #   ips: "{% if groups['etcd'] is not defined %}{{ groups['master'] }}{% else %}{{ groups['etcd'] }}{% endif %}"
 
 - name: Generate etcd peers certificate
   community.crypto.x509_certificate:
@@ -219,6 +224,8 @@
 
 - name: Generate etcd healthcheck csr
   community.crypto.openssl_csr:
+    owner: etcd
+    group: root
     path: /etc/kubernetes/pki/etcd/healthcheck-client.csr
     privatekey_path: /etc/kubernetes/pki/etcd/healthcheck-client.key
     common_name: "etcd-client"
@@ -232,11 +239,14 @@
     extended_key_usage:
       - serverAuth
       - clientAuth
-    subject_alt_name: "{{ item.value | map('regex_replace', '^', 'IP:') | list }}"
-    owner: etcd
-    group: root
-  with_dict: 
-    ips: "{% if groups['etcd'] is not defined %}{{ groups['master'] }}{% else %}{{ groups['etcd'] }}{% endif %}"
+    subject_alt_name: 
+      - "DNS:localhost"
+      - "DNS:{{ ansible_hostname | lower }}"
+      - "IP:127.0.0.1"
+      - "IP:{{ ansible_default_ipv4.address }}"
+  #   subject_alt_name: "{{ item.value | map('regex_replace', '^', 'IP:') | list }}"
+  # with_dict: 
+  #   ips: "{% if groups['etcd'] is not defined %}{{ groups['master'] }}{% else %}{{ groups['etcd'] }}{% endif %}"
 
 - name: Generate etcd healthcheck certificate
   community.crypto.x509_certificate:
