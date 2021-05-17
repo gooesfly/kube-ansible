@@ -17,7 +17,6 @@ ExecStart=/usr/local/bin/kubelet \
 {% if nodename is defined %}
   --hostname-override={{ nodename | lower }} \
 {% endif %}
-  --register-node=true \
 {% if RUNTIME == "containerd" %}
   --container-runtime=remote \
   --runtime-request-timeout=15m \
