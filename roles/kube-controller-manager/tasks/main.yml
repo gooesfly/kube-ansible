@@ -149,7 +149,7 @@
 
 - name: Waiting for the service
   wait_for:
-    port: 10252
+    port: 10257
     delay: 30
     state: started
   when: controllermanager_service.changed
