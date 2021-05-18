@@ -182,3 +182,16 @@
   delay: 5
   changed_when: false
   when: kubelet_service.changed
+
+- name: Install Check command
+  template:
+    src: check-node.sh.j2
+    dest: /usr/local/bin/check-node.sh
+    mode: 755
+
+- name: Create check kubernetes node status in cron
+  cron:
+    name: "check kubernetes node status by kube-ansible"
+    minute: "0"
+    hour: "0"
+    job: "/usr/local/bin/check-node.sh"
