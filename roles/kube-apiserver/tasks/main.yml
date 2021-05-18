@@ -22,6 +22,10 @@
     name: /etc/kubernetes/pki
     state: directory
 
+- name: debug message
+  debug:
+    msg: "{{ kubernetes_ca_key }}"
+
 - name: Distribution certificate
   copy:
     src: "{{ item.src }}"
