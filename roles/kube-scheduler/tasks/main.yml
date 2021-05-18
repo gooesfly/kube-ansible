@@ -149,7 +149,7 @@
 
 - name: Waiting for the service
   wait_for:
-    port: 10251
+    port: 10259
     delay: 30
     state: started
   when: kube_scheduler_service.changed
