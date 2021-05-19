@@ -34,6 +34,7 @@
     mode: 0600
   delegate_to: localhost
   run_once: true
+  register: etcd_ca_key
   # when: etcd_certificate_expired.failed
 
 - name: Generate an etcd CA csr
@@ -60,4 +61,5 @@
     mode: 0644
   run_once: true
   delegate_to: localhost
+  register: etcd_ca_crt
   # when: etcd_certificate_expired.failed

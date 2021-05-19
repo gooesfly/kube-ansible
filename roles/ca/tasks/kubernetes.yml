@@ -13,6 +13,7 @@
     mode: 0600
   delegate_to: localhost
   run_once: true
+  register: kubernetes_ca_key
 
 - name: Generate an kubernetes SA private key
   community.crypto.openssl_privatekey:
@@ -21,6 +22,7 @@
     mode: 0600
   delegate_to: localhost
   run_once: true
+  register: kubernetes_sa_key
 
 - name: Generate an kubernetes CA CSR
   community.crypto.openssl_csr:
@@ -46,6 +48,7 @@
     provider: selfsigned
   run_once: true
   delegate_to: localhost
+  register: kubernetes_ca_crt
 
 # - name: Generate an front proxy private key
 #   community.crypto.openssl_privatekey:
