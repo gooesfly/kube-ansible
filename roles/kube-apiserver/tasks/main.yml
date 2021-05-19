@@ -301,5 +301,5 @@
 
 - name: Approve renewals for nodes rbac
   ansible.builtin.command:
-    cmd: /usr/local/bin/kubectl -f /tmp/auto-approve-renewals-for-nodes.yaml
+    cmd: /usr/local/bin/kubectl apply -f /tmp/auto-approve-renewals-for-nodes.yaml
   when: renewals_for_nodes_rbac.changed
