@@ -239,8 +239,8 @@
 
 - name: Install health check command
   template:
-    src: etcd-check.j2
-    dest: /usr/local/bin/etcd-check
+    src: etcd-check.sh.j2
+    dest: /usr/local/bin/etcd-check.sh
     mode: 755
 
 - name: Health check
@@ -250,8 +250,8 @@
 
 - name: Install Backup command
   template:
-    src: etcd-backup.j2
-    dest: /usr/local/bin/etcd-backup
+    src: etcd-backup.sh.j2
+    dest: /usr/local/bin/etcd-backup.sh
     mode: 755
 
 - name: Create backup kubernetes etcd data in cron
@@ -259,4 +259,4 @@
     name: "backup kubernetes etcd data by kube-ansible"
     minute: "0"
     hour: "2"
-    job: "/usr/local/bin/etcd-backup"
+    job: "/usr/local/bin/etcd-backup.sh"
