@@ -26,6 +26,7 @@ ExecStart=/usr/local/bin/kube-controller-manager \
   --use-service-account-credentials=true \
   --tls-cert-file=/etc/kubernetes/pki/kube-controller-manager.crt \
   --tls-private-key-file=/etc/kubernetes/pki/kube-controller-manager.key \
+  --feature-gates=RotateKubeletServerCertificate=true \
 {% if controllerManager.extraArgs is defined %}
 {% for extraArg in controllerManager.extraArgs %}
   {{ extraArg }} \
