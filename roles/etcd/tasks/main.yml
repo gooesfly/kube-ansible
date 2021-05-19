@@ -43,6 +43,8 @@
       - "README*"
     extra_opts:
       - --strip-components=1
+    owner: root
+    group: root
   register: etcd_bin
 
 - name: Create data directory

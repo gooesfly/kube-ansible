@@ -39,6 +39,8 @@
     remote_src: yes
     extra_opts:
       - --strip-components=1
+    owner: root
+    group: root
   register: docker_pkg2
 
 - name: Create data directory
