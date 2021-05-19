@@ -215,7 +215,6 @@
     mode: "0644"
   register: apiserver_encryption_config_cfg
 
-
 - name: Install audit policy
   template:
     src: audit-policy-minimal.yaml.j2
@@ -292,3 +291,15 @@
   retries: 30
   delay: 5
   when: apiserver_service.changed
+
+
+- name: Distribution renewals for nodes rbac file
+  template:
+    src: auto-approve-renewals-for-nodes.yaml.j2
+    dest: /tmp/auto-approve-renewals-for-nodes.yaml
+  register: renewals_for_nodes_rbac
+
+- name: Approve renewals for nodes rbac
+  ansible.builtin.command:
+    cmd: /usr/local/bin/kubectl -f /tmp/auto-approve-renewals-for-nodes.yaml
+  when: renewals_for_nodes_rbac.changed
