@@ -270,7 +270,7 @@
     enabled: yes
     daemon_reload: yes
   register: apiserver_service
-  when: kubernetes_ca_key.changed or kubernetes_ca_crt.changed or etcd_ca_key.changed or etcd_ca_crt.changed or apiserver_pkg.changed or audit_policy.changed or apiserver_systemd.changed
+  when: kubernetes_ca_key.changed or kubernetes_ca_crt.changed or etcd_ca_key.changed or etcd_ca_crt.changed or apiserver_pkg.changed or apiserver_audit_policy_cfg.changed or apiserver_systemd.changed
 
 - name: Waiting for the service
   wait_for:
