@@ -292,14 +292,12 @@
   delay: 5
   when: apiserver_service.changed
 
-
 - name: Distribution renewals for nodes rbac file
   template:
     src: auto-approve-renewals-for-nodes.yaml.j2
     dest: /tmp/auto-approve-renewals-for-nodes.yaml
-  register: renewals_for_nodes_rbac
 
 - name: Approve renewals for nodes rbac
   ansible.builtin.command:
     cmd: /usr/local/bin/kubectl apply -f /tmp/auto-approve-renewals-for-nodes.yaml
-  when: renewals_for_nodes_rbac.changed
+  run_once: true
