@@ -75,18 +75,8 @@
         src: "/etc/ssl/kubernetes/etcd/ca.key",
         dest: "/etc/kubernetes/pki/etcd/ca.key"
       }
+  when: etcd_ca_key.changed or etcd_ca_crt.changed
 
-# - name: Create etcd server certificate
-#   shell: |
-#     openssl genrsa -out etcd/server.key 2048 && \
-#     openssl req -new -key etcd/server.key -subj "/CN=etcd-server" -out etcd/server.csr && \
-#     openssl x509 -in etcd/server.csr -req -CA etcd/ca.crt -CAkey etcd/ca.key -CAcreateserial -extensions v3_req_etcd -extfile openssl.cnf -out etcd/server.crt -days {{ kubernetes.ssl.days | default(3652) }}
-#     chown etcd:etcd etcd/server.key etcd/server.csr etcd/server.crt
-#   args:
-#     chdir: "/etc/kubernetes/pki"
-#     executable: /bin/bash
-#   register: etcd_server_certificate
-#   when: etcd_server_certificate_expired.failed
 - name: Generate etcd server private key
   community.crypto.openssl_privatekey:
     path: /etc/kubernetes/pki/etcd/server.key
@@ -117,9 +107,6 @@
       - "DNS:{{ ansible_hostname | lower }}"
       - "IP:127.0.0.1"
       - "IP:{{ ansible_default_ipv4.address }}"
-  #   subject_alt_name: "{{ item.value | map('regex_replace', '^', 'IP:') | list }}"
-  # with_dict: 
-  #   ips: "{% if groups['etcd'] is not defined %}{{ groups['master'] }}{% else %}{{ groups['etcd'] }}{% endif %}"
 
 - name: Generate etcd server certificate
   community.crypto.x509_certificate:
@@ -131,25 +118,7 @@
     mode: 0644
     owner: etcd
     group: root
-
-# - name: Check etcd peer certificate expired(30 days)
-#   community.crypto.openssl_certificate:
-#     path: "/etc/kubernetes/pki/etcd/peer.crt"
-#     provider: assertonly
-#     valid_in: "2592000"
-#   ignore_errors: yes
-#   register: etcd_peer_certificate_expired
-
-# - name: Create etcd peer certificate
-#   shell: |
-#     openssl genrsa -out etcd/peer.key 2048 && \
-#     openssl req -new -key etcd/peer.key -subj "/CN=etcd-peer" -out etcd/peer.csr && \
-#     openssl x509 -in etcd/peer.csr -req -CA etcd/ca.crt -CAkey etcd/ca.key -CAcreateserial -extensions v3_req_etcd -extfile openssl.cnf -out etcd/peer.crt -days {{ kubernetes.ssl.days | default(3652) }}
-#   args:
-#     chdir: "/etc/kubernetes/pki"
-#     executable: /bin/bash
-#   register: etcd_peer_certificate
-#   when: etcd_peer_certificate_expired.failed
+  when: etcd_ca_key.changed or etcd_ca_crt.changed
 
 - name: Generate etcd peer private key
   community.crypto.openssl_privatekey:
@@ -181,9 +150,6 @@
       - "DNS:{{ ansible_hostname | lower }}"
       - "IP:127.0.0.1"
       - "IP:{{ ansible_default_ipv4.address }}"
-  #   subject_alt_name: "{{ item.value | map('regex_replace', '^', 'IP:') | list }}"
-  # with_dict: 
-  #   ips: "{% if groups['etcd'] is not defined %}{{ groups['master'] }}{% else %}{{ groups['etcd'] }}{% endif %}"
 
 - name: Generate etcd peers certificate
   community.crypto.x509_certificate:
@@ -195,25 +161,8 @@
     mode: 0644
     owner: etcd
     group: root
+  when: etcd_ca_key.changed or etcd_ca_crt.changed
 
-
-# - name: Check etcd healthcheck certificate expired(30 days)
-#   community.crypto.openssl_certificate:
-#     path: "/etc/kubernetes/pki/etcd/healthcheck-client.crt"
-#     provider: assertonly
-#     valid_in: "2592000"
-#   ignore_errors: yes
-#   register: etcd_healthcheck_certificate_expired
-
-# - name: Create etcd healthcheck client
-#   shell: |
-#     openssl genrsa -out etcd/healthcheck-client.key 2048 && \
-#     openssl req -new -key etcd/healthcheck-client.key -subj "/CN=etcd-client" -out etcd/healthcheck-client.csr && \
-#     openssl x509 -in etcd/healthcheck-client.csr -req -CA etcd/ca.crt -CAkey etcd/ca.key -CAcreateserial -extensions v3_req_etcd -extfile openssl.cnf -out etcd/healthcheck-client.crt -days {{ kubernetes.ssl.days | default(3652) }}
-#   args:
-#     chdir: "/etc/kubernetes/pki"
-#     executable: /bin/bash
-#   when: etcd_healthcheck_certificate_expired.failed
 - name: Generate etcd healthcheck private key
   community.crypto.openssl_privatekey:
     path: /etc/kubernetes/pki/etcd/healthcheck-client.key
@@ -244,9 +193,6 @@
       - "DNS:{{ ansible_hostname | lower }}"
       - "IP:127.0.0.1"
       - "IP:{{ ansible_default_ipv4.address }}"
-  #   subject_alt_name: "{{ item.value | map('regex_replace', '^', 'IP:') | list }}"
-  # with_dict: 
-  #   ips: "{% if groups['etcd'] is not defined %}{{ groups['master'] }}{% else %}{{ groups['etcd'] }}{% endif %}"
 
 - name: Generate etcd healthcheck certificate
   community.crypto.x509_certificate:

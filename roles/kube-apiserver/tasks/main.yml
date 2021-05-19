@@ -22,10 +22,6 @@
     name: /etc/kubernetes/pki
     state: directory
 
-- name: debug message
-  debug:
-    msg: "{{ kubernetes_ca_key }}"
-
 - name: Distribution certificate
   copy:
     src: "{{ item.src }}"
@@ -54,25 +50,12 @@
         dest: "/etc/kubernetes/pki/ca.key",
         mode: 600,
       }
+  when:
+    - kubernetes_ca_key.changed
+    - kubernetes_ca_crt.changed
+    - etcd_ca_key.changed
+    - etcd_ca_crt.changed
 
-# - name: Check kube-apiserver certificate expired(30 days)
-#   community.crypto.openssl_certificate:
-#     path: /etc/kubernetes/pki/apiserver.crt
-#     provider: assertonly
-#     valid_in: "2592000"
-#   ignore_errors: yes
-#   register: apiserver_certificate_expired
-
-# - name: Create kube-apiserver certificate
-#   shell: |
-#     openssl genrsa -out apiserver.key 2048 && \
-#     openssl req -new -key apiserver.key -subj "/CN=kube-apiserver/O=Kubernetes" -config openssl.cnf -out apiserver.csr && \
-#     openssl x509 -req -in apiserver.csr -CA ca.crt -CAkey ca.key -CAcreateserial -extensions v3_req_apiserver -extfile openssl.cnf -out apiserver.crt -days {{ kubernetes.ssl.days | default(3652) }}
-#   args:
-#     chdir: "/etc/kubernetes/pki"
-#     executable: /bin/bash
-#   register: apiserver_certificate
-#   when: apiserver_certificate_expired.failed or openssl_conf.changed
 - name: Generate kube-apiserver private key
   community.crypto.openssl_privatekey:
     path: /etc/kubernetes/pki/apiserver.key
@@ -117,25 +100,9 @@
     ownca_privatekey_path: /etc/kubernetes/pki/ca.key
     provider: ownca
     mode: 0644
-
-# - name: Check front-proxy-client certificate expired(30 days)
-#   community.crypto.openssl_certificate:
-#     path: "/etc/kubernetes/pki/front-proxy-client.crt"
-#     provider: assertonly
-#     valid_in: "2592000"
-#   ignore_errors: yes
-#   register: front_proxy_client_certificate_expired
-
-# - name: Create front-proxy-client certificate
-#   shell: |
-#     openssl genrsa -out front-proxy-client.key 2048 && \
-#     openssl req -new -key front-proxy-client.key -subj "/CN=front-proxy-client" -out front-proxy-client.csr && \
-#     openssl x509 -req -in front-proxy-client.csr -CA ca.crt -CAkey ca.key -CAcreateserial -extensions v3_req_client -extfile openssl.cnf -out front-proxy-client.crt -days {{ kubernetes.ssl.days | default(3652) }}
-#   args:
-#     chdir: "/etc/kubernetes/pki"
-#     executable: /bin/bash
-#   register: front_proxy_client_certificate
-#   when: front_proxy_client_certificate_expired.failed or openssl_conf.changed
+  when:
+    - kubernetes_ca_key.changed
+    - kubernetes_ca_crt.changed
 
 - name: Generate front-proxy-client private key
   community.crypto.openssl_privatekey:
@@ -167,24 +134,9 @@
     ownca_privatekey_path: /etc/kubernetes/pki/ca.key
     provider: ownca
     mode: 0644
-
-# - name: Check apiserver-kubelet-client certificate expired(30 days)
-#   community.crypto.openssl_certificate:
-#     path: "/etc/kubernetes/pki/apiserver-kubelet-client.crt"
-#     provider: assertonly
-#     valid_in: "2592000"
-#   ignore_errors: yes
-#   register: kubelet_client_certificate_expired
-# - name: Create apiserver-kubelet-client certificate
-#   shell: |
-#     openssl genrsa -out apiserver-kubelet-client.key 2048 && \
-#     openssl req -new -key apiserver-kubelet-client.key -subj "/CN=apiserver-kubelet-client/O=system:masters" -out apiserver-kubelet-client.csr && \
-#     openssl x509 -req -in apiserver-kubelet-client.csr -CA ca.crt -CAkey ca.key -CAcreateserial -extensions v3_req_client -extfile openssl.cnf -out apiserver-kubelet-client.crt -days {{ kubernetes.ssl.days | default(3652) }}
-#   args:
-#     chdir: "/etc/kubernetes/pki"
-#     executable: /bin/bash
-#   register: kubelet_client_certificate
-#   when: kubelet_client_certificate_expired.failed or openssl_conf.changed
+  when:
+    - kubernetes_ca_key.changed
+    - kubernetes_ca_crt.changed
 
 - name: Generate apiserver-kubelet-client private key
   community.crypto.openssl_privatekey:
@@ -217,24 +169,10 @@
     ownca_privatekey_path: /etc/kubernetes/pki/ca.key
     provider: ownca
     mode: 0644
+  when:
+    - kubernetes_ca_key.changed
+    - kubernetes_ca_crt.changed
 
-# - name: Check apiserver-etcd-client certificate expired(30 days)
-#   community.crypto.openssl_certificate:
-#     path: "/etc/kubernetes/pki/apiserver-etcd-client.crt"
-#     provider: assertonly
-#     valid_in: "2592000"
-#   ignore_errors: yes
-#   register: apiserver_etcd_client_certificate_expired
-# - name: Create apiserver etcd client certificate
-#   shell: |
-#     openssl genrsa -out apiserver-etcd-client.key 2048 && \
-#     openssl req -new -key apiserver-etcd-client.key -subj "/CN=apiserver-etcd-client/O=system:masters" -out apiserver-etcd-client.csr && \
-#     openssl x509 -in apiserver-etcd-client.csr -req -CA etcd/ca.crt -CAkey etcd/ca.key -CAcreateserial -extensions v3_req_etcd -extfile openssl.cnf -out apiserver-etcd-client.crt -days {{ kubernetes.ssl.days | default(3652) }}
-#   args:
-#     chdir: "/etc/kubernetes/pki"
-#     executable: /bin/bash
-#   register: apiserver_etcd_client_certificate
-#   when: apiserver_etcd_client_certificate_expired.failed or openssl_conf.changed
 - name: Generate apiserver-etcd-client private key
   community.crypto.openssl_privatekey:
     path: /etc/kubernetes/pki/apiserver-etcd-client.key
@@ -266,19 +204,24 @@
     ownca_privatekey_path: /etc/kubernetes/pki/etcd/ca.key
     provider: ownca
     mode: 0644
+  when:
+    - kubernetes_ca_key.changed
+    - kubernetes_ca_crt.changed
 
 - name: Install encryption config
   template:
     src: encryption-config.yaml.j2
     dest: /etc/kubernetes/encryption-config.yaml
     mode: "0644"
+  register: apiserver_encryption_config_cfg
+
 
 - name: Install audit policy
   template:
     src: audit-policy-minimal.yaml.j2
     dest: /etc/kubernetes/audit-policy-minimal.yaml
     mode: "0644"
-  register: audit_policy
+  register: apiserver_audit_policy_cfg
 
 - name: Install admission control config
   template:
@@ -288,6 +231,7 @@
   when:
     - apiServer.admissionControlConfigFile is defined
     - apiServer.admissionControlConfigFile | length >= 1
+  register: apiserver_admission_control_cfg
 
 - name: Create admission control config plugins files
   ansible.builtin.file:
@@ -327,7 +271,7 @@
     enabled: yes
     daemon_reload: yes
   register: apiserver_service
-  when: apiserver_pkg.changed or audit_policy.changed or apiserver_systemd.changed
+  when: kubernetes_ca_key.changed or kubernetes_ca_crt.changed or etcd_ca_key.changed or etcd_ca_crt.changed or apiserver_pkg.changed or audit_policy.changed or apiserver_systemd.changed
 
 - name: Waiting for the service
   wait_for:
