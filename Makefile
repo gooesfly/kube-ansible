@@ -5,17 +5,17 @@ ANSIBLE_OPT :=
 DOWNLOAD_WAY := official
 
 # binary version
-KUBE_VERSION := 1.20.2
-ETCD_VERSION := 3.4.14
+KUBE_VERSION := 1.21.1
+ETCD_VERSION := 3.4.16
 CNI_VERSION := 0.8.5
 
 # container runtime. containerd or docker
 RUNTIME := docker
-DOCKER_VERSION := 20.10.3
+DOCKER_VERSION := 20.10.6
 
-CONTAINERD_VERSION := 1.4.3
-CRICTL_VERSION := 1.20.0
-RUNC_VERSION := 1.0.0-rc93
+CONTAINERD_VERSION := 1.5.1
+CRICTL_VERSION := 1.21.0
+RUNC_VERSION := 1.0.0-rc95
 
 # nexus information
 NEXUS_DOMAIN_NAME := 
