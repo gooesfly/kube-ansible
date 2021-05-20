@@ -38,13 +38,13 @@ etcd:
     - "--enable-v2=false"
     - "--snapshot-count=10000"
 
-ha:
-  # none not use lb for apiserver
-  # slb is software load balancing, will install harpoxy and keepalived on master node
-  # clb is cloud load balancing, will use cloud load balancing
-  type: slb
-  vip: 172.16.6.10
-  mask: 16
+# ha:
+#   # none not use lb for apiserver
+#   # slb is software load balancing, will install harpoxy and keepalived on master node
+#   # clb is cloud load balancing, will use cloud load balancing
+#   type: slb
+#   vip: 172.16.6.10
+#   mask: 16
 
 networking:
   dnsDomain: cluster.local
