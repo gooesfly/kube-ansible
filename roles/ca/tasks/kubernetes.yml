@@ -49,7 +49,7 @@
   delegate_to: localhost
   run_once: true
 
-- name: Generate an front proxy sa csr
+- name: Generate an front proxy csr
   community.crypto.openssl_csr:
     path: /etc/ssl/kubernetes/front-proxy-ca.csr
     privatekey_path: /etc/ssl/kubernetes/front-proxy-ca.key
@@ -64,7 +64,7 @@
   delegate_to: localhost
   run_once: true
 
-- name: Sign front proxy sa certificate
+- name: Sign front proxy certificate
   community.crypto.x509_certificate:
     path: /etc/ssl/kubernetes/front-proxy-ca.crt
     csr_path: /etc/ssl/kubernetes/front-proxy-ca.csr
@@ -87,6 +87,7 @@
 #     curve: secp521r1
 #   delegate_to: localhost
 #   run_once: true
+
 # # SA
 # - name: Generate an kubernetes sa private key
 #   community.crypto.openssl_privatekey:
