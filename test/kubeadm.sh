@@ -5,7 +5,7 @@ tee /etc/apt/sources.list.d/kubernetes.list <<EOF
 deb https://mirrors.aliyun.com/kubernetes/apt/ kubernetes-xenial main
 EOF
 apt-get update
-apt-get install kubelet=1.19.9-00 kubeadm=1.19.9-00 kubectl=1.19.9-00 -y
+apt-get install kubelet-1.19.7 kubeadm-1.19.7 kubectl-1.19.7 -y
 
 
 cat > /etc/modules-load.d/kubernetes.conf << EOF
@@ -91,11 +91,6 @@ cat > /etc/docker/daemon.json << EOF
     "userland-proxy": false
 }
 EOF
-
-# init
-git config --global http.sslVerify false
-git clone https://LIUPENG@git.cn.svc.corpintra.net/devops/osinit.git /usr/local/src/osinit
-git clone https://LIUPENG@git.cn.svc.corpintra.net/Phoenix/kubeadm-salt.git /usr/local/src/kubeadm-salt
 
 systemctl stop ufw
 systemctl disable ufw
