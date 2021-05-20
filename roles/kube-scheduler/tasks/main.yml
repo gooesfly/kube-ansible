@@ -106,31 +106,24 @@
       {% endif %}
     {% endif %}
 
-    /usr/local/bin/kubectl config set-cluster {{ kubernetes.name | default("kubernetes") }} \
+    /usr/local/bin/kubectl config set-cluster kubernetes \
       --embed-certs=true \
       --certificate-authority=/etc/kubernetes/pki/ca.crt \
       --server=https://{{ KUBE_APISERVER_ADDR }}:{{ KUBE_APISERVER_PORT }} \
-      --kubeconfig=/etc/kubernetes/{{ item.KUBE_CONFIG }}
+      --kubeconfig=/etc/kubernetes/kube-scheduler.kubeconfig
 
-    /usr/local/bin/kubectl config set-credentials {{ item.KUBE_USER }} \
+    /usr/local/bin/kubectl config set-credentials system:kube-scheduler \
       --embed-certs=true \
-      --client-certificate=/etc/kubernetes/pki/{{ item.KUBE_CERT }}.crt \
-      --client-key=/etc/kubernetes/pki/{{ item.KUBE_CERT }}.key \
-      --kubeconfig=/etc/kubernetes/{{ item.KUBE_CONFIG }}
+      --client-certificate=/etc/kubernetes/pki/kube-scheduler.crt \
+      --client-key=/etc/kubernetes/pki/kube-scheduler.key \
+      --kubeconfig=/etc/kubernetes/kube-scheduler.kubeconfig
 
-    /usr/local/bin/kubectl config set-context {{ item.KUBE_USER }}@{{ kubernetes.name | default("kubernetes") }} \
-      --cluster={{ kubernetes.name | default("kubernetes") }} \
-      --user={{ item.KUBE_USER }} \
-      --kubeconfig=/etc/kubernetes/{{ item.KUBE_CONFIG }}
+    /usr/local/bin/kubectl config set-context system:kube-scheduler@kubernetes \
+      --cluster=kubernetes \
+      --user=system:kube-scheduler \
+      --kubeconfig=/etc/kubernetes/kube-scheduler.kubeconfig
 
-    /usr/local/bin/kubectl config use-context {{ item.KUBE_USER }}@{{ kubernetes.name | default("kubernetes") }} --kubeconfig=/etc/kubernetes/{{ item.KUBE_CONFIG }}
-  with_items:
-    - {
-        KUBE_USER: "system:kube-scheduler",
-        KUBE_CERT: "kube-scheduler",
-        KUBE_CONFIG: "kube-scheduler.kubeconfig",
-      }
-  register: kube_scheduler_kubeconfig
+    /usr/local/bin/kubectl config use-context system:kube-scheduler@kubernetes --kubeconfig=/etc/kubernetes/kube-scheduler.kubeconfig
 
 - name: Install systemd file
   template:

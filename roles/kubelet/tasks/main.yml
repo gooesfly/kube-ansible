@@ -140,12 +140,12 @@
       --client-key=/etc/kubernetes/pki/kubelet.key \
       --kubeconfig=/etc/kubernetes/kubelet.kubeconfig
 
-    /usr/local/bin/kubectl config set-context kubernetes \
+    /usr/local/bin/kubectl config set-context system:node:{{ ansible_hostname | lower }}@kubernetes \
       --cluster=kubernetes \
       --user=system:node:{{ ansible_hostname | lower }} \
       --kubeconfig=/etc/kubernetes/kubelet.kubeconfig
 
-    /usr/local/bin/kubectl config use-context kubernetes --kubeconfig=/etc/kubernetes/kubelet.kubeconfig
+    /usr/local/bin/kubectl config use-context system:node:{{ ansible_hostname | lower }}@kubernetes --kubeconfig=/etc/kubernetes/kubelet.kubeconfig
   register: kubelet_kubeconfig
 
 - name: Install systemd file
