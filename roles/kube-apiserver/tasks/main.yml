@@ -95,9 +95,6 @@
     ownca_privatekey_path: /etc/kubernetes/pki/ca.key
     provider: ownca
     mode: 0644
-  when:
-    - kubernetes_ca_key.changed
-    - kubernetes_ca_crt.changed
 
 - name: Generate front-proxy-client private key
   community.crypto.openssl_privatekey:
@@ -129,9 +126,6 @@
     ownca_privatekey_path: /etc/kubernetes/pki/ca.key
     provider: ownca
     mode: 0644
-  when:
-    - kubernetes_ca_key.changed
-    - kubernetes_ca_crt.changed
 
 - name: Generate apiserver-kubelet-client private key
   community.crypto.openssl_privatekey:
@@ -164,9 +158,6 @@
     ownca_privatekey_path: /etc/kubernetes/pki/ca.key
     provider: ownca
     mode: 0644
-  when:
-    - kubernetes_ca_key.changed
-    - kubernetes_ca_crt.changed
 
 - name: Generate apiserver-etcd-client private key
   community.crypto.openssl_privatekey:
@@ -199,9 +190,6 @@
     ownca_privatekey_path: /etc/kubernetes/pki/etcd/ca.key
     provider: ownca
     mode: 0644
-  when:
-    - kubernetes_ca_key.changed
-    - kubernetes_ca_crt.changed
 
 - name: Install encryption config
   template:
@@ -264,15 +252,12 @@
     state: restarted
     enabled: yes
     daemon_reload: yes
-  register: apiserver_service
-  when: kubernetes_ca_key.changed or kubernetes_ca_crt.changed or etcd_ca_key.changed or etcd_ca_crt.changed or apiserver_pkg.changed or apiserver_audit_policy_cfg.changed or apiserver_systemd.changed
 
 - name: Waiting for the service
   wait_for:
     port: 6443
     delay: 30
     state: started
-  when: apiserver_service.changed
 
 - name: Health check
   uri:
@@ -285,7 +270,6 @@
   until: "'ok' in this.content"
   retries: 30
   delay: 5
-  when: apiserver_service.changed
 
 - name: Distribution renewals for nodes rbac file
   template:
