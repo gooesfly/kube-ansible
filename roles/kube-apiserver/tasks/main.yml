@@ -50,11 +50,6 @@
         dest: "/etc/kubernetes/pki/ca.key",
         mode: 600,
       }
-  when:
-    - kubernetes_ca_key.changed
-    - kubernetes_ca_crt.changed
-    - etcd_ca_key.changed
-    - etcd_ca_crt.changed
 
 - name: Generate kube-apiserver private key
   community.crypto.openssl_privatekey:
