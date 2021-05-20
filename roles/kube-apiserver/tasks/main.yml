@@ -50,7 +50,18 @@
         dest: "/etc/kubernetes/pki/ca.key",
         mode: 600,
       }
+    - {
+        src: "/etc/ssl/kubernetes/front-proxy-ca.crt",
+        dest: "/etc/kubernetes/pki/front-proxy-ca.crt",
+        mode: 644,
+      }
+    - {
+        src: "/etc/ssl/kubernetes/front-proxy-ca.key",
+        dest: "/etc/kubernetes/pki/front-proxy-ca.key",
+        mode: 600,
+      }
 
+# apiserver
 - name: Generate kube-apiserver private key
   community.crypto.openssl_privatekey:
     path: /etc/kubernetes/pki/apiserver.key
@@ -96,6 +107,7 @@
     provider: ownca
     mode: 0644
 
+# front-proxy-client
 - name: Generate front-proxy-client private key
   community.crypto.openssl_privatekey:
     path: /etc/kubernetes/pki/front-proxy-client.key
@@ -106,7 +118,7 @@
   community.crypto.openssl_csr:
     path: /etc/kubernetes/pki/front-proxy-client.csr
     privatekey_path: /etc/kubernetes/pki/front-proxy-client.key
-    common_name: "front-proxy-client"
+    common_name: front-proxy-client
     basic_constraints_critical: yes
     basic_constraints:
       - "CA:FALSE"
@@ -115,18 +127,18 @@
       - digitalSignature
       - keyEncipherment
     extended_key_usage:
-      - serverAuth
       - clientAuth
 
-- name: Generate front-proxy-client certificate
+- name: Generate front-proxy-client crt
   community.crypto.x509_certificate:
     path: /etc/kubernetes/pki/front-proxy-client.crt
     csr_path: /etc/kubernetes/pki/front-proxy-client.csr
-    ownca_path: /etc/kubernetes/pki/ca.crt
-    ownca_privatekey_path: /etc/kubernetes/pki/ca.key
+    ownca_path: /etc/kubernetes/pki/front-proxy-ca.crt
+    ownca_privatekey_path: /etc/kubernetes/pki/front-proxy-ca.key
     provider: ownca
     mode: 0644
 
+# apiserver kubelet client
 - name: Generate apiserver-kubelet-client private key
   community.crypto.openssl_privatekey:
     path: /etc/kubernetes/pki/apiserver-kubelet-client.key
@@ -137,7 +149,7 @@
   community.crypto.openssl_csr:
     path: /etc/kubernetes/pki/apiserver-kubelet-client.csr
     privatekey_path: /etc/kubernetes/pki/apiserver-kubelet-client.key
-    common_name: "apiserver-kubelet-client"
+    common_name: "kube-apiserver-kubelet-client"
     organization_name: "system:masters"
     basic_constraints_critical: yes
     basic_constraints:
@@ -147,7 +159,6 @@
       - digitalSignature
       - keyEncipherment
     extended_key_usage:
-      - serverAuth
       - clientAuth
 
 - name: Generate apiserver-kubelet-client certificate

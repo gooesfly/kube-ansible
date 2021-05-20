@@ -77,7 +77,6 @@
         src: "/etc/ssl/kubernetes/etcd/ca.key",
         dest: "/etc/kubernetes/pki/etcd/ca.key"
       }
-  when: etcd_ca_key.changed or etcd_ca_crt.changed
 
 - name: Generate etcd server private key
   community.crypto.openssl_privatekey:
@@ -87,13 +86,14 @@
     owner: etcd
     group: root
 
+# server
 - name: Generate etcd server csr
   community.crypto.openssl_csr:
     owner: etcd
     group: root
     path: /etc/kubernetes/pki/etcd/server.csr
     privatekey_path: /etc/kubernetes/pki/etcd/server.key
-    common_name: "etcd-server"
+    common_name: "{{ ansible_hostname | lower }}"
     basic_constraints_critical: yes
     basic_constraints:
       - "CA:FALSE"
@@ -109,6 +109,7 @@
       - "DNS:{{ ansible_hostname | lower }}"
       - "IP:127.0.0.1"
       - "IP:{{ ansible_default_ipv4.address }}"
+      - "IP:0:0:0:0:0:0:0:1"
 
 - name: Generate etcd server certificate
   community.crypto.x509_certificate:
@@ -120,8 +121,8 @@
     mode: 0644
     owner: etcd
     group: root
-  when: etcd_ca_key.changed or etcd_ca_crt.changed
 
+# peer
 - name: Generate etcd peer private key
   community.crypto.openssl_privatekey:
     path: /etc/kubernetes/pki/etcd/peer.key
@@ -136,7 +137,7 @@
     group: root
     path: /etc/kubernetes/pki/etcd/peer.csr
     privatekey_path: /etc/kubernetes/pki/etcd/peer.key
-    common_name: "etcd-peer"
+    common_name: "{{ ansible_hostname | lower }}"
     basic_constraints_critical: yes
     basic_constraints:
       - "CA:FALSE"
@@ -152,6 +153,7 @@
       - "DNS:{{ ansible_hostname | lower }}"
       - "IP:127.0.0.1"
       - "IP:{{ ansible_default_ipv4.address }}"
+      - "IP:0:0:0:0:0:0:0:1"
 
 - name: Generate etcd peers certificate
   community.crypto.x509_certificate:
@@ -165,6 +167,7 @@
     group: root
   when: etcd_ca_key.changed or etcd_ca_crt.changed
 
+# healthcheck
 - name: Generate etcd healthcheck private key
   community.crypto.openssl_privatekey:
     path: /etc/kubernetes/pki/etcd/healthcheck-client.key
@@ -179,7 +182,8 @@
     group: root
     path: /etc/kubernetes/pki/etcd/healthcheck-client.csr
     privatekey_path: /etc/kubernetes/pki/etcd/healthcheck-client.key
-    common_name: "etcd-client"
+    common_name: "kube-etcd-healthcheck-client"
+    organization_name: "system:masters"
     basic_constraints_critical: yes
     basic_constraints:
       - "CA:FALSE"
@@ -188,13 +192,7 @@
       - digitalSignature
       - keyEncipherment
     extended_key_usage:
-      - serverAuth
       - clientAuth
-    subject_alt_name: 
-      - "DNS:localhost"
-      - "DNS:{{ ansible_hostname | lower }}"
-      - "IP:127.0.0.1"
-      - "IP:{{ ansible_default_ipv4.address }}"
 
 - name: Generate etcd healthcheck certificate
   community.crypto.x509_certificate:
