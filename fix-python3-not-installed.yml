@@ -1,0 +1,6 @@
+- name: Install Python3
+  hosts: all
+  tasks:
+    - name: Python3
+      ansible.builtin.package:
+        name: python3
