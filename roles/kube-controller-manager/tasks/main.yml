@@ -40,24 +40,16 @@
         dest: "/etc/kubernetes/pki/ca.key",
         mode: 600,
       }
-
-# - name: Check kube-controller-manager certificate expired(30 days)
-#   community.crypto.openssl_certificate:
-#     path: "/etc/kubernetes/pki/kube-controller-manager.crt"
-#     provider: assertonly
-#     valid_in: "2592000"
-#   ignore_errors: yes
-#   register: kube_controller_manager_certificate_expired
-# - name: Create kube-controller-manager
-#   shell: |
-#     openssl genrsa -out kube-controller-manager.key 2048 && \
-#     openssl req -new -key kube-controller-manager.key -subj "/CN=system:kube-controller-manager/O=system:kube-controller-manager" -out kube-controller-manager.csr && \
-#     openssl x509 -req -in kube-controller-manager.csr -CA ca.crt -CAkey ca.key -CAcreateserial -extensions v3_req_client -extfile openssl.cnf -out kube-controller-manager.crt -days {{ kubernetes.ssl.days | default(3652) }}
-#   args:
-#     chdir: "/etc/kubernetes/pki"
-#     executable: /bin/bash
-#   register: kube_controller_manager_certificate
-#   when: kube_controller_manager_certificate_expired.failed
+    - {
+        src: "/etc/ssl/kubernetes/front-proxy-ca.crt",
+        dest: "/etc/kubernetes/pki/front-proxy-ca.crt",
+        mode: 644,
+      }
+    - {
+        src: "/etc/ssl/kubernetes/front-proxy-ca.key",
+        dest: "/etc/kubernetes/pki/front-proxy-ca.key",
+        mode: 600,
+      }
 
 - name: Generate kube-controller-manager private key
   community.crypto.openssl_privatekey:
