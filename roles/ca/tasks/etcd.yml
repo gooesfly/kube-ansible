@@ -6,28 +6,7 @@
   delegate_to: localhost
   run_once: true
 
-# - name: Check etcd certificate expired(30 days)
-#   community.crypto.openssl_certificate:
-#     path: /etc/ssl/kubernetes/etcd/ca.crt
-#     provider: assertonly
-#     valid_in: "2592000"
-#   ignore_errors: yes
-#   register: etcd_certificate_expired
-#   delegate_to: localhost
-#   run_once: true
-
-# - name: Generate etcd ca
-#   shell: |
-#     openssl genrsa -out etcd/ca.key 2048 && \
-#     openssl req -x509 -new -nodes -key etcd/ca.key -subj "/CN=etcd-ca" -out etcd/ca.crt -days {{ kubernetes.ssl.days | default(3652) }}
-#   args:
-#     chdir: "/etc/ssl/{{ kubernetes.project }}"
-#     executable: /bin/bash
-#   delegate_to: localhost
-#   run_once: true
-#   when: etcd_certificate_expired.failed
-
-- name: Generate an etcd CA private key
+- name: Generate an etcd ca private key
   community.crypto.openssl_privatekey:
     path: /etc/ssl/kubernetes/etcd/ca.key
     size: 2048
@@ -35,12 +14,12 @@
   delegate_to: localhost
   run_once: true
   register: etcd_ca_key
-  # when: etcd_certificate_expired.failed
 
-- name: Generate an etcd CA csr
+- name: Generate an etcd ca csr
   community.crypto.openssl_csr:
     path: /etc/ssl/kubernetes/etcd/ca.csr
     privatekey_path: /etc/ssl/kubernetes/etcd/ca.key
+    common_name: etcd-ca
     basic_constraints: "CA:TRUE"
     basic_constraints_critical: true
     key_usage_critical: true
@@ -50,9 +29,8 @@
       - keyCertSign
   delegate_to: localhost
   run_once: true
-  # when: etcd_certificate_expired.failed
 
-- name: Sign etcd CA csr
+- name: Sign etcd ca certificate
   community.crypto.x509_certificate:
     path: /etc/ssl/kubernetes/etcd/ca.crt
     csr_path: /etc/ssl/kubernetes/etcd/ca.csr
@@ -62,4 +40,3 @@
   run_once: true
   delegate_to: localhost
   register: etcd_ca_crt
-  # when: etcd_certificate_expired.failed

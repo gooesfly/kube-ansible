@@ -6,7 +6,8 @@
   delegate_to: localhost
   run_once: true
 
-- name: Generate an kubernetes CA private key
+# Kubernetes CA
+- name: Generate an kubernetes ca private key
   community.crypto.openssl_privatekey:
     path: /etc/ssl/kubernetes/ca.key
     size: 2048
@@ -15,16 +16,7 @@
   run_once: true
   register: kubernetes_ca_key
 
-- name: Generate an kubernetes SA private key
-  community.crypto.openssl_privatekey:
-    path: /etc/ssl/kubernetes/sa.key
-    size: 2048
-    mode: 0600
-  delegate_to: localhost
-  run_once: true
-  register: kubernetes_sa_key
-
-- name: Generate an kubernetes CA CSR
+- name: Generate an kubernetes ca csr
   community.crypto.openssl_csr:
     path: /etc/ssl/kubernetes/ca.csr
     privatekey_path: /etc/ssl/kubernetes/ca.key
@@ -39,7 +31,7 @@
   delegate_to: localhost
   run_once: true
 
-- name: Sign kubernetes CA CSR
+- name: Sign kubernetes ca certificate
   community.crypto.x509_certificate:
     path: /etc/ssl/kubernetes/ca.crt
     csr_path: /etc/ssl/kubernetes/ca.csr
@@ -50,38 +42,39 @@
   delegate_to: localhost
   register: kubernetes_ca_crt
 
-# - name: Generate an front proxy private key
-#   community.crypto.openssl_privatekey:
-#     path: /etc/ssl/kubernetes/front-proxy-ca.key
-#     size: 2048
-#     mode: 0600
-#   delegate_to: localhost
-#   run_once: true
+# Front Proxy CA
+- name: Generate an front proxy private key
+  community.crypto.openssl_privatekey:
+    path: /etc/ssl/kubernetes/front-proxy-ca.key
+    size: 2048
+    mode: 0600
+  delegate_to: localhost
+  run_once: true
 
-# - name: Generate an front proxy CA CSR
-#   community.crypto.openssl_csr:
-#     path: /etc/ssl/kubernetes/front-proxy-ca.csr
-#     privatekey_path: /etc/ssl/kubernetes/front-proxy-ca.key
-#     common_name: kubernetes-ca
-#     basic_constraints: "CA:TRUE"
-#     basic_constraints_critical: true
-#     key_usage_critical: true
-#     key_usage:
-#       - digitalSignature
-#       - keyEncipherment
-#       - keyCertSign
-#   delegate_to: localhost
-#   run_once: true
+- name: Generate an front proxy sa csr
+  community.crypto.openssl_csr:
+    path: /etc/ssl/kubernetes/front-proxy-ca.csr
+    privatekey_path: /etc/ssl/kubernetes/front-proxy-ca.key
+    common_name: front-proxy-ca
+    basic_constraints: "CA:TRUE"
+    basic_constraints_critical: true
+    key_usage_critical: true
+    key_usage:
+      - digitalSignature
+      - keyEncipherment
+      - keyCertSign
+  delegate_to: localhost
+  run_once: true
 
-# - name: Sign front proxy CA CSR
-#   community.crypto.x509_certificate:
-#     path: /etc/ssl/kubernetes/front-proxy-ca.crt
-#     csr_path: /etc/ssl/kubernetes/front-proxy-ca.csr
-#     privatekey_path: /etc/ssl/kubernetes/front-proxy-ca.key
-#     mode: 0644
-#     provider: selfsigned
-#   run_once: true
-#   delegate_to: localhost
+- name: Sign front proxy sa certificate
+  community.crypto.x509_certificate:
+    path: /etc/ssl/kubernetes/front-proxy-ca.crt
+    csr_path: /etc/ssl/kubernetes/front-proxy-ca.csr
+    privatekey_path: /etc/ssl/kubernetes/front-proxy-ca.key
+    mode: 0644
+    provider: selfsigned
+  run_once: true
+  delegate_to: localhost
 
 # openssl genrsa -out sa.key 2048 && \
 # openssl ecparam -name secp521r1 -genkey -noout -out sa.key && \
@@ -94,6 +87,14 @@
 #     size: 2048
 #     mode: 0600
 #     curve: secp521r1
+#   delegate_to: localhost
+#   run_once: true
+# # SA
+# - name: Generate an kubernetes sa private key
+#   community.crypto.openssl_privatekey:
+#     path: /etc/ssl/kubernetes/sa.key
+#     size: 2048
+#     mode: 0600
 #   delegate_to: localhost
 #   run_once: true
 
