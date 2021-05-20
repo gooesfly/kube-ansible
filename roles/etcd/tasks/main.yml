@@ -165,7 +165,6 @@
     mode: 0644
     owner: etcd
     group: root
-  when: etcd_ca_key.changed or etcd_ca_crt.changed
 
 # healthcheck
 - name: Generate etcd healthcheck private key
