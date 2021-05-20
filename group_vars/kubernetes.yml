@@ -43,7 +43,7 @@ ha:
   # slb is software load balancing, will install harpoxy and keepalived on master node
   # clb is cloud load balancing, will use cloud load balancing
   type: slb
-  vip: 172.16.16.10
+  vip: 172.16.6.10
   mask: 16
 
 networking:
@@ -87,7 +87,7 @@ apiServer:
   encryption: Tsg7sO4Ki/W3s9bfwGfTi8ECcp+/3uDedQMq6rLQTIY= # head -c 32 /dev/urandom | base64
   timeoutForControlPlane: 4m0s
   certSANs:
-    - "*.kubernetes.local"
+    - "DNS:*.kubernetes.local"
   admissionControlConfigFile:
     - name: EventRateLimit
       path: EventRateLimit.yaml
