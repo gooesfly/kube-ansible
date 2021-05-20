@@ -2,5 +2,5 @@
   hosts: all
   tasks:
     - name: Python3
-      ansible.builtin.package:
+      dnf:
         name: python3
