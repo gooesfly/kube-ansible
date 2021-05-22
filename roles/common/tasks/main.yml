@@ -18,7 +18,7 @@
     name: 
       - pyopenssl>=0.15
       - pyyaml
-      - cryptography>=1.6
+      - cryptography>=1.2.3
     extra_args: "-i https://mirrors.aliyun.com/pypi/simple"
 
 - name: Set the Hostname
