@@ -1,6 +1,5 @@
 - name: Install some applications
   apt:
-    name: "{{ item }}"
+    name: "{{ package }}"
     state: present
     update_cache: yes
-  with_items: "{{ package }}"
