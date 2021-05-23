@@ -155,6 +155,6 @@
     client_key: "/etc/kubernetes/pki/kube-controller-manager.key"
   register: this
   until: "'ok' in this.content"
-  retries: 30
-  delay: 5
+  retries: 120
+  delay: 1
   when: controllermanager_service.changed
