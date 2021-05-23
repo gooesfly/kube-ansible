@@ -154,7 +154,9 @@
     client_cert: "/etc/kubernetes/pki/kube-controller-manager.crt"
     client_key: "/etc/kubernetes/pki/kube-controller-manager.key"
   register: this
-  until: "'ok' in this.content"
+  until: 
+    - "'ok' in this.content"
+    - this.status == 200
   retries: 120
   delay: 1
   when: controllermanager_service.changed

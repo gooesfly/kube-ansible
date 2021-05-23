@@ -169,7 +169,9 @@
     validate_certs: no
     return_content: yes
   register: this
-  until: "'ok' in this.content"
+  until: 
+    - "'ok' in this.content"
+    - this.status == 200
   retries: 120
   delay: 1
   when: kubelet_service.changed

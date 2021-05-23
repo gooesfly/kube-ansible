@@ -155,7 +155,9 @@
     client_cert: "/etc/kubernetes/pki/kube-scheduler.crt"
     client_key: "/etc/kubernetes/pki/kube-scheduler.key"
   register: this
-  until: "'ok' in this.content"
+  until: 
+    - "'ok' in this.content"
+    - this.status == 200
   retries: 120
   delay: 1
   when: kube_scheduler_service.changed
