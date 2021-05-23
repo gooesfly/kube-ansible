@@ -16,6 +16,7 @@
 - name: Install python applications
   pip:
     name: 
+      - pip
       - pyopenssl>=0.15
       - pyyaml
       - cryptography>=1.2.3
