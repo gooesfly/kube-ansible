@@ -1,7 +1,7 @@
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: create-csrs-for-bootstrapping
+  name: kubeadm:kubelet-bootstrap
 subjects:
 - kind: Group
   name: system:bootstrappers
@@ -15,7 +15,7 @@ roleRef:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: auto-approve-csrs-for-group
+  name: kubeadm:node-autoapprove-bootstrap
 subjects:
 - kind: Group
   name: system:bootstrappers
@@ -29,7 +29,7 @@ roleRef:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: auto-approve-renewals-for-nodes
+  name: kubeadm:node-autoapprove-certificate-rotation
 subjects:
 - kind: Group
   name: system:nodes
