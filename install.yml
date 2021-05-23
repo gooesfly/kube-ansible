@@ -26,7 +26,7 @@
   tags:
     - etcd
 
-- name: Deployment kube master
+- name: Deployment kubernetes master
   hosts: master
   become: yes
   roles:
@@ -44,7 +44,7 @@
   tags:
     - kube-master
 
-- name: Deployment kube worker
+- name: Deployment kubernetes worker
   hosts: worker
   become: yes
   roles:
@@ -65,7 +65,7 @@
   tags:
     - cleanup
 
-- name: Deployment add-on
+- name: Deployment kubernetes add-on
   hosts: master
   become: yes
   roles:
@@ -78,7 +78,7 @@
   tags:
     - addons
 
-- name: Deployment apps
+- name: Deployment kubernetes apps
   hosts: master
   roles:
     - apps

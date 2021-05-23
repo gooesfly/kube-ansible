@@ -12,7 +12,7 @@ Refer to the `README.md` and `group_vars/template.yml` files for project configu
 
 ## OS Support
 
-All Node install python3.
+All node please install python3.
 
 * [x] CentOS 7.*
 * [x] CentOS 8.*
@@ -78,7 +78,7 @@ cd /usr/local/src/kube-ansible
 
 #### Install ansible
 
-if use python2, all node please run command `curl -s https://bootstrap.pypa.io/pip/2.7/get-pip.py | python2` to update pip
+if python3 not install on other node, please run command `ansible-playbook fix-python3.yml`.
 
 ```
 make runtime

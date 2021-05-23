@@ -16,9 +16,8 @@
 - name: Install python applications
   pip:
     name: 
-      - pip
-      - pyopenssl>=0.15
       - pyyaml
+      - pyopenssl>=0.15
       - cryptography>=1.2.3
     extra_args: "-i https://mirrors.aliyun.com/pypi/simple"
 
