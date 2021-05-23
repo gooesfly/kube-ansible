@@ -280,7 +280,7 @@
   register: this
   until: "'ok' in this.content"
   retries: 120
-  delay: 1
+  delay: 15
 
 - name: Distribution renewals for nodes rbac file
   template:
