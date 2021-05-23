@@ -164,9 +164,7 @@
     url: 'http://{% if proxy.bindAddress != "0.0.0.0" %}127.0.0.1{% else %}{{ ansible_default_ipv4.address }}{% endif %}:10256/healthz'
     validate_certs: no
   register: this
-  until: 
-    - "'ok' in this.content"
-    - this.status == 200
+  until: this.status == 200
   retries: 120
   delay: 1
   when: kube_proxy_service.changed
