@@ -5,11 +5,6 @@ After=network-online.target firewalld.service
 Wants=network-online.target
 
 [Service]
-{% if docker.systemd.service is defined %}
-{% for opt in docker.systemd.service %}
-{{ opt }}
-{% endfor %}
-{% endif %}
 ExecStartPre=/sbin/iptables -P FORWARD ACCEPT
 ExecStart=/usr/local/bin/dockerd
 ExecReload=/bin/kill -s HUP $MAINPID
