@@ -6,4 +6,4 @@
 
 - name: Update the kernel
   include: "{{ ansible_os_family }}.yml"
-  when: "KERNEL_VER | float < 4.19"
+  when: "KERNEL_VERSION | float < 4.19"
