@@ -1,0 +1,9 @@
+---
+# tasks file for linux-kernel
+- name: Set OS fact
+  set_fact:
+     KERNEL_VERSION: "{{ ansible_kernel.split('-')[0].split('.')[0]|int + ansible_kernel.split('-')[0].split('.')[1]|int/100 }}"
+
+- name: Update the kernel
+  include: "{{ ansible_os_family }}.yml"
+  when: "KERNEL_VER | float < 4.19"

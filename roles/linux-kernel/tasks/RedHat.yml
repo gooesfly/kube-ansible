@@ -1,0 +1,18 @@
+- name: Install elrepo
+  yum:
+    name: http://www.elrepo.org/elrepo-release-7.0-2.el7.elrepo.noarch.rpm
+    state: present
+
+- name: Install kernel-lt
+  yum:
+    name: 
+      - kernel-lt
+      - kernel-lt-headers
+      - kernel-lt-devel
+    enablerepo: elrepo-kernel
+
+- name: Grub2 set default
+  shell: grub2-set-default 0
+
+- name: Grub2 mkconfig
+  shell: grub2-mkconfig -o /etc/grub2.cfg

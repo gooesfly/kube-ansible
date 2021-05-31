@@ -5,9 +5,6 @@
 scripts/binaries
 roles/apps/files/*.yaml
 
-# local package
-inventory/terraform
-
 inventory/hosts
 group_vars/all.yml
 
