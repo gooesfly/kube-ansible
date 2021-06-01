@@ -1,11 +1,16 @@
+- name: Import a key from a url
+  ansible.builtin.rpm_key:
+    state: present
+    key: https://www.elrepo.org/RPM-GPG-KEY-elrepo.org
+
 - name: Install elrepo
   yum:
-    name: http://www.elrepo.org/elrepo-release-7.0-2.el7.elrepo.noarch.rpm
+    name: https://www.elrepo.org/elrepo-release-{{ ansible_distribution_major_version }}.el{{ ansible_distribution_major_version }}.elrepo.noarch.rpm
     state: present
 
 - name: Install kernel-lt
   yum:
-    name: 
+    name:
       - kernel-lt
       - kernel-lt-headers
       - kernel-lt-devel
