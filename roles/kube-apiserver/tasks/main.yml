@@ -60,6 +60,16 @@
         dest: "/etc/kubernetes/pki/front-proxy-ca.key",
         mode: 600,
       }
+    - {
+        src: "/etc/ssl/kubernetes/sa.key",
+        dest: "/etc/kubernetes/pki/sa.key",
+        mode: 644,
+      }
+    - {
+        src: "/etc/ssl/kubernetes/sa.pub",
+        dest: "/etc/kubernetes/pki/sa.pub",
+        mode: 600,
+      }
 
 # apiserver
 - name: Generate kube-apiserver private key

@@ -79,36 +79,17 @@
 # openssl ec -in sa.key -outform PEM -pubout -out sa.pub && \
 # openssl req -new -sha256 -key sa.key -subj "/CN=system:kube-controller-manager" -out sa.csr && \
 # openssl x509 -req -in sa.csr -CA ca.crt -CAkey ca.key -CAcreateserial -days {{ days }} -extensions v3_req_client -extfile openssl.cnf -out sa.crt
-# - name: Generate an sa private key
-#   community.crypto.openssl_privatekey:
-#     path: /etc/ssl/kubernetes/sa.key
-#     size: 2048
-#     mode: 0600
-#     curve: secp521r1
-#   delegate_to: localhost
-#   run_once: true
+# SA
+- name: Generate an sa private key
+  community.crypto.openssl_privatekey:
+    path: /etc/ssl/kubernetes/sa.key
+    # curve: secp521r1
+    size: 2048
+    mode: 0600
+  delegate_to: localhost
+  run_once: true
 
-# # SA
-# - name: Generate an kubernetes sa private key
-#   community.crypto.openssl_privatekey:
-#     path: /etc/ssl/kubernetes/sa.key
-#     size: 2048
-#     mode: 0600
-#   delegate_to: localhost
-#   run_once: true
-
-# - name: Generate an sa private csr
-#   community.crypto.openssl_csr:
-#     path: /etc/ssl/kubernetes/sa.csr
-#     privatekey_path: /etc/ssl/kubernetes/sa.key
-#     common_name: "system:kube-controller-manager"
-#     organization_name: "system:kube-controller-manager"
-#     basic_constraints_critical: yes
-#     basic_constraints:
-#       - "CA:FALSE"
-#     key_usage_critical: yes
-#     key_usage:
-#       - digitalSignature
-#       - keyEncipherment
-#     extended_key_usage:
-#       - clientAuth
+- name: Generate an sa public key
+  community.crypto.openssl_publickey:
+    path: /etc/ssl/kubernetes/sa.pub
+    privatekey_path: /etc/ssl/kubernetes/sa.key
