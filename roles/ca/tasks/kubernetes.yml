@@ -74,11 +74,6 @@
   run_once: true
   delegate_to: localhost
 
-# openssl genrsa -out sa.key 2048 && \
-# openssl ecparam -name secp521r1 -genkey -noout -out sa.key && \
-# openssl ec -in sa.key -outform PEM -pubout -out sa.pub && \
-# openssl req -new -sha256 -key sa.key -subj "/CN=system:kube-controller-manager" -out sa.csr && \
-# openssl x509 -req -in sa.csr -CA ca.crt -CAkey ca.key -CAcreateserial -days {{ days }} -extensions v3_req_client -extfile openssl.cnf -out sa.crt
 # SA
 - name: Generate an sa private key
   community.crypto.openssl_privatekey:
@@ -93,3 +88,5 @@
   community.crypto.openssl_publickey:
     path: /etc/ssl/kubernetes/sa.pub
     privatekey_path: /etc/ssl/kubernetes/sa.key
+  delegate_to: localhost
+  run_once: true
