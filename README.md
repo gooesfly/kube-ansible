@@ -78,7 +78,7 @@ cd /usr/local/src/kube-ansible
 
 #### Install ansible
 
-if python3 not install on other node, please run command `ansible-playbook fix-python3.yml`.
+if python3 not install on other node, please run command `ansible-playbook fix-python3.yml` or `curl -s https://bootstrap.pypa.io/pip/get-pip.py | python3`.
 
 ```
 make runtime
