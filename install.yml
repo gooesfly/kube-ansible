@@ -5,6 +5,8 @@
   roles:
     - common
     - chrony
+    - kernel
+    - cni
   tags:
     - common
 
@@ -40,7 +42,6 @@
     - kube-controller-manager
     - kubelet
     - kube-proxy
-    - cni-plugins
   tags:
     - kube-master
 
@@ -53,7 +54,6 @@
     - kubectl
     - kubelet
     - kube-proxy
-    - cni-plugins
   tags:
     - kube-worker
 

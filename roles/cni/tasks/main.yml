@@ -1,15 +1,13 @@
 ---
 # tasks file for cni
+- name: Set OS dependent variables
+  include_vars: "{{ DOWNLOAD_WAY }}.yml"
+
 - name: Create binary directory
   file:
     name: /opt/cni/bin
     state: directory
     mode: "0755"
-  when: addon.network == "flannel"  or addon.network == "cilium"
-
-- name: Set OS dependent variables
-  include_vars: "{{ DOWNLOAD_WAY }}.yml"
-  when: addon.network == "flannel" or addon.network == "cilium"
 
 - name: Download binary
   get_url:
@@ -24,11 +22,9 @@
   register: cni_pkg
   until: cni_pkg is succeeded
   retries: 10
-  when: addon.network == "flannel" or addon.network == "cilium"
 
 - name: Extract CNI
   unarchive:
     src: "/usr/local/src/cni-plugins-linux-amd64-v{{ CNI_VERSION }}.tgz"
     dest: /opt/cni/bin
     remote_src: yes
-  when: addon.network == "flannel" or addon.network == "cilium"
