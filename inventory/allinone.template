@@ -1,8 +1,0 @@
-[master]
-172.16.1.2
-
-[worker]
-
-[kubernetes:children]
-master
-worker
