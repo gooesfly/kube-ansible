@@ -20,3 +20,4 @@ package:
   - python3-pip
   - python2-pip
   - python3-setuptools
+  - jq
