@@ -1,28 +1,26 @@
 # About group vars
 
-## all.yml
+## all.template
 
 include configuration
 
-* etcd
+* modprobe
+* ipvs
+* sysctl
+
+
+## kubernetes.template
+
+include configuration
+
 * docker
-
-## kubernetes.yml
-
-include configuration
-
-* kubernetes version
-* addon version
-    * coredns
-    * canal
-    * ...
-* kubelet
-* kube-proxy
-
-## master.yml
-
-include configuration
-
+* etcd
+* ha
+* cloudProvider
 * apiServer
-* scheduler
 * controllerManager
+* scheduler
+* kubelet
+* proxy
+* addon
+* apps
