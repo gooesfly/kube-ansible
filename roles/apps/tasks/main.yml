@@ -9,12 +9,12 @@
 
     - name: Download manifests
       get_url:
-        url: "{{ item }}"
-        dest: '{{ apps.location | default("/etc/kubernetes/apps") }}'
+        url: "{{ item.url }}"
+        dest: '{{ apps.location | default("/etc/kubernetes/apps") }}/{{ item.name }}'
       with_items: "{{ apps.files }}"
 
     - name: Deployment application
-      shell: "/usr/local/bin/kubectl apply -f {{ item }}"
+      shell: "/usr/local/bin/kubectl apply -f {{ apps.location | default('/etc/kubernetes/apps') }}/{{ item.name }}"
       run_once: true
       with_items: "{{ apps.files }}"
   when: apps is defined

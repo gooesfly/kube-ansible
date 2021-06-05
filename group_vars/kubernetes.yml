@@ -180,6 +180,11 @@ addon:
 apps:
   location: /etc/kubernetes/apps
   files:
-    - https://raw.githubusercontent.com/buxiaomo/kubernetes-manifests/master/ingress/traefik-2.0.yaml
-    # - https://raw.githubusercontent.com/buxiaomo/kubernetes-manifests/master/jenkins.yaml
-    # - https://raw.githubusercontent.com/buxiaomo/kubernetes-manifests/master/nfs-client.yaml
+    - {
+        url: https://raw.githubusercontent.com/buxiaomo/kubernetes-manifests/master/ingress/traefik-2.0.yaml,
+        name: traefik.yaml,
+      }
+    - {
+        url: https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml,
+        name: metrics.yaml,
+      }
