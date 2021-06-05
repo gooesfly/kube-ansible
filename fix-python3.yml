@@ -9,7 +9,4 @@
         state: latest
 
     - name: Upgrade pip
-      pip:
-        name: pip
-        extra_args: "-U -i https://mirrors.aliyun.com/pypi/simple"
-        executable: pip3
+      shell: curl -s https://bootstrap.pypa.io/pip/get-pip.py | python3
