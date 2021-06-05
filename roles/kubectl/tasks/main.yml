@@ -42,25 +42,6 @@
         mode: 600,
       }
 
-# - name: Check admin certificate expired(30 days)
-#   community.crypto.openssl_certificate:
-#     path: "/etc/kubernetes/pki/admin.crt"
-#     provider: assertonly
-#     valid_in: "2592000"
-#   ignore_errors: yes
-#   register: admin_certificate_expired
-
-# - name: Create admin certificate
-#   shell: |
-#     openssl genrsa -out admin.key 2048 && \
-#     openssl req -new -key admin.key -subj "/CN=admin/O=system:masters" -out admin.csr && \
-#     openssl x509 -req -in admin.csr -CA ca.crt -CAkey ca.key -CAcreateserial -extensions v3_req_client -extfile openssl.cnf -out admin.crt -days {{ kubernetes.ssl.days | default(3652) }}
-#   args:
-#     chdir: "/etc/kubernetes/pki"
-#     executable: /bin/bash
-#   register: admin_certificate
-#   when: admin_certificate_expired.failed
-
 - name: Generate kubectl private key
   community.crypto.openssl_privatekey:
     path: /etc/kubernetes/pki/admin.key
@@ -94,60 +75,21 @@
     mode: 0644
 
 - name: Create admin kubeconfig
-  shell: |
-    {% set KUBE_APISERVER_ADDR, KUBE_APISERVER_PORT = ansible_default_ipv4.address, 6443 %}
-    {% if inventory_hostname in groups['master'] %}
-      {% set KUBE_APISERVER_ADDR, KUBE_APISERVER_PORT = ansible_default_ipv4.address, 6443 %}
-    {% else %}
-      {% if ha.type == "none" %}
-        {% set KUBE_APISERVER_ADDR, KUBE_APISERVER_PORT = hostvars[groups['master'][0]].inventory_hostname, 6443 %}
-      {% else %}
-        {% if ha.type == "slb" %}
-          {% set KUBE_APISERVER_ADDR, KUBE_APISERVER_PORT = ha.vip, 8443 %}
-        {% else %}
-          {% set KUBE_APISERVER_ADDR, KUBE_APISERVER_PORT = ha.vip, 6443 %}
-        {% endif %}
-      {% endif %}
-    {% endif %}
-
-    /usr/local/bin/kubectl config set-cluster kubernetes \
-      --certificate-authority=/etc/kubernetes/pki/ca.crt \
-      --server=https://{{ KUBE_APISERVER_ADDR }}:{{ KUBE_APISERVER_PORT }} \
-      --embed-certs=true \
-      --kubeconfig=/etc/kubernetes/admin.kubeconfig
-
-    /usr/local/bin/kubectl config set-credentials admin \
-      --client-certificate=/etc/kubernetes/pki/admin.crt \
-      --client-key=/etc/kubernetes/pki/admin.key \
-      --embed-certs=true \
-      --kubeconfig=/etc/kubernetes/admin.kubeconfig
-
-    /usr/local/bin/kubectl config set-context admin@kubernetes \
-      --cluster=kubernetes \
-      --user=admin \
-      --kubeconfig=/etc/kubernetes/admin.kubeconfig
-
-    /usr/local/bin/kubectl config use-context admin@kubernetes --kubeconfig=/etc/kubernetes/admin.kubeconfig
-  register: admin_kubeconfig
-
-- name: Change file permissions
-  file:
-    path: /etc/kubernetes/admin.kubeconfig
-    mode: "0644"
-  when: admin_kubeconfig.changed
+  template:
+    src: admin.kubeconfig.j2
+    dest: /etc/kubernetes/admin.kubeconfig
+    mode: 0600
 
 - name: Delete user kube directory
   file:
     name: ~/.kube
     state: absent
-  when: admin_kubeconfig.changed
 
 - name: Create user kube directory
   file:
     name: ~/.kube
     state: directory
     mode: "0755"
-  when: admin_kubeconfig.changed
 
 - name: Create User kubeconfig
   copy:
@@ -155,7 +97,6 @@
     dest: ~/.kube/config
     mode: "0600"
     remote_src: yes
-  when: admin_kubeconfig.changed
 
 - name: Install kubectl completion
   copy:

@@ -93,52 +93,15 @@
     mode: 0644
 
 - name: Create kubeconfig
-  shell: |
-    {% set KUBE_APISERVER_ADDR, KUBE_APISERVER_PORT = ansible_default_ipv4.address, 6443 %}
-    {% if inventory_hostname in groups['master'] %}
-      {% set KUBE_APISERVER_ADDR, KUBE_APISERVER_PORT = ansible_default_ipv4.address, 6443 %}
-    {% else %}
-      {% if ha.type == "none" %}
-        {% set KUBE_APISERVER_ADDR, KUBE_APISERVER_PORT = hostvars[groups['master'][0]].inventory_hostname, 6443 %}
-      {% else %}
-        {% if ha.type == "slb" %}
-          {% set KUBE_APISERVER_ADDR, KUBE_APISERVER_PORT = ha.vip, 8443 %}
-        {% else %}
-          {% set KUBE_APISERVER_ADDR, KUBE_APISERVER_PORT = ha.vip, 6443 %}
-        {% endif %}
-      {% endif %}
-    {% endif %}
-
-    /usr/local/bin/kubectl config set-cluster kubernetes \
-      --embed-certs=true \
-      --certificate-authority=/etc/kubernetes/pki/ca.crt \
-      --server=https://{{ KUBE_APISERVER_ADDR }}:{{ KUBE_APISERVER_PORT }} \
-      --kubeconfig=/etc/kubernetes/kube-controller-manager.kubeconfig
-
-    /usr/local/bin/kubectl config set-credentials system:kube-controller-manager \
-      --embed-certs=true \
-      --client-certificate=/etc/kubernetes/pki/{{ item.KUBE_CERT }}.crt \
-      --client-key=/etc/kubernetes/pki/{{ item.KUBE_CERT }}.key \
-      --kubeconfig=/etc/kubernetes/kube-controller-manager.kubeconfig
-
-    /usr/local/bin/kubectl config set-context system:kube-controller-manager@kubernetes \
-      --cluster=kubernetes \
-      --user=system:kube-controller-manager \
-      --kubeconfig=/etc/kubernetes/kube-controller-manager.kubeconfig
-
-    /usr/local/bin/kubectl config use-context system:kube-controller-manager@kubernetes --kubeconfig=/etc/kubernetes/kube-controller-manager.kubeconfig
-  with_items:
-    - {
-        KUBE_USER: "system:kube-controller-manager",
-        KUBE_CERT: "kube-controller-manager",
-        KUBE_CONFIG: "kube-controller-manager.kubeconfig",
-      }
+  template:
+    src: kube-controller-manager.kubeconfig.j2
+    dest: /etc/kubernetes/kube-controller-manager.kubeconfig
+    mode: 0600
 
 - name: Install systemd file
   template:
     src: kube-controller-manager.service.j2
     dest: /etc/systemd/system/kube-controller-manager.service
-  register: controllermanager_systemd
 
 - name: Start the service
   systemd:
@@ -146,15 +109,12 @@
     state: restarted
     enabled: yes
     daemon_reload: yes
-  register: controllermanager_service
-  when: controllermanager_pkg.changed or controllermanager_systemd.changed
 
 - name: Waiting for the service
   wait_for:
     port: 10257
     delay: 30
     state: started
-  when: controllermanager_service.changed
 
 - name: Health check
   uri:
@@ -169,4 +129,3 @@
     - this.status == 200
   retries: 120
   delay: 1
-  when: controllermanager_service.changed

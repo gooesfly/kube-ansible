@@ -41,23 +41,6 @@
         mode: 600,
       }
 
-# - name: Check kube-scheduler certificate expired(30 days)
-#   community.crypto.openssl_certificate:
-#     path: "/etc/kubernetes/pki/kube-scheduler.crt"
-#     provider: assertonly
-#     valid_in: "2592000"
-#   ignore_errors: yes
-#   register: kube_scheduler_certificate_expired
-# - name: Create kube-scheduler certificate
-#   shell: |
-#     openssl genrsa -out kube-scheduler.key 2048 && \
-#     openssl req -new -key kube-scheduler.key -subj "/CN=system:kube-scheduler/O=system:kube-scheduler" -out kube-scheduler.csr && \
-#     openssl x509 -req -in kube-scheduler.csr -CA ca.crt -CAkey ca.key -CAcreateserial -extensions v3_req_client -extfile openssl.cnf -out kube-scheduler.crt -days {{ kubernetes.ssl.days | default(3652) }}
-#   args:
-#     chdir: "/etc/kubernetes/pki"
-#     executable: /bin/bash
-#   register: kube_scheduler_certificate
-#   when: kube_scheduler_certificate_expired.failed
 - name: Generate kube-scheduler private key
   community.crypto.openssl_privatekey:
     path: /etc/kubernetes/pki/kube-scheduler.key
@@ -90,46 +73,15 @@
     mode: 0644
 
 - name: Create kubeconfig
-  shell: |
-    {% set KUBE_APISERVER_ADDR, KUBE_APISERVER_PORT = ansible_default_ipv4.address, 6443 %}
-    {% if inventory_hostname in groups['master'] %}
-      {% set KUBE_APISERVER_ADDR, KUBE_APISERVER_PORT = ansible_default_ipv4.address, 6443 %}
-    {% else %}
-      {% if ha.type == "none" %}
-        {% set KUBE_APISERVER_ADDR, KUBE_APISERVER_PORT = hostvars[groups['master'][0]].inventory_hostname, 6443 %}
-      {% else %}
-        {% if ha.type == "slb" %}
-          {% set KUBE_APISERVER_ADDR, KUBE_APISERVER_PORT = ha.vip, 8443 %}
-        {% else %}
-          {% set KUBE_APISERVER_ADDR, KUBE_APISERVER_PORT = ha.vip, 6443 %}
-        {% endif %}
-      {% endif %}
-    {% endif %}
-
-    /usr/local/bin/kubectl config set-cluster kubernetes \
-      --embed-certs=true \
-      --certificate-authority=/etc/kubernetes/pki/ca.crt \
-      --server=https://{{ KUBE_APISERVER_ADDR }}:{{ KUBE_APISERVER_PORT }} \
-      --kubeconfig=/etc/kubernetes/kube-scheduler.kubeconfig
-
-    /usr/local/bin/kubectl config set-credentials system:kube-scheduler \
-      --embed-certs=true \
-      --client-certificate=/etc/kubernetes/pki/kube-scheduler.crt \
-      --client-key=/etc/kubernetes/pki/kube-scheduler.key \
-      --kubeconfig=/etc/kubernetes/kube-scheduler.kubeconfig
-
-    /usr/local/bin/kubectl config set-context system:kube-scheduler@kubernetes \
-      --cluster=kubernetes \
-      --user=system:kube-scheduler \
-      --kubeconfig=/etc/kubernetes/kube-scheduler.kubeconfig
-
-    /usr/local/bin/kubectl config use-context system:kube-scheduler@kubernetes --kubeconfig=/etc/kubernetes/kube-scheduler.kubeconfig
+  template:
+    src: kube-scheduler.kubeconfig.j2
+    dest: /etc/kubernetes/kube-scheduler.kubeconfig
+    mode: 0600
 
 - name: Install systemd file
   template:
     src: kube-scheduler.service.j2
     dest: /etc/systemd/system/kube-scheduler.service
-  register: kube_scheduler_systemd
 
 - name: Start the service
   systemd:
@@ -137,15 +89,12 @@
     state: restarted
     enabled: yes
     daemon_reload: yes
-  register: kube_scheduler_service
-  when: kube_scheduler_pkg.changed or kube_scheduler_systemd.changed
 
 - name: Waiting for the service
   wait_for:
     port: 10259
     delay: 30
     state: started
-  when: kube_scheduler_service.changed
 
 - name: Health check
   uri:
@@ -160,4 +109,3 @@
     - this.status == 200
   retries: 120
   delay: 1
-  when: kube_scheduler_service.changed

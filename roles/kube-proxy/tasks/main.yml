@@ -41,25 +41,6 @@
         mode: 600,
       }
 
-# - name: Check kube-proxy certificate expired(30 days)
-#   community.crypto.openssl_certificate:
-#     path: "/etc/kubernetes/pki/kube-proxy.crt"
-#     provider: assertonly
-#     valid_in: "2592000"
-#   ignore_errors: yes
-#   register: kube_proxy_certificate_expired
-
-# - name: Create kube-proxy certificate
-#   shell: |
-#     openssl genrsa -out kube-proxy.key 2048 && \
-#     openssl req -new -key kube-proxy.key -subj "/CN=system:kube-proxy/O=system:node-proxier" -out kube-proxy.csr && \
-#     openssl x509 -req -in kube-proxy.csr -CA ca.crt -CAkey ca.key -CAcreateserial -extensions v3_req_client -extfile openssl.cnf -out kube-proxy.crt -days {{ kubernetes.ssl.days | default(3652) }}
-#   args:
-#     chdir: "/etc/kubernetes/pki"
-#     executable: /bin/bash
-#   register: kube_proxy_certificate
-#   when: kube_proxy_certificate_expired.failed
-
 - name: Generate kube-proxy private key
   community.crypto.openssl_privatekey:
     path: /etc/kubernetes/pki/kube-proxy.key
@@ -92,63 +73,20 @@
     mode: 0644
 
 - name: Create kubeconfig
-  shell: |
-    {% set KUBE_APISERVER_ADDR, KUBE_APISERVER_PORT = ansible_default_ipv4.address, 6443 %}
-    {% if inventory_hostname in groups['master'] %}
-      {% set KUBE_APISERVER_ADDR, KUBE_APISERVER_PORT = ansible_default_ipv4.address, 6443 %}
-    {% else %}
-      {% if ha.type == "none" %}
-        {% set KUBE_APISERVER_ADDR, KUBE_APISERVER_PORT = hostvars[groups['master'][0]].inventory_hostname, 6443 %}
-      {% else %}
-        {% if ha.type == "slb" %}
-          {% set KUBE_APISERVER_ADDR, KUBE_APISERVER_PORT = ha.vip, 8443 %}
-        {% else %}
-          {% set KUBE_APISERVER_ADDR, KUBE_APISERVER_PORT = ha.vip, 6443 %}
-        {% endif %}
-      {% endif %}
-    {% endif %}
-
-    /usr/local/bin/kubectl config set-cluster kubernetes \
-      --embed-certs=true \
-      --certificate-authority=/etc/kubernetes/pki/ca.crt \
-      --server=https://{{ KUBE_APISERVER_ADDR }}:{{ KUBE_APISERVER_PORT }} \
-      --kubeconfig=/etc/kubernetes/kube-proxy.kubeconfig
-
-    /usr/local/bin/kubectl config set-credentials kube-proxy \
-      --embed-certs=true \
-      --client-certificate=/etc/kubernetes/pki/kube-proxy.crt \
-      --client-key=/etc/kubernetes/pki/kube-proxy.key \
-      --kubeconfig=/etc/kubernetes/kube-proxy.kubeconfig
-
-    /usr/local/bin/kubectl config set-context kubernetes \
-      --cluster=kubernetes \
-      --user=kube-proxy \
-      --kubeconfig=/etc/kubernetes/kube-proxy.kubeconfig
-
-    /usr/local/bin/kubectl config use-context kubernetes --kubeconfig=/etc/kubernetes/kube-proxy.kubeconfig
-  with_items:
-    - {
-        KUBE_USER: "kube-proxy",
-        KUBE_CERT: "kube-proxy",
-        KUBE_CONFIG: "kube-proxy.kubeconfig",
-      }
-
-- name: Change file permissions
-  file:
-    path: /etc/kubernetes/kube-proxy.kubeconfig
-    mode: "0644"
+  template:
+    src: kube-proxy.kubeconfig.j2
+    dest: /etc/kubernetes/kube-proxy.kubeconfig
+    mode: 0600
 
 - name: Install config file
   template:
     src: kube-proxy.yaml.j2
     dest: /etc/kubernetes/kube-proxy.yaml
-  register: kube_proxy_conf
 
 - name: Install systemd file
   template:
     src: kube-proxy.service.j2
     dest: /etc/systemd/system/kube-proxy.service
-  register: kube_proxy_systemd
 
 - name: Start the service
   systemd:
@@ -157,7 +95,6 @@
     enabled: yes
     daemon_reload: yes
   register: kube_proxy_service
-  when: kube_proxy_pkg.changed or kube_proxy_systemd.changed
 
 - name: Health check
   uri:
@@ -167,4 +104,3 @@
   until: this.status == 200
   retries: 120
   delay: 1
-  when: kube_proxy_service.changed

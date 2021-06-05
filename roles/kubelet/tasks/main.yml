@@ -52,28 +52,6 @@
         mode: 644,
       }
 
-# - name: Check kubelet certificate expired(30 days)
-#   community.crypto.openssl_certificate:
-#     path: "/etc/kubernetes/pki/kubelet.crt"
-#     provider: assertonly
-#     valid_in: "2592000"
-#   ignore_errors: yes
-#   register: kubelet_certificate_expired
-
-# - name: Create kubelet certificate
-#   shell: |
-#     {% set hostname_override = ansible_hostname %}
-#     {% if nodename is defined %}
-#       {%- set hostname_override = nodename %}
-#     {% endif %}
-#     openssl genrsa -out kubelet.key 2048
-#     openssl req -new -key kubelet.key -subj "/CN=system:node:{{ hostname_override | lower }}/O=system:nodes" -out kubelet.csr
-#     openssl x509 -req -in kubelet.csr -CA ca.crt -CAkey ca.key -CAcreateserial -extensions v3_req_client -extfile openssl.cnf -out kubelet.crt -days {{ kubernetes.ssl.days | default(3652) }}
-#   args:
-#     chdir: "/etc/kubernetes/pki"
-#     executable: /bin/bash
-#   register: kubelet_certificate
-#   when: kubelet_certificate_expired.failed
 - name: Generate kubelet private key
   community.crypto.openssl_privatekey:
     path: /etc/kubernetes/pki/kubelet.key
@@ -112,47 +90,15 @@
     mode: 0644
 
 - name: Create kubeconfig
-  shell: |
-    {% set KUBE_APISERVER_ADDR, KUBE_APISERVER_PORT = ansible_default_ipv4.address, 6443 %}
-    {% if inventory_hostname in groups['master'] %}
-      {% set KUBE_APISERVER_ADDR, KUBE_APISERVER_PORT = ansible_default_ipv4.address, 6443 %}
-    {% else %}
-      {% if ha.type == "none" %}
-        {% set KUBE_APISERVER_ADDR, KUBE_APISERVER_PORT = hostvars[groups['master'][0]].inventory_hostname, 6443 %}
-      {% else %}
-        {% if ha.type == "slb" %}
-          {% set KUBE_APISERVER_ADDR, KUBE_APISERVER_PORT = ha.vip, 8443 %}
-        {% else %}
-          {% set KUBE_APISERVER_ADDR, KUBE_APISERVER_PORT = ha.vip, 6443 %}
-        {% endif %}
-      {% endif %}
-    {% endif %}
-
-    /usr/local/bin/kubectl config set-cluster kubernetes \
-      --embed-certs=true \
-      --certificate-authority=/etc/kubernetes/pki/ca.crt \
-      --server=https://{{ KUBE_APISERVER_ADDR }}:{{ KUBE_APISERVER_PORT }} \
-      --kubeconfig=/etc/kubernetes/kubelet.kubeconfig
-
-    /usr/local/bin/kubectl config set-credentials system:node:{{ ansible_hostname | lower }} \
-      --embed-certs=true \
-      --client-certificate=/etc/kubernetes/pki/kubelet.crt \
-      --client-key=/etc/kubernetes/pki/kubelet.key \
-      --kubeconfig=/etc/kubernetes/kubelet.kubeconfig
-
-    /usr/local/bin/kubectl config set-context system:node:{{ ansible_hostname | lower }}@kubernetes \
-      --cluster=kubernetes \
-      --user=system:node:{{ ansible_hostname | lower }} \
-      --kubeconfig=/etc/kubernetes/kubelet.kubeconfig
-
-    /usr/local/bin/kubectl config use-context system:node:{{ ansible_hostname | lower }}@kubernetes --kubeconfig=/etc/kubernetes/kubelet.kubeconfig
-  register: kubelet_kubeconfig
+  template:
+    src: kubelet.kubeconfig.j2
+    dest: /etc/kubernetes/kubelet.kubeconfig
+    mode: 0600
 
 - name: Install systemd file
   template:
     src: kubelet.service.j2
     dest: /etc/systemd/system/kubelet.service
-  register: kubelet_systemd
 
 - name: Start the service
   systemd:
@@ -161,7 +107,6 @@
     enabled: yes
     daemon_reload: yes
   register: kubelet_service
-  when: kubelet_pkg.changed or kubelet_systemd.changed
 
 - name: Health check
   uri:
@@ -174,7 +119,6 @@
     - this.status == 200
   retries: 120
   delay: 1
-  when: kubelet_service.changed
 
 - name: Waiting node on-line
   shell: /usr/local/bin/kubectl get node {% if nodename is defined %}{{ nodename | lower }}{% else %}{{ hostvars[inventory_hostname].ansible_hostname | lower }}{% endif %}
@@ -183,7 +127,6 @@
   retries: 15
   delay: 5
   changed_when: false
-  when: kubelet_service.changed
 
 - name: Install Check command
   template:
