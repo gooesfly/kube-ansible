@@ -153,6 +153,7 @@
   copy:
     src: /etc/kubernetes/admin.kubeconfig
     dest: ~/.kube/config
+    mode: "0600"
     remote_src: yes
   when: admin_kubeconfig.changed
 
