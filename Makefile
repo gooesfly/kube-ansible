@@ -7,7 +7,7 @@ DOWNLOAD_WAY := official
 # binary version
 KUBE_VERSION := 1.21.1
 ETCD_VERSION := 3.4.16
-CNI_VERSION := 0.8.5
+CNI_VERSION := 0.9.1
 
 # container runtime. containerd or docker
 RUNTIME := docker
@@ -88,14 +88,14 @@ uninstall:
 version: 
 	@command -v jq > /dev/null 2>&1 || ( echo -e "\033[32mPlease install jq\033[0m" &&  exit 1)
 	@echo "etcd" > .etcd
-	@curl -s `curl -s https://api.github.com/repos/coreos/etcd/releases | jq -r .url` | jq -r '.[].name' | grep -Ev 'rc|beta|alpha' | sed 's/v//g' | head -n 15 | sort -r >> .etcd
+	@curl -s `curl -s https://api.github.com/repos/coreos/etcd/releases | jq -r .url` | jq -r '.[].name' | grep -Ev 'rc|beta|alpha' | sed 's/v//g' | head -n 15 | sort -r -V >> .etcd
 	@echo "docker" > .docker
-	@curl -s https://api.github.com/repos/moby/moby/releases | jq -r '.[].name' | grep -Ev 'rc|beta|alpha|-ce' | sed 's/v//g' | head -n 15 | sort -r >> .docker
+	@curl -s https://api.github.com/repos/moby/moby/releases | jq -r '.[].name' | grep -Ev 'rc|beta|alpha|-ce' | sed 's/v//g' | head -n 15 | sort -r -V >> .docker
 	@echo "kubernetes" > .kubernetes
-	@curl -s https://api.github.com/repos/kubernetes/kubernetes/releases | jq -r '.[].name' | grep -Ev 'rc|beta|alpha' | sed 's/v//g' | sed 's/Kubernetes //g' | head -n 15 | sort -r >> .kubernetes
+	@curl -s https://api.github.com/repos/kubernetes/kubernetes/releases | jq -r '.[].name' | grep -Ev 'rc|beta|alpha' | sed 's/v//g' | sed 's/Kubernetes //g' | head -n 15 | sort -r -V >> .kubernetes
 	@echo "containerd" > .containerd
-	@curl -s https://api.github.com/repos/containerd/containerd/releases | jq -r '.[].name' | grep -Ev 'rc|beta|alpha' | sed 's/containerd //g' | head -n 15 | sort -r >> .containerd
+	@curl -s https://api.github.com/repos/containerd/containerd/releases | jq -r '.[].name' | grep -Ev 'rc|beta|alpha' | sed 's/containerd //g' | head -n 15 | sort -r -V >> .containerd
 	@echo "crictl" > .crictl
-	@curl -s https://api.github.com/repos/kubernetes-sigs/cri-tools/releases | jq -r '.[].name' | grep -Ev 'rc|beta|alpha' | sed 's/cri-tools v//g'| head -n 15 | sort -r >> .crictl
+	@curl -s https://api.github.com/repos/kubernetes-sigs/cri-tools/releases | jq -r '.[].name' | grep -Ev 'rc|beta|alpha' | sed 's/cri-tools v//g'| head -n 15 | sort -r -V >> .crictl
 	@paste -d '|' .etcd .docker .kubernetes .containerd .crictl | column -t -s '|'
 	@rm -rf .etcd .docker .kubernetes .containerd .crictl
