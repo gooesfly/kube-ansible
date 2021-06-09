@@ -184,12 +184,12 @@ apps:
   location: /etc/kubernetes/apps
   files:
     - {
-        url: https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml,
-        name: metrics.yaml,
-      }
-    - {
         url: https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml,
         name: flannel.yaml,
+      }
+    - {
+        url: https://raw.githubusercontent.com/buxiaomo/kubernetes-sigs/main/metrics.yaml,
+        name: metrics.yaml,
       }
     # - {
     #     url: https://raw.githubusercontent.com/buxiaomo/kubernetes-manifests/master/ingress/traefik-2.0.yaml,

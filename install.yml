@@ -65,18 +65,18 @@
   tags:
     - cleanup
 
-- name: Deployment kubernetes add-on
-  hosts: master
-  become: yes
-  roles:
-    - addons/coredns
-    - addons/flannel
-    - addons/canal
-    - addons/calico
-    - addons/cilium
-    - addons/metrics
-  tags:
-    - addons
+# - name: Deployment kubernetes add-on
+#   hosts: master
+#   become: yes
+#   roles:
+#     - addons/coredns
+#     - addons/flannel
+#     - addons/canal
+#     - addons/calico
+#     - addons/cilium
+#     - addons/metrics
+#   tags:
+#     - addons
 
 - name: Deployment kubernetes apps
   hosts: master
