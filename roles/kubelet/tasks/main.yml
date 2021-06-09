@@ -73,12 +73,10 @@
       - keyEncipherment
     extended_key_usage:
       - clientAuth
-  #   subject_alt_name: "{{ item.value | list }}"
-  # with_dict: 
-  #   ips: 
-  #     - "DNS:{{ ansible_hostname | lower }}"
-  #     - "IP:{{ ansible_default_ipv4.address }}"
-  #     - "IP:127.0.0.1"
+    # subject_alt_name: 
+    #   - "DNS:{{ ansible_hostname | lower }}"
+    #   - "IP:{{ ansible_default_ipv4.address }}"
+    #   - "IP:127.0.0.1"
 
 - name: Generate kubelet certificate
   community.crypto.x509_certificate:
