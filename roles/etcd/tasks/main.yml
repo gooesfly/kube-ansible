@@ -251,6 +251,12 @@
     dest: /usr/local/bin/etcd-backup.sh
     mode: 755
 
+- name: Install Etcdctl command alias
+  template:
+    src: etcd.sh.j2
+    dest: /etc/profile.d/etcd.sh
+    mode: 755
+
 - name: Create backup kubernetes etcd data in cron
   cron:
     name: "backup kubernetes etcd data by kube-ansible"
