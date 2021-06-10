@@ -17,6 +17,13 @@
     {% else %}
       /usr/local/bin/kubectl label node {{ hostvars[inventory_hostname].ansible_hostname | lower }} {% if inventory_hostname in groups['master'] %} node-role.kubernetes.io/master=""{% else %} node-role.kubernetes.io/worker=""{% endif %} --overwrite
     {% endif %}
+    {% if inventory_hostname in groups['master'] %}
+      {% if nodename is defined %}
+        /usr/local/bin/kubectl label node {{ nodename | lower }} node-role.kubernetes.io/control-plane="" --overwrite
+      {% else %}
+        /usr/local/bin/kubectl label node {{ hostvars[inventory_hostname].ansible_hostname | lower }} node-role.kubernetes.io/control-plane="" --overwrite
+      {% endif %}
+    {% endif %}
 
 - name: Clean kubeconfig for kube-minion nodes
   file:
