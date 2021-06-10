@@ -303,3 +303,4 @@
   ansible.builtin.command:
     cmd: /usr/local/bin/kubectl apply -f /tmp/auto-approve-renewals-for-nodes.yaml
   run_once: true
+  ignore_errors: True
