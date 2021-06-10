@@ -7,7 +7,7 @@
   file:
     name: /opt/cni/bin
     state: directory
-    mode: "0755"
+    mode: 0755
 
 - name: Download binary
   get_url:
@@ -28,3 +28,5 @@
     src: "/usr/local/src/cni-plugins-linux-amd64-v{{ CNI_VERSION }}.tgz"
     dest: /opt/cni/bin
     remote_src: yes
+    owner: root
+    group: root
