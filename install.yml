@@ -6,7 +6,6 @@
     - common
     - chrony
     - kernel
-    - cni
   tags:
     - common
 
@@ -28,11 +27,17 @@
   tags:
     - etcd
 
+- name: Initialization kubernetes dependence
+  hosts: kubernetes
+  become: yes
+  roles:
+    - cni
+    - ipvsadm
+
 - name: Deployment kubernetes master
   hosts: master
   become: yes
   roles:
-    - ipvsadm
     - haproxy
     - keepalived
     - "{% if RUNTIME == 'docker' %}docker{% else %}containerd{% endif %}"
@@ -49,7 +54,6 @@
   hosts: worker
   become: yes
   roles:
-    - ipvsadm
     - "{% if RUNTIME == 'docker' %}docker{% else %}containerd{% endif %}"
     - kubectl
     - kubelet

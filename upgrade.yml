@@ -24,19 +24,17 @@
   tags:
     - etcd
 
-- name: Init all kubernetes node
+- name: Initialization kubernetes dependence
   hosts: kubernetes
   become: yes
   roles:
-    - ipvsadm
-  tags:
+    - cni
     - ipvsadm
 
 - name: Deployment kube master
   serial: 1
   hosts: master
   roles:
-    - cni-plugins
     - "{% if RUNTIME == 'docker' %}docker{% else %}containerd{% endif %}"
     - kubectl
     - kube-apiserver

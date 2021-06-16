@@ -5,6 +5,7 @@
   roles:
     - common
     - chrony
+    - kernel
   tags:
     - common
 
@@ -20,6 +21,7 @@
   hosts: worker
   become: yes
   roles:
+    - cni
     - ipvsadm
     - "{% if RUNTIME == 'docker' %}docker{% else %}containerd{% endif %}"
     - kubectl
