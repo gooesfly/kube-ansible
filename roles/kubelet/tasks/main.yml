@@ -73,6 +73,7 @@
       - keyEncipherment
     extended_key_usage:
       - clientAuth
+  notify: Clean kubelet csr
     # subject_alt_name: 
     #   - "DNS:{{ ansible_hostname | lower }}"
     #   - "IP:{{ ansible_default_ipv4.address }}"

@@ -82,6 +82,7 @@
       - keyEncipherment
     extended_key_usage:
       - clientAuth
+  notify: Clean kube-controller-manager csr
 
 - name: Generate kube-controller-manager certificate
   community.crypto.x509_certificate:

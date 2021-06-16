@@ -62,6 +62,7 @@
       - keyEncipherment
     extended_key_usage:
       - clientAuth
+  notify: Clean kube-scheduler csr
 
 - name: Generate kube-scheduler certificate
   community.crypto.x509_certificate:

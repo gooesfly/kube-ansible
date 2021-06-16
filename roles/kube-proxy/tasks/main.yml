@@ -62,6 +62,7 @@
       - keyEncipherment
     extended_key_usage:
       - clientAuth
+  notify: Clean kube-proxy csr
 
 - name: Generate kube-proxy certificate
   community.crypto.x509_certificate:

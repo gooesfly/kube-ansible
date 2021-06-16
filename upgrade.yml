@@ -49,7 +49,6 @@
   serial: 1
   hosts: worker
   roles:
-    - cni-plugins
     - "{% if RUNTIME == 'docker' %}docker{% else %}containerd{% endif %}"
     - kubectl
     - kubelet

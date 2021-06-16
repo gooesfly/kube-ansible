@@ -1,2 +1,6 @@
 ---
 # handlers file for kubelet
+- name: Clean kubelet csr
+  ansible.builtin.file:
+    path: /etc/kubernetes/pki/kubelet.csr
+    state: absent

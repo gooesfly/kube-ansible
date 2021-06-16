@@ -1,2 +1,6 @@
 ---
 # handlers file for kube-proxy
+- name: Clean kube-proxy csr
+  ansible.builtin.file:
+    path: /etc/kubernetes/pki/kube-proxy.csr
+    state: absent
