@@ -105,8 +105,6 @@
       - "IP:{{ networking.SvcIP }}"
       - "IP:{{ ha.vip }}"
       - "IP:{{ ansible_default_ipv4.address }}"
-  # with_dict:
-  #   ips: "{% set IPS = [] %}{% if ha.vip is defined %}{{ IPS.append('IP:' + ha.vip) }}{{ IPS.append('IP:' + networking.SvcIP) }}{% endif %}{% if groups['etcd'] is not defined %}{% for host in groups['master'] %}{{ IPS.append('IP:' + host) }}{% endfor %}{% else %}{% for host in groups['etcd'] %}{{ IPS.append('IP:' + host)}}{% endfor %}{% endif %}{{ IPS.append('DNS:localhost')}}{{ IPS.append('DNS:kubernetes')}}{{ IPS.append('DNS:kubernetes.default')}}{{ IPS }}"
 
 - name: Generate kube-apiserver certificate
   community.crypto.x509_certificate:
@@ -116,6 +114,7 @@
     ownca_privatekey_path: /etc/kubernetes/pki/ca.key
     provider: ownca
     mode: 0644
+  notify: Clean kube-apiserver csr
 
 # front-proxy-client
 - name: Generate front-proxy-client private key
@@ -147,6 +146,7 @@
     ownca_privatekey_path: /etc/kubernetes/pki/front-proxy-ca.key
     provider: ownca
     mode: 0644
+  notify: Clean front-proxy-client csr
 
 # apiserver kubelet client
 - name: Generate apiserver-kubelet-client private key
@@ -179,6 +179,7 @@
     ownca_privatekey_path: /etc/kubernetes/pki/ca.key
     provider: ownca
     mode: 0644
+  notify: Clean apiserver-kubelet-client csr
 
 - name: Generate apiserver-etcd-client private key
   community.crypto.openssl_privatekey:
@@ -211,6 +212,7 @@
     ownca_privatekey_path: /etc/kubernetes/pki/etcd/ca.key
     provider: ownca
     mode: 0644
+  notify: Clean apiserver-etcd-client csr
 
 - name: Install encryption config
   template:
