@@ -1,2 +1,6 @@
 ---
 # handlers file for kubectl
+- name: Clean kubectl csr
+  ansible.builtin.file:
+    path: /etc/kubernetes/pki/admin.csr
+    state: absent

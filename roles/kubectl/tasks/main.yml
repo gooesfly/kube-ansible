@@ -73,6 +73,7 @@
     ownca_privatekey_path: /etc/kubernetes/pki/ca.key
     provider: ownca
     mode: 0644
+  notify: Clean kubectl csr
 
 - name: Create admin kubeconfig
   template:
