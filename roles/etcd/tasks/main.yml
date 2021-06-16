@@ -110,6 +110,7 @@
       - "IP:127.0.0.1"
       - "IP:{{ ansible_default_ipv4.address }}"
       - "IP:0:0:0:0:0:0:0:1"
+  notify: Clean etcd server csr
 
 - name: Generate etcd server certificate
   community.crypto.x509_certificate:
@@ -154,6 +155,7 @@
       - "IP:127.0.0.1"
       - "IP:{{ ansible_default_ipv4.address }}"
       - "IP:0:0:0:0:0:0:0:1"
+  notify: Clean etcd peer csr
 
 - name: Generate etcd peers certificate
   community.crypto.x509_certificate:
@@ -192,6 +194,7 @@
       - keyEncipherment
     extended_key_usage:
       - clientAuth
+  notify: Clean etcd healthcheck csr
 
 - name: Generate etcd healthcheck certificate
   community.crypto.x509_certificate:

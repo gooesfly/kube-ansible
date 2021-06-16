@@ -1,2 +1,16 @@
 ---
 # handlers file for etcd
+- name: Clean etcd server csr
+  ansible.builtin.file:
+    path: /etc/kubernetes/pki/etcd/server.csr
+    state: absent
+
+- name: Clean etcd peer csr
+  ansible.builtin.file:
+    path: /etc/kubernetes/pki/etcd/peer.csr
+    state: absent
+
+- name: Clean etcd healthcheck csr
+  ansible.builtin.file:
+    path: /etc/kubernetes/pki/etcd/healthcheck-client.csr
+    state: absent
