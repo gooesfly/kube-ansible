@@ -105,7 +105,8 @@
       - "IP:{{ networking.SvcIP }}"
       - "IP:{{ ha.vip }}"
       - "IP:{{ ansible_default_ipv4.address }}"
-
+  notify: Clean kube-apiserver csr
+ 
 - name: Generate kube-apiserver certificate
   community.crypto.x509_certificate:
     path: /etc/kubernetes/pki/apiserver.crt
@@ -114,7 +115,6 @@
     ownca_privatekey_path: /etc/kubernetes/pki/ca.key
     provider: ownca
     mode: 0644
-  notify: Clean kube-apiserver csr
 
 # front-proxy-client
 - name: Generate front-proxy-client private key
@@ -137,6 +137,7 @@
       - keyEncipherment
     extended_key_usage:
       - clientAuth
+  notify: Clean front-proxy-client csr
 
 - name: Generate front-proxy-client crt
   community.crypto.x509_certificate:
@@ -146,7 +147,6 @@
     ownca_privatekey_path: /etc/kubernetes/pki/front-proxy-ca.key
     provider: ownca
     mode: 0644
-  notify: Clean front-proxy-client csr
 
 # apiserver kubelet client
 - name: Generate apiserver-kubelet-client private key
@@ -170,6 +170,7 @@
       - keyEncipherment
     extended_key_usage:
       - clientAuth
+  notify: Clean apiserver-kubelet-client csr
 
 - name: Generate apiserver-kubelet-client certificate
   community.crypto.x509_certificate:
@@ -179,7 +180,6 @@
     ownca_privatekey_path: /etc/kubernetes/pki/ca.key
     provider: ownca
     mode: 0644
-  notify: Clean apiserver-kubelet-client csr
 
 - name: Generate apiserver-etcd-client private key
   community.crypto.openssl_privatekey:
@@ -203,6 +203,7 @@
     extended_key_usage:
       - serverAuth
       - clientAuth
+  notify: Clean apiserver-etcd-client csr
 
 - name: Generate apiserver-etcd-client certificate
   community.crypto.x509_certificate:
@@ -212,7 +213,6 @@
     ownca_privatekey_path: /etc/kubernetes/pki/etcd/ca.key
     provider: ownca
     mode: 0644
-  notify: Clean apiserver-etcd-client csr
 
 - name: Install encryption config
   template:
