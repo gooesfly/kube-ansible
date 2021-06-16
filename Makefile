@@ -85,6 +85,9 @@ uninstall:
 	@echo -e "\033[32mUninstall kubernetes...\033[0m"
 	@ansible-playbook -i ./inventory/hosts uninstall.yml
 
+fix:
+	@ansible-playbook -i ./inventory/hosts fix-python3.yml
+
 version: 
 	@command -v jq > /dev/null 2>&1 || ( echo -e "\033[32mPlease install jq\033[0m" &&  exit 1)
 	@echo "etcd" > .etcd
