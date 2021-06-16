@@ -53,7 +53,7 @@ do
   echo -e "\033[32m-----------------------------Node: ${node}-----------------------------\033[0m"
   for podip in $(kubectl get pod -n test01 --selector=app=nginx01 -o jsonpath='{.items[*].status.podIP}');
   do
-    ssh ${node} "ping -c 1 ${podip}"
+    ssh ${node} "ping -w 3 -c 1 ${podip}"
   done
   echo
 done

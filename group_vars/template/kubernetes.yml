@@ -184,10 +184,6 @@ apps:
   location: /etc/kubernetes/apps
   files:
     - {
-        url: https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml,
-        name: flannel.yaml,
-      }
-    - {
         url: https://raw.githubusercontent.com/buxiaomo/kubernetes-sigs/main/metrics.yaml,
         name: metrics.yaml,
       }
@@ -195,6 +191,14 @@ apps:
         url: https://raw.githubusercontent.com/buxiaomo/kubernetes-sigs/main/coredns.yaml,
         name: coredns.yaml,
       }
+    # - {
+    #     url: https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml,
+    #     name: flannel.yaml,
+    #   }
+    # - {
+    #     url: https://raw.githubusercontent.com/buxiaomo/kubernetes-sigs/main/cilium.yaml,
+    #     name: cilium.yaml,
+    #   }
     # - {
     #     url: https://raw.githubusercontent.com/buxiaomo/kubernetes-manifests/master/ingress/traefik-2.0.yaml,
     #     name: traefik.yaml,
