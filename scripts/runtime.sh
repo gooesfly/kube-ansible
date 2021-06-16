@@ -15,5 +15,5 @@ case ${PKG} in
     exit 1
     ;;
 esac
-pip3 install --upgrade pip
+pip3 install --upgrade -i https://mirrors.aliyun.com/pypi/simple/ pip
 pip3 install --upgrade -i https://mirrors.aliyun.com/pypi/simple/ "ansible==4.0.0"
