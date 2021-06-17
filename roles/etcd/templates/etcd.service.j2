@@ -11,8 +11,8 @@
 [Unit]
 Description=etcd
 Documentation=https://github.com/coreos/etcd
-Conflicts=etcd.service
-Conflicts=etcd2.service
+After=network-online.target firewalld.service
+Wants=network-online.target
 
 [Service]
 User=etcd
