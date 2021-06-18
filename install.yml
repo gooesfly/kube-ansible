@@ -47,6 +47,7 @@
     - kube-controller-manager
     - kubelet
     - kube-proxy
+    - cleanup
   tags:
     - kube-master
 
@@ -58,29 +59,9 @@
     - kubectl
     - kubelet
     - kube-proxy
+    - cleanup
   tags:
     - kube-worker
-
-- name: Clean up the data
-  hosts: all
-  become: yes
-  roles:
-    - cleanup
-  tags:
-    - cleanup
-
-# - name: Deployment kubernetes add-on
-#   hosts: master
-#   become: yes
-#   roles:
-#     - addons/coredns
-#     - addons/flannel
-#     - addons/canal
-#     - addons/calico
-#     - addons/cilium
-#     - addons/metrics
-#   tags:
-#     - addons
 
 - name: Deployment kubernetes apps
   hosts: master
