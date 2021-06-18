@@ -159,36 +159,6 @@ proxy:
   log:
     level: 1
 
-# addon:
-#   # add-on manifests directory
-#   location: /etc/kubernetes/addon
-#   # choose: none flannel calico canals
-#   #   none: not deployment any network plugin
-#   #   flannel: will deployment flannel plugin (default)
-#   #   calico: will deployment calico plugin
-#   #   canal: will deployment canal plugin
-#   #   cilium: will deployment cilium plugin
-#   network: flannel
-#   metrics: true
-#   # addon images
-#   image:
-#     metrics: k8s.gcr.io/metrics-server-amd64:v0.3.6
-#     coredns: coredns/coredns:1.8.0
-#     flannel: quay.io/coreos/flannel:v0.13.0
-#     canal:
-#       node: calico/node:v3.13.2
-#       flannel: quay.io/coreos/flannel:v0.11.0
-#       cni: calico/cni:v3.13.2
-#       flexvol: calico/pod2daemon-flexvol:v3.13.2
-#     calico:
-#       node: calico/node:v3.13.2
-#       cni: calico/cni:v3.13.2
-#       typha: quay.io/calico/typha:v3.1.7
-#       flexvol: calico/pod2daemon-flexvol:v3.13.2
-#       controllers: calico/kube-controllers:v3.13.2
-#     cilium:
-#       operator: docker.io/cilium/operator-generic:v1.8.1
-
 apps:
   location: /etc/kubernetes/apps
   files:
