@@ -57,7 +57,7 @@ ExecStart=/usr/local/bin/kube-apiserver \
   {{ extraArg }} \
 {% endfor %}
 {% endif %}
-  --v={{ apiServer.log.level | default(2) }}
+  --v={{ apiServer.log.level | default(1) }}
 
 Restart=on-failure
 RestartSec=5

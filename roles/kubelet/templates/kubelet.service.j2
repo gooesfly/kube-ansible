@@ -27,7 +27,7 @@ ExecStart=/usr/local/bin/kubelet \
   {{ extraArg }} \
 {% endfor %}
 {% endif %}
-  --v={{ kubelet.log.level | default(2)}}
+  --v={{ kubelet.log.level | default(1) }}
 
 Restart=on-failure
 RestartSec=5

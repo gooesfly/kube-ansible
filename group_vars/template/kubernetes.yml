@@ -120,7 +120,7 @@ apiServer:
     - "--tls-cipher-suites=TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305,TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305,TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384,TLS_RSA_WITH_AES_256_GCM_SHA384,TLS_RSA_WITH_AES_128_GCM_SHA256"
     - "--feature-gates=TTLAfterFinished=true"
   log:
-    level: 2
+    level: 1
 
 controllerManager:
   bindAddress: "0.0.0.0"
@@ -133,7 +133,7 @@ controllerManager:
     - "--profiling=false"
     - "--feature-gates=TTLAfterFinished=true"
   log:
-    level: 2
+    level: 1
 
 scheduler:
   bindAddress: "0.0.0.0"
@@ -141,7 +141,7 @@ scheduler:
     - "--profiling=false"
     - "--feature-gates=TTLAfterFinished=true"
   log:
-    level: 2
+    level: 1
 
 kubelet:
   bindAddress: "0.0.0.0"
@@ -150,14 +150,14 @@ kubelet:
     - "--tls-cipher-suites=TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305,TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305,TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384,TLS_RSA_WITH_AES_256_GCM_SHA384,TLS_RSA_WITH_AES_128_GCM_SHA256"
     - "--allowed-unsafe-sysctls=net.*"
   log:
-    level: 2
+    level: 1
 
 proxy:
   bindAddress: "0.0.0.0"
   extraArgs:
     - "--mode=ipvs"
   log:
-    level: 2
+    level: 1
 
 # addon:
 #   # add-on manifests directory

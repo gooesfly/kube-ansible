@@ -32,7 +32,7 @@ ExecStart=/usr/local/bin/kube-controller-manager \
   {{ extraArg }} \
 {% endfor %}
 {% endif %}
-  --v={{ controllerManager.log.level | default(2) }}
+  --v={{ controllerManager.log.level | default(1) }}
 
 
 Restart=always
