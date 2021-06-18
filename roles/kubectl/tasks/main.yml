@@ -41,12 +41,14 @@
         dest: "/etc/kubernetes/pki/ca.key",
         mode: 600,
       }
+  notify: Clean ca key
 
 - name: Generate kubectl private key
   community.crypto.openssl_privatekey:
     path: /etc/kubernetes/pki/admin.key
     size: 2048
     mode: 0600
+  notify: Clean admin key
 
 - name: Generate kubectl csr
   community.crypto.openssl_csr:
@@ -64,7 +66,7 @@
     extended_key_usage:
       - serverAuth
       - clientAuth
-  notify: Clean kubectl csr
+  notify: Clean admin csr
 
 - name: Generate kubectl certificate
   community.crypto.x509_certificate:
@@ -74,12 +76,14 @@
     ownca_privatekey_path: /etc/kubernetes/pki/ca.key
     provider: ownca
     mode: 0644
+  notify: Clean admin crt
 
 - name: Create admin kubeconfig
   template:
     src: admin.kubeconfig.j2
     dest: /etc/kubernetes/admin.kubeconfig
     mode: 0600
+  notify: Clean admin kubeconfig
 
 - name: Delete user kube directory
   file:
@@ -91,6 +95,7 @@
     name: ~/.kube
     state: directory
     mode: "0755"
+  notify: Clean .kube
 
 - name: Create User kubeconfig
   copy:
