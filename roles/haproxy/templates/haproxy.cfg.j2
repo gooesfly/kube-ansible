@@ -51,8 +51,10 @@ backend k8s-apiserver
   server {{ hostvars[host].ansible_hostname }} {{ hostvars[host].inventory_hostname }}:6443 check check-ssl verify none
 {% endfor %}
 
+
+{% if loadBalancing.http is defined %}
 frontend k8s-ingress-http
-  bind 0.0.0.0:80
+  bind 0.0.0.0:{{ loadBalancing.http.src }}
   mode tcp
   option tcplog
   tcp-request inspect-delay 5s
@@ -61,16 +63,17 @@ frontend k8s-ingress-http
 backend k8s-ingress-http
   mode tcp
   option tcplog
-  option ssl-hello-chk
   option tcp-check
   balance roundrobin
   default-server inter 10s downinter 5s rise 2 fall 2 slowstart 60s maxconn 250 maxqueue 256 weight 100
-{% for host in groups['master'] %}
-  server {{ hostvars[host].ansible_hostname }} {{ hostvars[host].inventory_hostname }}:30001 check check-ssl verify none
+{% for host in groups['worker'] %}
+  server {{ hostvars[host].ansible_hostname }} {{ hostvars[host].inventory_hostname }}:{{ loadBalancing.http.dest }} check none
 {% endfor %}
+{% endif %}
 
+{% if loadBalancing.https is defined %}
 frontend k8s-ingress-https
-  bind 0.0.0.0:443
+  bind 0.0.0.0:{{ loadBalancing.https.src }}
   mode tcp
   option tcplog
   tcp-request inspect-delay 5s
@@ -83,6 +86,7 @@ backend k8s-ingress-https
   option tcp-check
   balance roundrobin
   default-server inter 10s downinter 5s rise 2 fall 2 slowstart 60s maxconn 250 maxqueue 256 weight 100
-{% for host in groups['master'] %}
-  server {{ hostvars[host].ansible_hostname }} {{ hostvars[host].inventory_hostname }}:30002 check check-ssl verify none
+{% for host in groups['worker'] %}
+  server {{ hostvars[host].ansible_hostname }} {{ hostvars[host].inventory_hostname }}:{{ loadBalancing.https.dest }} check none
 {% endfor %}
+{% endif %}
