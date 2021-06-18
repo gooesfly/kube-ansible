@@ -46,14 +46,14 @@ etcd:
 #   vip: 172.16.6.10
 #   mask: 16
 
-# LoadBalancing is 4 layer forwarding to ingress by haproxy, only used in slb
-loadBalancing:
-  http:
-    src: 80
-    dest: 30001
-  https:
-    src: 443
-    dest: 30002
+# # LoadBalancing is 4 layer forwarding to ingress by haproxy, only used in slb
+# loadBalancing:
+#   http:
+#     src: 80
+#     dest: 30001
+#   https:
+#     src: 443
+#     dest: 30002
 
 networking:
   dnsDomain: cluster.local

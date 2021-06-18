@@ -67,7 +67,7 @@ backend k8s-ingress-http
   balance roundrobin
   default-server inter 10s downinter 5s rise 2 fall 2 slowstart 60s maxconn 250 maxqueue 256 weight 100
 {% for host in groups['worker'] %}
-  server {{ hostvars[host].ansible_hostname }} {{ hostvars[host].inventory_hostname }}:{{ loadBalancing.http.dest }} check none
+  server {{ hostvars[host].ansible_hostname }} {{ hostvars[host].inventory_hostname }}:{{ loadBalancing.http.dest }} check
 {% endfor %}
 {% endif %}
 
@@ -87,6 +87,6 @@ backend k8s-ingress-https
   balance roundrobin
   default-server inter 10s downinter 5s rise 2 fall 2 slowstart 60s maxconn 250 maxqueue 256 weight 100
 {% for host in groups['worker'] %}
-  server {{ hostvars[host].ansible_hostname }} {{ hostvars[host].inventory_hostname }}:{{ loadBalancing.https.dest }} check none
+  server {{ hostvars[host].ansible_hostname }} {{ hostvars[host].inventory_hostname }}:{{ loadBalancing.https.dest }} check check-ssl verify none
 {% endfor %}
 {% endif %}
