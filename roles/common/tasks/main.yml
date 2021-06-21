@@ -84,6 +84,3 @@
     value: "{{ item.value }}"
     dest: /etc/security/99-kubernetes.conf
   with_items: "{{ limits }}"
-  # copy:
-  #   src: limits.conf
-  #   dest: /etc/security/limits.d/99-kubernetes.conf
