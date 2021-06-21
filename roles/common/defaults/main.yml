@@ -44,3 +44,9 @@ sysctl:
     kernel.pid_max: 65535
     net.ipv4.tcp_congestion_control: bbr
     net.core.default_qdisc: fq
+
+limits:
+  - { domain: "*", limit_type: "soft", limit_item: "nproc", value: 655360 }
+  - { domain: "*", limit_type: "hard", limit_item: "nproc", value: 655360 }
+  - { domain: "*", limit_type: "soft", limit_item: "nofile", value: 655360 }
+  - { domain: "*", limit_type: "hard", limit_item: "nofile", value: 655360 }

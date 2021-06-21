@@ -77,6 +77,13 @@
   when: ansible_swaptotal_mb > 0
 
 - name: Settings limits
-  copy:
-    src: limits.conf
-    dest: /etc/security/limits.d/99-kubernetes.conf
+  community.general.pam_limits:
+    domain: "{{ item.domain }}"
+    limit_type: "{{ item.limit_type }}"
+    limit_item: "{{ item.limit_item }}"
+    value: "{{ item.value }}"
+    dest: /etc/security/99-kubernetes.conf
+  with_items: "{{ limits }}"
+  # copy:
+  #   src: limits.conf
+  #   dest: /etc/security/limits.d/99-kubernetes.conf
