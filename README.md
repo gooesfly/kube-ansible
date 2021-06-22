@@ -29,6 +29,7 @@ All node please install python3.
 * [x] 1.18.x
 * [x] 1.19.x
 * [x] 1.20.x
+* [x] 1.21.x
 
 ## Runtime Support
 
