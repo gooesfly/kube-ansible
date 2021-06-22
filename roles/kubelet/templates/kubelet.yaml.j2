@@ -63,7 +63,11 @@ podPidsLimit: -1
 port: 10250
 registryBurst: 10
 registryPullQPS: 5
+{% if 'systemd-resolved.service' in ansible_facts.services %}
 resolvConf: /etc/resolv.conf
+{% else%}
+resolvConf: /run/systemd/resolve/resolv.conf
+{% endif %}
 rotateCertificates: true
 runtimeRequestTimeout: 2m0s
 serializeImagePulls: true

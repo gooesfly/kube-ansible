@@ -2,6 +2,9 @@
 - name: Set OS dependent variables
   include_vars: "{{ DOWNLOAD_WAY }}.yml"
 
+- name: Populate service facts
+  ansible.builtin.service_facts:
+
 - name: Download binary
   get_url:
     url: "{{ download_url }}"
