@@ -1,4 +1,4 @@
-# docker parameter configuration
+# docker config
 docker:
   datadir: /var/lib/docker
   # auto create dockr primary partition
@@ -28,6 +28,7 @@ docker:
         Hard: 655360
         Soft: 655360
 
+# etcd config
 etcd:
   dataDir: /var/lib/etcd
   backupDir: /tmp
@@ -38,6 +39,7 @@ etcd:
     - "--enable-v2=false"
     - "--snapshot-count=10000"
 
+# ha config
 # none not use lb for apiserver
 # slb is software load balancing, will install harpoxy and keepalived on master node
 # clb is cloud load balancing, will use cloud load balancing
@@ -46,7 +48,7 @@ etcd:
 #   vip: 172.16.6.10
 #   mask: 16
 
-# # LoadBalancing is 4 layer forwarding to ingress by haproxy, only used in slb
+# loadBalancing is 4 layer forwarding to ingress by haproxy, only used in slb
 # loadBalancing:
 #   http:
 #     src: 80
@@ -55,6 +57,7 @@ etcd:
 #     src: 443
 #     dest: 30002
 
+# kubernetes network config
 networking:
   dnsDomain: cluster.local
   serviceSubnet: 10.96.0.0/12
@@ -62,7 +65,7 @@ networking:
   SvcIP: 10.96.0.1
   DNSIP: 10.96.0.2
 
-# Cloud Provider Config
+# kubernetes cloud provider config
 # cloudProvider:
 #   provider: azure
 #   config: |
@@ -91,6 +94,7 @@ networking:
 #       "useInstanceMetadata": true
 #     }
 
+# kube-apiserver config
 apiServer:
   bindAddress: "0.0.0.0"
   encryption: Tsg7sO4Ki/W3s9bfwGfTi8ECcp+/3uDedQMq6rLQTIY= # head -c 32 /dev/urandom | base64
@@ -122,6 +126,7 @@ apiServer:
   log:
     level: 1
 
+# kube-controller-manager config
 controllerManager:
   bindAddress: "0.0.0.0"
   extraArgs:
@@ -135,6 +140,7 @@ controllerManager:
   log:
     level: 1
 
+# kube-scheduler config
 scheduler:
   bindAddress: "0.0.0.0"
   extraArgs:
@@ -143,6 +149,7 @@ scheduler:
   log:
     level: 1
 
+# kubelet config
 kubelet:
   bindAddress: "0.0.0.0"
   extraArgs:
@@ -152,6 +159,7 @@ kubelet:
   log:
     level: 1
 
+# kube-proxy config
 proxy:
   bindAddress: "0.0.0.0"
   extraArgs:
