@@ -35,6 +35,7 @@
     csr_path: /etc/ssl/kubernetes/etcd/ca.csr
     privatekey_path: /etc/ssl/kubernetes/etcd/ca.key
     provider: selfsigned
+    selfsigned_not_after: "+730d"
     mode: 0644
   run_once: true
   delegate_to: localhost
