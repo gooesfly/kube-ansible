@@ -37,6 +37,7 @@
     privatekey_path: /etc/ssl/kubernetes/ca.key
     mode: 0644
     provider: selfsigned
+    valid_at: "+3d"
   run_once: true
   delegate_to: localhost
 
@@ -71,6 +72,7 @@
     privatekey_path: /etc/ssl/kubernetes/front-proxy-ca.key
     mode: 0644
     provider: selfsigned
+    valid_at: "+3d"
   run_once: true
   delegate_to: localhost
 

@@ -119,6 +119,7 @@
     ownca_path: /etc/kubernetes/pki/etcd/ca.crt
     ownca_privatekey_path: /etc/kubernetes/pki/etcd/ca.key
     provider: ownca
+    ownca_not_after: "+365d"
     mode: 0644
     owner: etcd
     group: root
@@ -164,6 +165,7 @@
     ownca_path: /etc/kubernetes/pki/etcd/ca.crt
     ownca_privatekey_path: /etc/kubernetes/pki/etcd/ca.key
     provider: ownca
+    ownca_not_after: "+365d"
     mode: 0644
     owner: etcd
     group: root
@@ -203,6 +205,7 @@
     ownca_path: /etc/kubernetes/pki/etcd/ca.crt
     ownca_privatekey_path: /etc/kubernetes/pki/etcd/ca.key
     provider: ownca
+    ownca_not_after: "+365d"
     mode: 0644
     owner: etcd
     group: root

@@ -114,6 +114,7 @@
     ownca_path: /etc/kubernetes/pki/ca.crt
     ownca_privatekey_path: /etc/kubernetes/pki/ca.key
     provider: ownca
+    ownca_not_after: "+365d"
     mode: 0644
 
 # front-proxy-client
@@ -146,6 +147,7 @@
     ownca_path: /etc/kubernetes/pki/front-proxy-ca.crt
     ownca_privatekey_path: /etc/kubernetes/pki/front-proxy-ca.key
     provider: ownca
+    ownca_not_after: "+365d"
     mode: 0644
 
 # apiserver kubelet client
@@ -179,6 +181,7 @@
     ownca_path: /etc/kubernetes/pki/ca.crt
     ownca_privatekey_path: /etc/kubernetes/pki/ca.key
     provider: ownca
+    ownca_not_after: "+365d"
     mode: 0644
 
 - name: Generate apiserver-etcd-client private key
@@ -212,6 +215,7 @@
     ownca_path: /etc/kubernetes/pki/etcd/ca.crt
     ownca_privatekey_path: /etc/kubernetes/pki/etcd/ca.key
     provider: ownca
+    ownca_not_after: "+365d"
     mode: 0644
 
 - name: Install encryption config

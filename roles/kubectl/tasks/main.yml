@@ -75,6 +75,7 @@
     ownca_path: /etc/kubernetes/pki/ca.crt
     ownca_privatekey_path: /etc/kubernetes/pki/ca.key
     provider: ownca
+    ownca_not_after: "+365d"
     mode: 0644
   notify: Clean admin crt
 
