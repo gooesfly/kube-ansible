@@ -159,6 +159,7 @@ proxy:
   log:
     level: 1
 
+# app not support all kubernetes version, please confirm apiVersion on manifests.
 apps:
   location: /etc/kubernetes/apps
   files:
