@@ -218,7 +218,7 @@ component attributes of directory format:
 * [metrics-server](https://github.com/kubernetes-sigs/metrics-server)
 * [coredns on k8s](https://github.com/coredns/deployment/blob/master/kubernetes/CoreDNS-k8s_version.md)
 * [certificates](https://kubernetes.io/zh/docs/setup/best-practices/certificates/)
-* [k8s_the_hard_way](https://github.com/pythops/k8s_the_hard_way/blob/master/roles/pki/tasks/admin.yaml)
+* [k8s_the_hard_way](https://github.com/pythops/k8s_the_hard_way)
 
 
 
