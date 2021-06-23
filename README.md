@@ -144,7 +144,7 @@ NEXUS_HTTP_PASSWORD=admin
 
 #### Deploy
 
-[![asciicast](https://asciinema.org/a/325326.svg)](https://asciinema.org/a/325326)
+[![asciicast](https://asciinema.org/a/421915.svg)](https://asciinema.org/a/421915)
 
 ```
 # default version
