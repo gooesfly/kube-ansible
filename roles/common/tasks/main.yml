@@ -19,7 +19,7 @@
       - pyyaml
       - pyopenssl>=0.15
       - cryptography>=1.2.3
-    extra_args: "-i https://mirrors.aliyun.com/pypi/simple"
+    extra_args: "-i https://pypi.tuna.tsinghua.edu.cn/simple"
 
 - name: Set the Hostname
   hostname:
