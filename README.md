@@ -17,7 +17,7 @@ All node please install python3.
 * [x] CentOS 7.*
 * [x] CentOS 8.*
 * [x] Ubuntu 16.04.*
-* [ ] Ubuntu 18.04.*
+* [x] Ubuntu 18.04.*
 * [x] Ubuntu 20.04.*
 
 ## Kubernetes Support
