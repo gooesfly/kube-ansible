@@ -1,14 +1,14 @@
-name: Auto Update Version 
+name: Auto Update Version
 
 on:
   push:
     branches:
       - master
     paths:
-      - '.github/workflows/pipeline.yml'
-      - 'scripts/action.sh'
+      - ".github/workflows/pipeline.yml"
+      - "scripts/action.sh"
   schedule:
-    - cron: '00 18 * * *'
+    - cron: "00 18 * * *"
 
 jobs:
   update:
@@ -16,10 +16,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout Code
-      uses: actions/checkout@v2
+      - name: checkout code
+        uses: actions/checkout@v2
 
-    - name: Update k8s version
-      run: |
-        sudo apt-get install jq -y
-        ./scripts/action.sh kubernetes
+      - name: aotu update kubernetes version
+        run: |
+          sudo apt-get install jq -y
+          ./scripts/action.sh kubernetes
