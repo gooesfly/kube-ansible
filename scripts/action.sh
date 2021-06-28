@@ -1,5 +1,5 @@
 #!/bin/bash
-set -ex
+set -x
 
 function kubernetes() {
   export tag_name=$(curl -s -k -f --connect-timeout 20 --retry 5 --location --insecure https://api.github.com/repos/kubernetes/kubernetes/releases/latest | jq -r .tag_name)
