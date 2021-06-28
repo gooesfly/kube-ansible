@@ -6,6 +6,7 @@ on:
       - master
     paths:
       - '.github/workflows/pipeline.yml'
+      - 'scripts/action.sh'
   schedule:
     - cron: '00 18 * * *'
 
