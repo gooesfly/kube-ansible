@@ -1,0 +1,24 @@
+name: Auto Update Version 
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - '.github/workflows/pipeline.yml'
+  schedule:
+    - cron: '00 18 * * *'
+
+jobs:
+  update:
+    if: github.repository == 'buxiaomo/kube-ansible'
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v2
+
+    - name: Update v2ray version
+      run: |
+        sudo apt-get install jq -y
+        ./action.sh v2ray

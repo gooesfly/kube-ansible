@@ -1,27 +1,27 @@
 SHELL := /bin/bash
 
-ANSIBLE_OPT := 
+ANSIBLE_OPT:=
 # binary file download way, official nexus qiniu
-DOWNLOAD_WAY := official
+DOWNLOAD_WAY:=official
 
 # binary version
-KUBE_VERSION := 1.21.2
-ETCD_VERSION := 3.5.0
-CNI_VERSION := 0.9.1
+KUBE_VERSION:=1.21.1
+ETCD_VERSION:=3.5.0
+CNI_VERSION:=0.9.1
 
 # container runtime. containerd or docker
-RUNTIME := docker
-DOCKER_VERSION := 20.10.7
+RUNTIME:=docker
+DOCKER_VERSION:=20.10.7
 
-CONTAINERD_VERSION := 1.5.2
-CRICTL_VERSION := 1.21.0
-RUNC_VERSION := 1.0.0-rc93
+CONTAINERD_VERSION:=1.5.2
+CRICTL_VERSION:=1.21.0
+RUNC_VERSION:=1.0.0-rc93
 
 # nexus information
-NEXUS_DOMAIN_NAME := 
-NEXUS_REPOSITORY := kube-ansible
-NEXUS_HTTP_USERNAME := 
-NEXUS_HTTP_PASSWORD := 
+NEXUS_DOMAIN_NAME:=
+NEXUS_REPOSITORY:=kube-ansible
+NEXUS_HTTP_USERNAME:=
+NEXUS_HTTP_PASSWORD:=
 
 runtime:
 	@echo -e "\033[32mDeploy ansible...\033[0m"
