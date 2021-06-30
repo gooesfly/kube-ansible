@@ -15,6 +15,7 @@ group_vars/kubernetes.yml
 .kubernetes
 .containerd
 .crictl
+.runc
 
 # terraform
 test/terraform/*/.terraform

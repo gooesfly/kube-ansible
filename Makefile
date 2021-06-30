@@ -15,7 +15,7 @@ DOCKER_VERSION:=20.10.7
 
 CONTAINERD_VERSION:=1.5.2
 CRICTL_VERSION:=1.21.0
-RUNC_VERSION:=1.0.0-rc93
+RUNC_VERSION:=1.0.0
 
 # nexus information
 NEXUS_DOMAIN_NAME:=
@@ -91,14 +91,16 @@ fix:
 version: 
 	@command -v jq > /dev/null 2>&1 || ( echo -e "\033[32mPlease install jq\033[0m" &&  exit 1)
 	@echo "etcd" > .etcd
-	@curl -s `curl -s https://api.github.com/repos/coreos/etcd/releases | jq -r .url` | jq -r '.[].name' | grep -Ev 'rc|beta|alpha' | sed 's/v//g' | head -n 15 | sort -r -V >> .etcd
+	@curl -s `curl -s https://api.github.com/repos/coreos/etcd/releases | jq -r .url` | jq -r '.[].tag_name' | grep -Ev 'rc|beta|alpha' | sed 's/v//g' | head -n 15 | sort -r -V >> .etcd
 	@echo "docker" > .docker
-	@curl -s https://api.github.com/repos/moby/moby/releases | jq -r '.[].name' | grep -Ev 'rc|beta|alpha|-ce' | sed 's/v//g' | head -n 15 | sort -r -V >> .docker
+	@curl -s https://api.github.com/repos/moby/moby/releases | jq -r '.[].tag_name' | grep -Ev 'rc|beta|alpha|-ce' | sed 's/v//g' | head -n 15 | sort -r -V >> .docker
 	@echo "kubernetes" > .kubernetes
-	@curl -s https://api.github.com/repos/kubernetes/kubernetes/releases | jq -r '.[].name' | grep -Ev 'rc|beta|alpha' | sed 's/v//g' | sed 's/Kubernetes //g' | head -n 15 | sort -r -V >> .kubernetes
+	@curl -s https://api.github.com/repos/kubernetes/kubernetes/releases | jq -r '.[].tag_name' | grep -Ev 'rc|beta|alpha' | sed 's/v//g' | head -n 15 | sort -r -V >> .kubernetes
 	@echo "containerd" > .containerd
-	@curl -s https://api.github.com/repos/containerd/containerd/releases | jq -r '.[].name' | grep -Ev 'rc|beta|alpha' | sed 's/containerd //g' | head -n 15 | sort -r -V >> .containerd
+	@curl -s https://api.github.com/repos/containerd/containerd/releases | jq -r '.[].tag_name' | grep -Ev 'rc|beta|alpha' | sed 's/v//g' | head -n 15 | sort -r -V >> .containerd
 	@echo "crictl" > .crictl
-	@curl -s https://api.github.com/repos/kubernetes-sigs/cri-tools/releases | jq -r '.[].name' | grep -Ev 'rc|beta|alpha' | sed 's/cri-tools v//g'| head -n 15 | sort -r -V >> .crictl
-	@paste -d '|' .etcd .docker .kubernetes .containerd .crictl | column -t -s '|'
-	@rm -rf .etcd .docker .kubernetes .containerd .crictl
+	@curl -s https://api.github.com/repos/kubernetes-sigs/cri-tools/releases | jq -r '.[].tag_name' | grep -Ev 'rc|beta|alpha' | sed 's/v//g'| head -n 15 | sort -r -V >> .crictl
+	@echo "runc" > .runc
+	@curl -s https://api.github.com/repos/opencontainers/runc/releases | jq -r '.[].tag_name' | grep -Ev 'rc|beta|alpha' | sed 's/v//g'| head -n 15 | sort -r -V >> .runc
+	@paste -d '|' .etcd .docker .kubernetes .containerd .crictl .runc | column -t -s '|'
+	@rm -rf .etcd .docker .kubernetes .containerd .crictl .runc
