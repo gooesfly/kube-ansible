@@ -19,7 +19,7 @@ jobs:
       - name: checkout code
         uses: actions/checkout@v2
 
-      - name: aotu update kubernetes version
+      - name: auto update kubernetes version
         run: |
           sudo apt-get install jq -y
           ./scripts/action.sh kubernetes

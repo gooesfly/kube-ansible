@@ -11,7 +11,7 @@ function kubernetes() {
     git config --local user.email "action@github.com"
     git config --local user.name "GitHub Action"
     git add ./Makefile
-    git commit -am "aotu update kubernetes version to ${tag_name}"
+    git commit -am "auto update kubernetes version to ${tag_name}"
     git push
   fi
 }
