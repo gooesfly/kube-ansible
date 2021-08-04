@@ -15,5 +15,5 @@ case ${PKG} in
     exit 1
     ;;
 esac
-pip3 install --upgrade -i https://pypi.tuna.tsinghua.edu.cn/simple pip3
+pip3 install --upgrade -i https://pypi.tuna.tsinghua.edu.cn/simple pip
 pip3 install --upgrade -i https://pypi.tuna.tsinghua.edu.cn/simple "ansible==4.3.0"
