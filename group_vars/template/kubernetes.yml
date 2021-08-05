@@ -136,6 +136,7 @@ controllerManager:
     - "--node-monitor-grace-period=40s"
     - "--pod-eviction-timeout=5m0s"
     - "--profiling=false"
+    - "--port=0"
     - "--feature-gates=TTLAfterFinished=true"
   log:
     level: 1
@@ -145,6 +146,7 @@ scheduler:
   bindAddress: "0.0.0.0"
   extraArgs:
     - "--profiling=false"
+    - "--port=0"
     - "--feature-gates=TTLAfterFinished=true"
   log:
     level: 1

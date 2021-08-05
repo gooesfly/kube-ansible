@@ -10,7 +10,6 @@ ExecStart=/usr/local/bin/kube-scheduler \
   --bind-address={{ scheduler.bindAddress | default('127.0.0.1') }} \
   --kubeconfig=/etc/kubernetes/kube-scheduler.kubeconfig \
   --leader-elect=true \
-  --port=0 \
   --secure-port=10259 \
   --client-ca-file=/etc/kubernetes/pki/ca.crt \
   --tls-cert-file=/etc/kubernetes/pki/kube-scheduler.crt \
