@@ -40,6 +40,7 @@
     dest: /usr/local/bin
     owner: root
     group: root
+    mode: 0755
     remote_src: yes
     extra_opts:
       - --strip-components=1
@@ -64,6 +65,9 @@
   unarchive:
     src: "/usr/local/src/crictl-v{{ CRICTL_VERSION }}-linux-amd64.tar.gz"
     dest: /usr/local/bin
+    mode: 0755
+    owner: root
+    group: root
     remote_src: yes
 
 - name: Configuration Crictl
