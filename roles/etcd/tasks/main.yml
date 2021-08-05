@@ -45,6 +45,7 @@
       - --strip-components=1
     owner: root
     group: root
+    mode: 0755
   register: etcd_bin
 
 - name: Create data directory
@@ -241,7 +242,7 @@
   template:
     src: etcd-check.sh.j2
     dest: /usr/local/bin/etcd-check.sh
-    mode: 755
+    mode: 0755
 
 - name: Health check
   shell: |
@@ -252,13 +253,13 @@
   template:
     src: etcd-backup.sh.j2
     dest: /usr/local/bin/etcd-backup.sh
-    mode: 755
+    mode: 0755
 
 - name: Install Etcdctl command alias
   template:
     src: etcd.sh.j2
     dest: /etc/profile.d/etcd.sh
-    mode: 755
+    mode: 0755
 
 - name: Create backup kubernetes etcd data in cron
   cron:
