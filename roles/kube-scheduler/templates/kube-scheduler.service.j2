@@ -24,7 +24,6 @@ ExecStart=/usr/local/bin/kube-scheduler \
   {{ extraArg }} \
 {% endfor %}
 {% endif %}
-  --logging-format=json \
   --v={{ scheduler.log.level | default(1) }}
 
 Restart=always
