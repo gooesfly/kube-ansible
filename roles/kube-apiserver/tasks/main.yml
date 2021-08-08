@@ -106,7 +106,7 @@
       - "IP:{{ ha.vip }}"
       - "IP:{{ ansible_default_ipv4.address }}"
   notify: Clean kube-apiserver csr
- 
+
 - name: Generate kube-apiserver certificate
   community.crypto.x509_certificate:
     path: /etc/kubernetes/pki/apiserver.crt
